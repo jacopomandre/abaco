@@ -87,6 +87,25 @@ select:focus {
     background: #fdecee;
 }
 
+/* ---------- Closeness badge ---------- */
+/* Black outline on every level, and a bit more room between the letters: a dark outline of the
+   same hue as the row blended into it, and the thick outline closed up Impact's narrow letters */
+.closeness-badge {
+    letter-spacing: 0.12em;
+}
+
+.closeness-badge.far,
+.closeness-badge.near,
+.closeness-badge.close,
+.closeness-badge.won {
+    --edge: #000000;
+}
+
+/* No drop shadow: it read as a second, one-sided outline next to the black one */
+.closeness-badge .closeness-letter {
+    text-shadow: none;
+}
+
 @media (max-width: 640px) {
     .title.az-wordmark {
         font-size: 26px;
