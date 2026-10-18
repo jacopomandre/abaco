@@ -143,6 +143,20 @@ button::after  { content: " ]"; }
     content: none;
 }
 
+/* Hints "i" button: a bracketed command like the others, not the base theme's round serif badge
+   (its 26px circle squeezed the brackets in) */
+.start-option .info-btn {
+    width: auto;
+    height: auto;
+    padding: 2px 4px;
+    border: none;
+    border-radius: 0;
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
 button:hover:not(:disabled) {
     background: var(--ink);
     color: #000;
