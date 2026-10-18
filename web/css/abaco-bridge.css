@@ -1,0 +1,97 @@
+/* =========================================================================
+   Bridge: applies the "Abaco Zuzzurellone UI" theme (abaco-zuzzurellone.css)
+   to the existing game markup styled by style.css.
+   Load order: style.css -> css/abaco-zuzzurellone.css -> this file.
+   The theme is written for Bootstrap, which this app does not use, so here
+   we only remap style.css design tokens to the theme palette (--az-*).
+   To go back to the B/W look, remove the two theme <link> tags in index.html.
+   ========================================================================= */
+
+:root {
+    /* Palette: style.css tokens remapped to the theme colors */
+    --ink: var(--az-navy);
+    --ink-soft: #4a6187;
+    --ink-muted: #6e7f96;
+    --line: var(--az-navy);
+    --line-soft: var(--bs-border-color);
+    --surface: #fffdf8;
+    --surface-alt: var(--az-cream);
+    --surface-sunk: var(--az-cream);
+    --win-bg: #e3f4e6;
+    --win-line: var(--az-green);
+    /* "Acqua / fuoco" heat map: --heat-scale is NOT remapped to the theme on purpose.
+       Rows are filled with it under white text, and the theme colors are too light for that. */
+
+    /* Typography: theme font for UI chrome; mono stays on words so letters align */
+    --font-ui: var(--az-font-body);
+
+    /* Shape: pill buttons and rounder cards, as in the theme */
+    --r-sm: 999px;
+    --r-md: 0.85rem;
+    --r-lg: 1.4rem;
+}
+
+/* Stop the card's top margin collapsing through <body>, which would shift
+   the theme background gradient down and leave a flat strip at the top. */
+body.az-page {
+    display: flow-root;
+}
+
+/* ---------- Header: wordmark ---------- */
+/* Wordmark replaces the plain title; sizes tuned for the two-line lockup */
+.title.az-wordmark {
+    font-size: 34px;
+    line-height: 0.95;
+}
+
+.title.az-wordmark .az-wordmark-playful {
+    font-size: 36px;
+}
+
+/* The B/W theme dot marker clashes with the logo */
+.title.az-wordmark::before {
+    content: none;
+}
+
+/* ---------- Buttons ---------- */
+/* Main play action uses the theme accent (same role as .btn-orange) */
+#submit-guess {
+    background: var(--az-orange);
+    border-color: var(--az-orange);
+    color: #fff;
+}
+
+#submit-guess:hover:not(:disabled) {
+    background: #e84208;
+    border-color: #e84208;
+}
+
+/* style.css disabled state would leave white text on the cream surface */
+#submit-guess:disabled {
+    background: var(--surface);
+    border-color: var(--line-soft);
+    color: var(--ink-muted);
+}
+
+/* ---------- Inputs ---------- */
+.word-input.guess:focus,
+.code-input:focus,
+select:focus {
+    border-color: var(--az-blue);
+    box-shadow: 0 0 0 0.22rem rgba(36, 119, 200, 0.16);
+}
+
+/* ---------- Banner ---------- */
+.banner.error {
+    border-left-color: var(--az-red);
+    background: #fdecee;
+}
+
+@media (max-width: 640px) {
+    .title.az-wordmark {
+        font-size: 26px;
+    }
+    .title.az-wordmark .az-wordmark-playful {
+        font-size: 28px;
+    }
+}

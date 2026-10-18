@@ -1,0 +1,231 @@
+/* =========================================================================
+   Theme "matrix": green phosphor terminal, falling code rain behind the card.
+   Layered on style.css (loaded only while the theme is active, see theme.js).
+   Mostly remaps the style.css tokens, then restyles the few parts with a look of their own.
+   ========================================================================= */
+
+:root {
+    /* Palette: phosphor green on black */
+    --ink: #00ff41;
+    --ink-soft: #00c832;
+    --ink-muted: #0f9a33;
+    --line: #00ff41;
+    --line-soft: #0b3d17;
+    --surface: #000000;
+    --surface-alt: #020f05;
+    --surface-sunk: #000000;
+    --win-bg: #003b00;
+    --win-line: #00ff41;
+    /* Heat map: dark green (far) to bright green (close). Capped at a mid green,
+       so the light text on the rows stays readable on every stop. */
+    --heat-scale: #021a08, #04310f, #074a17, #0a611e, #0d7625, #108a2c;
+    --reveal-won: #108a2c;
+    /* Warnings in alarm red, the only non-green color of the theme */
+    --alert: #ff3b3b;
+    --reveal-surrendered: #1c2b1f;
+    /* Glow used by text and borders */
+    --mx-glow: 0 0 6px rgba(0, 255, 65, 0.7);
+
+    /* Typography: terminal monospace everywhere (fonts already on the device) */
+    --font-ui: 'Courier New', ui-monospace, 'Cascadia Mono', monospace;
+    --font-mono: 'Courier New', ui-monospace, 'Cascadia Mono', monospace;
+
+    /* Shape: square terminal corners */
+    --r-sm: 0;
+    --r-md: 2px;
+    --r-lg: 2px;
+}
+
+html,
+body {
+    background: #000;
+}
+
+/* ---------- Code rain ----------
+   Two layers of the same glyph tile, scrolled down at different speeds: the background moves,
+   nothing is redrawn. The tile height (480px) is the loop length, so the scroll is seamless. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='480' font-family='monospace' font-size='16' fill='%2300ff41'><text x='8' y='10' writing-mode='tb' opacity='0.9'>アイウエオ01カキクケコ</text><text x='38' y='200' writing-mode='tb' opacity='0.5'>サシスセソ1タチツ</text><text x='68' y='60' writing-mode='tb' opacity='0.7'>ナニヌネノ0ハヒフヘホ</text><text x='98' y='300' writing-mode='tb' opacity='0.4'>マミムメ10モヤ</text><text x='128' y='120' writing-mode='tb' opacity='0.8'>ラリルレロ0ワヲン</text><text x='158' y='20' writing-mode='tb' opacity='0.5'>ゼロ01アカサタナ</text><text x='188' y='240' writing-mode='tb' opacity='0.7'>ハマヤラワ1キシ</text><text x='218' y='90' writing-mode='tb' opacity='0.4'>チニヒミリ0イウ</text></svg>"),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='480' font-family='monospace' font-size='16' fill='%2300ff41'><text x='8' y='10' writing-mode='tb' opacity='0.9'>アイウエオ01カキクケコ</text><text x='38' y='200' writing-mode='tb' opacity='0.5'>サシスセソ1タチツ</text><text x='68' y='60' writing-mode='tb' opacity='0.7'>ナニヌネノ0ハヒフヘホ</text><text x='98' y='300' writing-mode='tb' opacity='0.4'>マミムメ10モヤ</text><text x='128' y='120' writing-mode='tb' opacity='0.8'>ラリルレロ0ワヲン</text><text x='158' y='20' writing-mode='tb' opacity='0.5'>ゼロ01アカサタナ</text><text x='188' y='240' writing-mode='tb' opacity='0.7'>ハマヤラワ1キシ</text><text x='218' y='90' writing-mode='tb' opacity='0.4'>チニヒミリ0イウ</text></svg>");
+    /* Second layer smaller and shifted sideways, so the two never line up */
+    background-size: 240px 480px, 160px 320px;
+    animation: mx-rain 16s linear infinite;
+}
+
+/* Layer 1 moves one tile (480px), layer 2 three of its tiles (960px): different speeds */
+@keyframes mx-rain {
+    from { background-position: 0 0, 90px 0; }
+    to   { background-position: 0 480px, 90px 960px; }
+}
+
+/* ---------- Card: terminal window, rain faintly visible through it ---------- */
+.page {
+    position: relative;
+    background: rgba(0, 6, 2, 0.9);
+    border: 1px solid var(--ink);
+    box-shadow: 0 0 24px rgba(0, 255, 65, 0.18), inset 0 0 40px rgba(0, 255, 65, 0.05);
+}
+
+/* CRT scanlines over the card (decoration only, clicks pass through) */
+.page::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+}
+
+/* Logo recolored green, with a glow */
+.logo {
+    filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5) brightness(0.95)
+            drop-shadow(0 0 6px rgba(0, 255, 65, 0.6));
+}
+
+.tagline {
+    font-style: normal;
+}
+
+.theme-label,
+.difficulty-label,
+.start-option-title,
+.history-title {
+    text-shadow: var(--mx-glow);
+}
+
+/* ---------- Attempt rows: light green text with glow on the heat fill ---------- */
+.word-input.bound {
+    color: #d9ffe0;
+    text-shadow: var(--mx-glow);
+    border-color: var(--line-soft);
+    /* Dot as a green ">" prompt marker instead of the white disc */
+    background-image:
+        radial-gradient(circle, #00ff41 3px, transparent 3.5px),
+        linear-gradient(90deg, var(--heat-scale));
+}
+
+.word-input.bound.no-heat {
+    background-color: #04310f;
+    background-image: radial-gradient(circle, #00ff41 3px, transparent 3.5px);
+}
+
+/* Guess field: blinking green block cursor, like a terminal prompt.
+   Browsers without caret-shape keep the usual thin (still green) caret. */
+.word-input.guess {
+    background: #000;
+    caret-color: var(--ink);
+    caret-shape: block;
+    text-shadow: var(--mx-glow);
+}
+
+.word-input.guess:focus,
+.code-input:focus,
+select:focus {
+    box-shadow: 0 0 0 1px var(--ink), 0 0 14px rgba(0, 255, 65, 0.45);
+}
+
+/* ---------- Buttons: bracketed terminal commands ---------- */
+button {
+    background: transparent;
+}
+
+button::before { content: "[ "; }
+button::after  { content: " ]"; }
+
+/* Icon buttons (back arrow) stay bare */
+.icon-btn::before,
+.icon-btn::after {
+    content: none;
+}
+
+button:hover:not(:disabled) {
+    background: var(--ink);
+    color: #000;
+    box-shadow: 0 0 14px rgba(0, 255, 65, 0.6);
+}
+
+/* Primary actions: filled green, black text */
+#submit-guess:hover:not(:disabled),
+#new-game:hover:not(:disabled),
+#import-confirm:hover:not(:disabled) {
+    background: #7dff9b;
+}
+
+#submit-guess:disabled {
+    background: transparent;
+}
+
+/* ---------- Revealed secret, history, banner, popup ---------- */
+.dict-entry {
+    color: #d9ffe0;
+    text-shadow: var(--mx-glow);
+    border-color: var(--ink);
+}
+
+.word-input.guess.won,
+.word-input.guess.won:disabled {
+    color: var(--ink);
+}
+
+.history-list li::before {
+    content: ">";
+    width: auto;
+    height: auto;
+    background: none;
+    color: var(--ink);
+}
+
+.banner {
+    border-left-color: var(--ink);
+}
+
+.banner.error {
+    border-left-color: #ff3b3b;
+    background: #1a0505;
+    color: #ff8080;
+}
+
+.dialog-error {
+    color: #ff5c5c;
+}
+
+.import-dialog {
+    border-color: var(--ink);
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.25);
+}
+
+.import-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* ---------- Heat badge: glowing terminal message ---------- */
+.heat-badge {
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    --slant: translateY(-50%) rotate(-6deg);
+}
+
+.heat-badge .heat-letter {
+    -webkit-text-stroke: 4px var(--edge);
+    text-shadow: 0 0 8px var(--fill), 0 0 16px var(--fill);
+}
+
+/* Far in alarm red, then greener and brighter as the guess gets closer */
+.heat-badge.acqua    { --fill: #ff3b3b; --edge: #2b0000; }
+.heat-badge.fuochino { --fill: #b6ff00; --edge: #0d2600; }
+.heat-badge.fuoco,
+.heat-badge.vinto    { --fill: #00ff41; --edge: #002b0a; }
+
+/* ---------- Reduced motion: no endless rain ---------- */
+@media (prefers-reduced-motion: reduce) {
+    body::before {
+        animation: none !important;
+    }
+}

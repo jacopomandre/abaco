@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Abaco Zuzzurellone</string>
+    <string name="title_activity_main">Abaco Zuzzurellone</string>
+    <string name="package_name">it.abaco.zuzzurellone</string>
+    <string name="custom_url_scheme">it.abaco.zuzzurellone</string>
+</resources>

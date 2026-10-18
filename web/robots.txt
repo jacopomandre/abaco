@@ -1,0 +1,5 @@
+# Abaco Zuzzurellone - every search engine may read the whole site
+User-agent: *
+Allow: /
+
+Sitemap: https://abacozuzzurellone.it/sitemap.xml

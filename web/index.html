@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Search engines: the title and the description are what Google shows in its results -->
+    <title>Abaco Zuzzurellone - Indovina la parola segreta</title>
+    <meta name="description" content="Gioco di parole gratuito in italiano: indovina la parola segreta scoprendo a ogni tentativo se viene prima o dopo la tua in ordine alfabetico.">
+    <!-- Browser tab icon and phone home-screen icon.
+         favicon.ico (16/32/48px) sits at the site root: Google's search results need an icon
+         whose size is a multiple of 48px, and look for /favicon.ico too. -->
+    <link rel="icon" href="favicon.ico" sizes="48x48">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="img/icon-192.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="theme-color" content="#FDF8EB">
+    <!-- Official address of the page: tells Google that www / non-www / netlify.app copies are this one -->
+    <link rel="canonical" href="https://abacozuzzurellone.it/">
+    <!-- Preview shown when the link is shared (WhatsApp, Facebook, ...): these need full addresses -->
+    <meta property="og:url" content="https://abacozuzzurellone.it/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="it_IT">
+    <meta property="og:title" content="Abaco Zuzzurellone - Indovina la parola segreta">
+    <meta property="og:description" content="Indovina la parola segreta: a ogni tentativo scopri se viene prima o dopo la tua in ordine alfabetico.">
+    <meta property="og:image" content="https://abacozuzzurellone.it/img/share.png">
+    <!-- Structured description of the page, read by Google -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Abaco Zuzzurellone",
+      "url": "https://abacozuzzurellone.it/",
+      "description": "Gioco di parole in italiano: indovina la parola segreta scoprendo a ogni tentativo se viene prima o dopo la tua in ordine alfabetico.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Any",
+      "inLanguage": "it",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+    }
+    </script>
+    <link rel="stylesheet" href="style.css">
+    <!-- Color themes layered on top of style.css, one active at a time (data-theme = theme name).
+         theme.js turns on the saved one and off the others, before the page is drawn. -->
+    <link rel="stylesheet" href="css/abaco-zuzzurellone.css" data-theme="classico">
+    <link rel="stylesheet" href="css/abaco-bridge.css" data-theme="classico">
+    <link rel="stylesheet" href="css/theme-matrix.css" data-theme="matrix">
+    <link rel="stylesheet" href="css/theme-retro.css" data-theme="retro">
+    <link rel="stylesheet" href="css/theme-sketch.css" data-theme="sketch">
+    <script src="theme.js"></script>
+</head>
+<!-- az-* classes come from the theme and are inert when its links are removed -->
+<body class="az-page">
+    <main class="page az-card">
+        <!-- Theme picker, top right: the choice is remembered for the next visit (theme.js) -->
+        <div class="theme-bar">
+            <label class="theme-label">
+                TEMA:
+                <select id="theme-select">
+                    <option value="classico">classico</option>
+                    <option value="matrix">matrix</option>
+                    <option value="retro">retro</option>
+                    <option value="sketch">sketch</option>
+                </select>
+            </label>
+        </div>
+
+        <!-- Header: logo (it carries the game name, so the alt text is the page title) + one-line pitch -->
+        <header class="header">
+            <!-- The logo goes back to the start screen, like the back arrow (app.js handles the click) -->
+            <h1 class="logo-title"><a id="logo-link" class="logo-link" href="./" title="Torna alla home"><img class="logo" src="img/logo.png" alt="Abaco Zuzzurellone" width="509" height="420"></a></h1>
+            <p class="tagline">Indovina la parola segreta.<br>A ogni tentativo ti dico se si nasconde prima o dopo la tua, in ordine alfabetico.<br>Hai i tentativi contati: buona caccia!</p>
+        </header>
+
+        <hr class="rule">
+
+        <!-- Start screen: shown by default, hidden once a game is active -->
+        <section id="start-screen" class="start-screen">
+            <!-- Start a new game with chosen difficulty -->
+            <div class="start-option">
+                <span class="start-option-title">NUOVA PARTITA</span>
+                <label class="difficulty-label">
+                    DIFFICOLTA:
+                    <select id="difficulty">
+                        <option value="EASY" selected>facile</option>
+                        <option value="MEDIUM">medio</option>
+                        <option value="HARD">difficile</option>
+                    </select>
+                </label>
+                <button id="new-game" type="button">NUOVA PARTITA</button>
+            </div>
+
+            <!-- Resume an exported game by pasting its code -->
+            <div class="start-option">
+                <span class="start-option-title">IMPORTA PARTITA</span>
+                <input
+                    id="import-code"
+                    class="code-input"
+                    type="text"
+                    placeholder="incolla il codice partita"
+                    aria-label="Codice partita"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+                <button id="import-game" type="button">IMPORTA</button>
+            </div>
+        </section>
+
+        <!-- Main play area: hidden until a game is active -->
+        <section class="board" hidden>
+            <!-- Top bar above the attempts: back arrow on the left, game code actions on the right.
+                 IMPORTA opens the import popup;
+                 ESPORTA copies this game's code (bounds + attempts + secret, Base64) as text. -->
+            <div class="code-actions">
+                <!-- Back arrow, far left: returns to the start screen (drops the current game) -->
+                <button id="back-home" type="button" class="quiet-btn icon-btn back-btn"
+                        title="Torna alla home" aria-label="Torna alla home">
+                    <svg class="btn-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
+                         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5"></path>
+                        <path d="M12 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button id="import-open" type="button" class="quiet-btn">IMPORTA</button>
+                <!-- The "copy" icon tells that exporting puts the game code on the clipboard -->
+                <button id="copy-code" type="button" class="quiet-btn icon-btn" title="Copia il codice partita negli appunti">
+                    <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="9" y="9" width="12" height="12" rx="2"></rect>
+                        <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+                    </svg>
+                    ESPORTA
+                </button>
+            </div>
+
+            <!-- Dynamic stack of locked attempt/bound rows with the editable guess in the middle.
+                 The guess placeholder shows the attempts countdown (25 / 20 / 15 by difficulty).
+                 Once the game is over, the guess row is replaced in place by the secret's dictionary entry. -->
+            <div id="board-stack" class="board-stack" aria-live="polite"></div>
+
+            <div class="actions">
+                <button id="submit-guess" type="button">TENTA</button>
+                <button id="surrender" type="button">ARRENDITI</button>
+                <!-- Back to the start screen: drops the current game -->
+                <button id="restart-game" type="button">NUOVA PARTITA</button>
+            </div>
+        </section>
+
+        <hr class="rule">
+
+        <!-- Attempts history (collapsible): hidden until a game is active -->
+        <section class="history-section" hidden>
+            <details class="history-details">
+                <summary class="history-title">STORIA TENTATIVI</summary>
+                <ul id="history" class="history-list"></ul>
+            </details>
+        </section>
+
+        <!-- Status / message banner at bottom -->
+        <section id="banner" class="banner" hidden></section>
+    </main>
+
+    <!-- Import popup, opened from the game screen: paste a game code to replace the current game.
+         Native <dialog>: Esc closes it and focus is trapped inside while it is open. -->
+    <dialog id="import-dialog" class="import-dialog" aria-labelledby="import-dialog-title">
+        <form id="import-form" class="dialog-form">
+            <h2 id="import-dialog-title" class="dialog-title">Importa partita</h2>
+            <!-- Shown only when a game is still being played -->
+            <p id="import-dialog-warning" class="dialog-warning" hidden>La partita in corso verrà sostituita.</p>
+            <input
+                id="import-code-game"
+                class="code-input"
+                type="text"
+                placeholder="incolla il codice partita"
+                aria-label="Codice partita"
+                autocomplete="off"
+                spellcheck="false"
+            >
+            <p id="import-dialog-error" class="dialog-error" role="alert" hidden></p>
+            <div class="dialog-actions">
+                <button id="import-cancel" type="button">ANNULLA</button>
+                <button id="import-confirm" type="submit">IMPORTA</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- The dictionary must load first: app.js reads window.ABACO_DIZIONARIO -->
+    <script src="dizionario.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

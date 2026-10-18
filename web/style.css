@@ -1,0 +1,871 @@
+/* =========================================================================
+   Abaco Zuzzurellone — modern editorial B/W theme
+   Sans for UI chrome, mono only where the words live (inputs + history).
+   ========================================================================= */
+
+:root {
+    /* Palette: pure B/W + a few neutral grays for hierarchy */
+    --ink: #0a0a0a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #8a8a8a;
+    --line: #1a1a1a;
+    --line-soft: #e5e5e5;
+    --surface: #ffffff;
+    --surface-alt: #fafafa;
+    --surface-sunk: #f3f3f3;
+    --win-bg: #ecf6ec;
+    --win-line: #2e7d32;
+    /* "Acqua / fuoco" heat map, from far (red) to close (green), in three bands that match the
+       heat badge levels of app.js (HEAT_FUOCHINO = 45%, HEAT_FUOCO = 85%): red "fuori strada",
+       amber "in pista", green "a un passo". Each band shades slightly inside, so rows still differ.
+       Soft, slightly muted tones, yet each stop stays dark enough to carry white text:
+       going lighter (true pastels, pure yellow or cyan) would make the words unreadable. */
+    --heat-scale: #c95560 0%, #c86450 44%, #b8873f 46%, #9a8e40 84%, #4f9460 86%, #3a8058 100%;
+    /* Revealed secret: guessed = the closest stop of the scale above (keep the two in sync),
+       surrendered = neutral grey, off the scale. Both carry white text. */
+    --reveal-won: #3a8058;
+    --reveal-surrendered: #7b8089;
+    /* Warnings (few attempts left, import errors): red, apart from the heat scale */
+    --alert: #c95560;
+
+    /* Typography */
+    --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', 'Courier New', monospace;
+
+    /* Motion */
+    --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+    --t-fast: 120ms;
+    --t-med: 220ms;
+
+    /* Shape */
+    --r-sm: 4px;
+    --r-md: 8px;
+    --r-lg: 14px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* The JS toggles sections via the `hidden` attribute; without this, any rule
+   setting `display` (flex/grid) on those sections would keep them visible. */
+[hidden] {
+    display: none !important;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--surface-sunk);
+    color: var(--ink);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Page container — a centered card with soft elevation */
+.page {
+    max-width: 760px;
+    margin: 48px auto;
+    padding: 40px 44px;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-lg);
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.04),
+        0 8px 24px rgba(0, 0, 0, 0.06);
+    /* The heat badge (.heat-badge) overhangs its row and flies in from the right: cut it at the
+       card's sides, or a narrow screen would scroll sideways. "clip" (unlike "hidden") leaves
+       the vertical axis alone. */
+    overflow-x: clip;
+}
+
+/* ---------- Theme picker, top right of the card ---------- */
+.theme-bar {
+    display: flex;
+    justify-content: flex-end;
+    /* Pulled up into the card's top padding, so it sits in the corner */
+    margin: -24px 0 12px;
+}
+
+.theme-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--ink-soft);
+}
+
+/* ---------- Header ---------- */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.title {
+    font-family: var(--font-ui);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-transform: none;
+}
+
+/* Subtle marker before the title for visual rhythm */
+.title::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 12px;
+    background: var(--ink);
+    border-radius: 50%;
+    vertical-align: 2px;
+}
+
+/* Logo in place of the text title. <h1> only wraps the image, so it must not add line spacing */
+.logo-title {
+    margin: 0;
+    line-height: 0;
+    flex-shrink: 0;
+}
+
+/* Link around the logo (back to the start screen): no inline gap under the picture */
+.logo-link {
+    display: block;
+}
+
+/* Height drives the size; the width follows the picture's proportions */
+.logo {
+    display: block;
+    height: 130px;
+    width: auto;
+}
+
+/* Short description of the game, beside the logo */
+.tagline {
+    /* Takes the room left by the logo; below 200px it wraps under it instead of squeezing */
+    flex: 1 1 200px;
+    margin: 0;
+    font-size: 15px;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--ink-muted);
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.difficulty-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* ---------- Separator ---------- */
+.rule {
+    border: none;
+    border-top: 1px solid var(--line-soft);
+    margin: 28px 0;
+}
+
+/* ---------- Board ---------- */
+.board {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.board-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Shared input geometry */
+.word-input {
+    width: 100%;
+    padding: 13px 18px;
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    color: var(--ink);
+    transition:
+        background var(--t-fast) var(--ease),
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease),
+        transform var(--t-fast) var(--ease);
+}
+
+/* Past attempts & initial bounds: locked rows, white text on the heat-map fill.
+   "Acqua / fuoco" hint: app.js sets --heat on each row (0 = far from the secret, 1 = very close). */
+.word-input.bound {
+    color: #fff;
+    font-weight: 600;
+    /* Keeps white text crisp on the lighter middle stops of the scale */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    cursor: default;
+    user-select: none;
+    padding-left: 36px;
+    position: relative;
+    border-color: transparent;
+    /* Fallback while --heat-scale is unavailable */
+    background-color: #4f6fb0;
+    /* Two layers: the leading white dot, then the heat color.
+       The heat layer is the --heat-scale gradient stretched 100x wider than the row and
+       slid by --heat, so the row shows (almost flat) the color found at that point of the scale. */
+    background-image:
+        radial-gradient(circle, #fff 3px, transparent 3.5px),
+        linear-gradient(90deg, var(--heat-scale));
+    background-repeat: no-repeat;
+    background-position: 16px center, calc(var(--heat, 0) * 100%) 0;
+    /* The dot needs an explicit size, or it would fill the row and land in its center */
+    background-size: 8px 8px, 10000% 100%;
+    background-clip: border-box;
+}
+
+/* Games without the color hint (hard): every locked row gets the same neutral fill.
+   Only the dot layer is kept; the stale second position/size values are simply ignored. */
+.word-input.bound.no-heat {
+    background-color: var(--ink);
+    background-image: radial-gradient(circle, #fff 3px, transparent 3.5px);
+}
+
+/* Hover slightly darkens the fill */
+.word-input.bound:hover {
+    filter: brightness(0.92);
+}
+
+/* Editable guess row — the star of the show */
+.word-input.guess {
+    background: var(--surface);
+    border: 1px solid var(--ink);
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    outline: none;
+    font-weight: 600;
+}
+
+.word-input.guess::placeholder {
+    color: var(--ink-muted);
+    font-weight: 400;
+    font-style: italic;
+}
+
+.word-input.guess:focus {
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
+}
+
+.word-input.guess:disabled {
+    background: var(--surface-alt);
+    color: var(--ink-soft);
+    border-color: var(--line-soft);
+}
+
+/* Winning row: subtle green wash, deliberate emphasis */
+.word-input.guess.won,
+.word-input.guess.won:disabled {
+    background: var(--win-bg);
+    color: var(--ink);
+    border-color: var(--win-line);
+    font-weight: 700;
+    animation: winPulse 600ms var(--ease) 1;
+}
+
+@keyframes winPulse {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.4); }
+    60%  { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+}
+
+/* ---------- Actions ---------- */
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+button,
+select {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 10px 18px;
+    border: 1px solid var(--ink);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+        background var(--t-fast) var(--ease),
+        color var(--t-fast) var(--ease),
+        transform var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+
+button {
+    text-transform: uppercase;
+}
+
+button:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--surface);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+    background: var(--surface);
+}
+
+/* Primary action — slight visual weight */
+#submit-guess {
+    background: var(--ink);
+    color: var(--surface);
+}
+#submit-guess:hover:not(:disabled) {
+    background: #000;
+}
+
+/* Secondary action — quieter */
+#surrender {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+/* The id rule above would otherwise keep a disabled button looking active */
+#surrender:disabled {
+    color: var(--ink-muted);
+}
+
+select {
+    padding: 7px 28px 7px 10px;
+    text-transform: none;
+    font-weight: 500;
+    border-color: var(--line-soft);
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+        linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position:
+        calc(100% - 14px) 50%,
+        calc(100% - 9px) 50%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+}
+
+select:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+#new-game {
+    background: var(--ink);
+    color: var(--surface);
+}
+
+/* ---------- History (collapsible) ---------- */
+.history-section {
+    margin-top: 8px;
+}
+
+.history-details {
+    border-top: 1px solid var(--line-soft);
+    padding-top: 16px;
+}
+
+.history-title {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin: 0;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color var(--t-fast) var(--ease);
+}
+
+.history-title:hover {
+    color: var(--ink);
+}
+
+.history-title::-webkit-details-marker {
+    display: none;
+}
+
+/* Replace the [+]/[-] glyph with a rotating chevron */
+.history-title::before {
+    content: "";
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    transition: transform var(--t-med) var(--ease);
+    transform: rotate(-90deg);
+}
+
+.history-details[open] > .history-title::before {
+    transform: rotate(0deg);
+}
+
+.history-details[open] > .history-list {
+    margin-top: 14px;
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.history-list li {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    padding: 6px 10px;
+    color: var(--ink);
+    background: var(--surface-alt);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-list li::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    background: var(--ink-muted);
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ---------- Banner (end-of-game / errors) ---------- */
+.banner {
+    margin-top: 28px;
+    padding: 16px 20px;
+    border: 1px solid var(--line-soft);
+    border-left: 3px solid var(--ink);
+    border-radius: var(--r-md);
+    background: var(--surface-alt);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink);
+    white-space: pre-wrap;
+    /* A game code is one long unbroken string: let it wrap instead of overflowing */
+    overflow-wrap: anywhere;
+    animation: bannerIn 260ms var(--ease) 1;
+}
+
+.banner.error {
+    border-left-color: #b00020;
+    background: #fdf2f2;
+}
+
+@keyframes bannerIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 640px) {
+    .page {
+        margin: 20px 16px;
+        padding: 28px 22px;
+    }
+    .title {
+        font-size: 20px;
+    }
+    .logo {
+        height: 96px;
+    }
+    .tagline {
+        font-size: 14px;
+    }
+    .word-input {
+        font-size: 16px;
+        padding: 12px 14px;
+    }
+    .word-input.bound {
+        padding-left: 32px;
+        /* Both layers must be restated: a single value would also move the heat layer */
+        background-position: 14px center, calc(var(--heat, 0) * 100%) 0;
+    }
+    .actions {
+        flex-wrap: wrap;
+    }
+}
+
+/* ---------- Start screen — two-column card grid ---------- */
+.start-screen {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin: 28px 0;
+}
+
+@media (max-width: 640px) {
+    /* Stack the two start-screen cards vertically */
+    .start-screen {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Individual option card — slightly sunken to distinguish from the page card */
+.start-option {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    padding: 24px;
+    background: var(--surface-alt);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+}
+
+/* All interactive controls inside an option fill the card width */
+.start-option select,
+.start-option input,
+.start-option button {
+    width: 100%;
+}
+
+/* Section label — matches .history-title typographic scale */
+.start-option-title {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+}
+
+/* ---------- Revealed secret, as a dictionary entry ---------- */
+/* Sits in the board stack in place of the guess row, between the words tried.
+   Same typography as the attempt rows (.word-input.bound) for every text inside:
+   children only change size, and the definition alone goes italic. */
+.dict-entry {
+    margin: 6px 0;
+    padding: 18px 22px;
+    border: 1px solid transparent;
+    border-radius: var(--r-md);
+    /* Surrendered by default: grey, the word was never reached */
+    background: var(--reveal-surrendered);
+    /* White text like the heat rows around it; children inherit it */
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    animation: bannerIn 260ms var(--ease) 1;
+}
+
+/* Follows the attempt rows' smaller size on narrow screens.
+   Kept here: it must come after the base rule above to win over it. */
+@media (max-width: 640px) {
+    .dict-entry {
+        font-size: 16px;
+    }
+}
+
+/* Guessed correctly: "fuoco", the hot end of the heat scale */
+.dict-entry.won {
+    background: var(--reveal-won);
+    /* Anchor of the "trovata" badge played on the winning guess (see .heat-badge) */
+    position: relative;
+}
+
+/* The entry is tall: the winning badge sits on its top line instead of mid-height */
+.dict-entry .heat-badge {
+    top: 30px;
+}
+
+/* Outcome line above the headword ("Hai indovinato in N tentativi!") */
+.dict-status {
+    margin: 0 0 8px;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+.dict-head {
+    margin: 0;
+}
+
+/* Headword: <dfn> is italic by default, keep it upright */
+.dict-word {
+    font-size: 22px;
+    font-weight: 700;
+    font-style: normal;
+    line-height: 1.2;
+}
+
+/* Grammatical category (sostantivo, verbo, ...): plain upright line below the headword */
+.dict-category {
+    margin: 2px 0 0;
+    font-size: 13px;
+    opacity: 0.9;
+}
+
+/* The only italic text of the entry */
+.dict-definition {
+    margin: 10px 0 0;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1.55;
+}
+
+/* ---------- Game-code input (import) ---------- */
+/* Coherent with .word-input but at the smaller scale used in the card */
+.code-input {
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
+    transition:
+        border-color var(--t-fast) var(--ease),
+        box-shadow var(--t-fast) var(--ease);
+}
+
+.code-input::placeholder {
+    color: var(--ink-muted);
+    font-style: italic;
+}
+
+.code-input:focus {
+    border-color: var(--ink);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- Attempts countdown, shown in the guess placeholder ---------- */
+/* Few attempts left: the placeholder turns to the "won/hot" red as a warning */
+.word-input.guess.low::placeholder {
+    color: var(--alert);
+    font-weight: 600;
+}
+
+/* ---------- Game code bar, top right above the attempts: import + export buttons ---------- */
+.code-actions {
+    display: flex;
+    /* stretch: every button of the bar gets exactly the same height, icon-only one included */
+    align-items: stretch;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Back arrow: pushed to the far left of the bar, icon only */
+.back-btn {
+    margin-right: auto;
+    padding: 6px 10px;
+}
+
+/* ---------- Import popup ---------- */
+/* No `display` on the <dialog> itself: the browser hides it while closed */
+.import-dialog {
+    width: min(440px, calc(100vw - 32px));
+    padding: 0;
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
+}
+
+.import-dialog::backdrop {
+    background: rgba(10, 20, 40, 0.45);
+}
+
+/* Padding lives on the form so a click on the dialog's own box means "backdrop" */
+.dialog-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+}
+
+.dialog-title {
+    margin: 0;
+    font-size: 20px;
+}
+
+.dialog-warning,
+.dialog-error {
+    margin: 0;
+    font-size: 14px;
+}
+
+.dialog-warning {
+    color: var(--ink-soft);
+}
+
+.dialog-error {
+    color: var(--alert);
+    font-weight: 600;
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Confirm is the primary action of the popup */
+#import-confirm {
+    background: var(--ink);
+    color: var(--surface);
+}
+
+/* Button with a leading icon: keep icon and label on one centered line */
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-icon {
+    flex-shrink: 0;
+}
+
+/* Quieter secondary button — smaller than the main actions */
+.quiet-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-color: var(--line-soft);
+}
+
+/* ---------- Heat badge ----------
+   Fighting-game style "acqua / fuochino / fuoco!" shout, shown for a moment over the right end
+   of the row just guessed. app.js builds it (createHeatBadge) and removes it when it has played. */
+
+/* Wraps the freshly guessed row only: an <input> cannot hold the badge itself */
+.bound-wrap {
+    position: relative;
+}
+
+.heat-badge {
+    /* Vertical centering lives in here too, so every keyframe below keeps it */
+    --slant: translateY(-50%) skewX(-14deg) rotate(-12deg);
+    position: absolute;
+    /* Sticks out past the row's right edge, and the tilt lifts it above the row: it is a
+       shout stamped across the board, not a label inside the row (.page clips it sideways) */
+    right: -12px;
+    top: 50%;
+    z-index: 1;
+    display: inline-flex;
+    pointer-events: none;
+    /* Typeface exactly as in the original demo: heavy condensed italic, fighting-game style */
+    font-family: Impact, "Arial Black", sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    /* Bigger than the demo, to read as a shout: about as tall as the row it sits on */
+    font-size: 32px;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    transform: var(--slant);
+    /* Rule for the whole badge: every animation below changes only transform or opacity, which
+       the browser can play without repainting anything. Keep it that way. */
+    will-change: transform, opacity;
+    animation: heat-badge-in 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+
+/* Colors per level, matching the heat scale of the rows: red (far), amber (near), green (very
+   near). Brighter and fully saturated, with a dark outline: the badge must pop off its row. */
+.heat-badge.acqua    { --fill: #ff5a5a; --edge: #6e0b12; }
+.heat-badge.fuochino { --fill: #ffc21a; --edge: #6b3d00; }
+.heat-badge.fuoco    { --fill: #4dff7a; --edge: #0b4d24; }
+/* Winning shout ("trovata"): same green as "fuoco", it is where the heat scale ends */
+.heat-badge.vinto    { --fill: #4dff7a; --edge: #0b4d24; }
+
+/* Letters slam in one after the other: app.js sets --i, the letter's position */
+.heat-badge .heat-letter {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    /* Some shouts hold a space ("fuori strada"): keep it, or its span would collapse */
+    white-space: pre;
+    opacity: 0;
+    /* 3px outline: a 6px stroke whose inner half is covered by the fill */
+    -webkit-text-stroke: 6px var(--edge);
+    paint-order: stroke fill;
+    color: var(--fill);
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+    will-change: transform, opacity;
+    animation: heat-letter-hit 0.22s calc(var(--i) * 55ms + 0.15s) cubic-bezier(0.2, 1.8, 0.4, 1) forwards;
+}
+
+/* Exit: slides off to the other side and fades */
+.heat-badge.leaving {
+    animation: heat-badge-out 0.3s ease-in forwards;
+}
+
+@keyframes heat-badge-in {
+    from { transform: translateX(60px) var(--slant) scale(1.6); opacity: 0; }
+    to   { transform: var(--slant); opacity: 1; }
+}
+
+@keyframes heat-letter-hit {
+    from { opacity: 0; transform: scale(2.4) translateY(-6px); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes heat-badge-out {
+    from { transform: var(--slant); opacity: 1; }
+    to   { transform: translateX(-60px) var(--slant) scale(0.6); opacity: 0; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    /* Heat badge: plain still text */
+    .heat-badge,
+    .heat-badge .heat-letter {
+        animation: none !important;
+        opacity: 1;
+    }
+}

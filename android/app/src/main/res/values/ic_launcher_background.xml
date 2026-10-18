@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cream of the logo tile: keep in sync with CREAM in tools/make-android-icons.py -->
+    <color name="ic_launcher_background">#FDF8EB</color>
+</resources>

@@ -1,0 +1,194 @@
+/*
+ * Abaco Zuzzurellone UI
+ * Bootstrap 5.3 theme — colors and typography inspired by the app logo.
+ * Load after Bootstrap's CSS.
+ */
+/* Fonts are bundled (web/fonts) so the app also works offline: no call to Google Fonts.
+   Both are variable fonts, latin subset (covers Italian accents), SIL Open Font License. */
+@font-face {
+  font-family: 'Caveat';
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('../fonts/caveat-latin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fredoka';
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../fonts/fredoka-latin.woff2') format('woff2');
+}
+
+:root {
+  --az-cream: #FFF9ED;
+  --az-cream-deep: #F5EBDD;
+  --az-navy: #173B6C;
+  --az-orange: #FF4B0B;
+  --az-amber: #FFB000;
+  --az-wood: #A85B25;
+  --az-wood-dark: #713817;
+  --az-red: #F04450;
+  --az-green: #35A84A;
+  --az-blue: #2477C8;
+  --az-purple: #7040A0;
+  --az-teal: #10A8AD;
+  --az-pink: #E93E78;
+
+  --az-font-body: 'Fredoka', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --az-font-playful: 'Caveat', cursive;
+
+  --bs-body-font-family: var(--az-font-body);
+  --bs-body-color: var(--az-navy);
+  --bs-body-bg: var(--az-cream);
+  --bs-primary: var(--az-navy);
+  --bs-primary-rgb: 23, 59, 108;
+  --bs-secondary: var(--az-wood);
+  --bs-secondary-rgb: 168, 91, 37;
+  --bs-success: var(--az-green);
+  --bs-success-rgb: 53, 168, 74;
+  --bs-warning: var(--az-amber);
+  --bs-warning-rgb: 255, 176, 0;
+  --bs-danger: var(--az-red);
+  --bs-danger-rgb: 240, 68, 80;
+  --bs-info: var(--az-teal);
+  --bs-info-rgb: 16, 168, 173;
+  --bs-border-color: #E9DCC8;
+  --bs-border-radius: 1rem;
+  --bs-border-radius-lg: 1.4rem;
+  --bs-link-color: var(--az-blue);
+  --bs-link-hover-color: var(--az-orange);
+}
+
+body {
+  font-family: var(--az-font-body);
+  background: var(--az-cream);
+  color: var(--az-navy);
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand, .az-heading {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--az-navy);
+}
+
+.az-wordmark {
+  font-weight: 700;
+  line-height: .95;
+  letter-spacing: -.04em;
+  color: var(--az-navy);
+}
+.az-wordmark .az-wordmark-playful {
+  display: block;
+  color: var(--az-orange);
+  font-family: var(--az-font-playful);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.az-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 95% 5%, rgba(255,176,0,.14), transparent 18rem),
+    var(--az-cream);
+}
+
+.az-card {
+  background: #fffdf8;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 1.4rem;
+  box-shadow: 0 12px 28px rgba(23, 59, 108, .07);
+}
+
+.az-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .35rem .75rem;
+  border-radius: 999px;
+  background: #FFF0D0;
+  color: var(--az-wood-dark);
+  font-size: .875rem;
+  font-weight: 600;
+}
+
+.btn {
+  --bs-btn-font-family: var(--az-font-body);
+  --bs-btn-font-weight: 600;
+  border-radius: 999px;
+  padding: .7rem 1.2rem;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.btn:hover { transform: translateY(-1px); }
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--az-navy);
+  --bs-btn-border-color: var(--az-navy);
+  --bs-btn-hover-bg: #102D54;
+  --bs-btn-hover-border-color: #102D54;
+  --bs-btn-active-bg: #102D54;
+  --bs-btn-active-border-color: #102D54;
+}
+.btn-orange {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--az-orange);
+  --bs-btn-border-color: var(--az-orange);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #E84208;
+  --bs-btn-hover-border-color: #E84208;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--az-navy);
+  --bs-btn-border-color: var(--az-navy);
+  --bs-btn-hover-bg: var(--az-navy);
+  --bs-btn-hover-border-color: var(--az-navy);
+}
+
+.form-control, .form-select {
+  border-radius: .85rem;
+  border-color: #E4D4BE;
+  padding: .75rem .9rem;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--az-blue);
+  box-shadow: 0 0 0 .22rem rgba(36, 119, 200, .16);
+}
+
+.az-letter {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.35rem;
+  font-weight: 700;
+  box-shadow: inset 0 -5px 0 rgba(0,0,0,.12);
+}
+.az-letter-red { background: var(--az-red); }
+.az-letter-amber { background: var(--az-amber); }
+.az-letter-green { background: var(--az-green); }
+.az-letter-blue { background: var(--az-blue); }
+.az-letter-purple { background: var(--az-purple); }
+.az-letter-teal { background: var(--az-teal); }
+.az-letter-pink { background: var(--az-pink); }
+
+.az-progress {
+  height: .75rem;
+  border-radius: 999px;
+  background: #EDE2D2;
+  overflow: hidden;
+}
+.az-progress .progress-bar {
+  background: linear-gradient(90deg, var(--az-amber), var(--az-orange));
+  border-radius: 999px;
+}
+
+.az-footer { color: #6E7F96; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
