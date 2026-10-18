@@ -1,0 +1,4 @@
+[build]
+  # Fails the deploy if the dictionary is invalid
+  command = "npm run check"
+  publish = "web"
