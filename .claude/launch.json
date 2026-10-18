@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "abaco-web",
+      "runtimeExecutable": "C:\\Users\\jackp\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+      "runtimeArgs": ["-m", "http.server", "8080", "--bind", "127.0.0.1", "--directory", "web"],
+      "port": 8080
+    }
+  ]
+}

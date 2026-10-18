@@ -14,6 +14,9 @@
       "Bash(git commit*)",
       "Bash(gh *)"
     ],
+    "ask": [
+      "Bash(git push*)"
+    ],
     "deny": [
       "Bash(rm -rf *)",
       "Bash(git push --force*)",
