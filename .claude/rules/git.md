@@ -9,6 +9,10 @@ description: Git workflow rules — feature branches only, never commit on main,
 - Every new feature or fix starts on a NEW branch created from `main` (e.g. `feature/<short-name>`, `fix/<short-name>`).
 - If the current branch is `main` when work starts, create and switch to a new branch BEFORE the first commit.
 
+## Commit messages
+- NEVER add a `Co-Authored-By:` trailer (or any other co-author / AI attribution line) to commit messages.
+- Why: the site deploys on Netlify's free plan, which allows a single contributor on private repos; an extra co-author fails the deploy ("unrecognized Git contributor").
+
 ## Push
 - NEVER push to any branch, remote or tag (`git push` in any form, including `--force`, `--tags`, `-u`).
 - Work only in the context of local commits: the user handles every push.
