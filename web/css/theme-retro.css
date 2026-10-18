@@ -291,11 +291,11 @@ select:focus,
 /* ---------- Closeness badge: WordArt-like shout ---------- */
 /* Fill matching the closeness scale of the rows: red (far), orange (near), green (very near).
    Black outline on every level: a colored outline of the same hue as the row vanished into it.
-   A darker shade of the fill makes the WordArt-like 3D shadow. */
-.closeness-badge.far   { --fill: #ff3333; --edge: #000000; --shade: #800000; }
-.closeness-badge.near  { --fill: #ff9900; --edge: #000000; --shade: #804000; }
+   A black shade makes the WordArt-like 3D shadow (a dark tint of the fill read as a red smear). */
+.closeness-badge.far   { --fill: #ff3333; --edge: #000000; --shade: #000000; }
+.closeness-badge.near  { --fill: #ff9900; --edge: #000000; --shade: #000000; }
 .closeness-badge.close,
-.closeness-badge.won   { --fill: #00ff00; --edge: #000000; --shade: #006600; }
+.closeness-badge.won   { --fill: #00ff00; --edge: #000000; --shade: #000000; }
 
 /* Wide upright letters with a thin outline: Impact's narrow letters, under the thick
    outline of the classic theme, closed up and could not be read */

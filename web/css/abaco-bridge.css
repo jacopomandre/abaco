@@ -88,10 +88,16 @@ select:focus {
 }
 
 /* ---------- Closeness badge ---------- */
-/* Black outline on every level, and a bit more room between the letters: a dark outline of the
-   same hue as the row blended into it, and the thick outline closed up Impact's narrow letters */
+/* The theme's own rounded face, bold, instead of Impact: it matches the logo, and it is bundled
+   (Impact does not exist on Android, where the badge fell back to the system font).
+   Upright letters: the badge's skew already slants them, and Fredoka has no italic.
+   Black outline on every level, and a bit of room between the letters: a dark outline of the
+   same hue as the row blended into it, and the thick outline closed the letters up */
 .closeness-badge {
-    letter-spacing: 0.12em;
+    font-family: var(--az-font-body);
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.06em;
 }
 
 .closeness-badge.far,
