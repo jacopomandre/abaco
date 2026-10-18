@@ -33,6 +33,10 @@
     const $banner          = document.getElementById('banner');
     const $startScreen     = document.getElementById('start-screen');
     const $theme           = document.getElementById('theme-select');
+    const $difficultyNote  = document.getElementById('difficulty-note');
+    const $hintsOpen       = document.getElementById('hints-open');
+    const $hintsDialog     = document.getElementById('hints-dialog');
+    const $hintsRows       = document.getElementById('hints-difficulty-rows');
     // board and history sections (no id, select by class)
     const $board           = document.querySelector('.board');
     const $historySection  = document.querySelector('.history-section');
@@ -141,36 +145,60 @@
 
     // --- "Acqua / fuoco" heat hint ---
 
-    // Number of distinct two-letter prefixes (aa..zz)
-    const PREFIX_SPAN = 26 * 26;
+    // Largest distance between two letters of the alphabet (a..z)
+    const LETTER_SPAN = 25;
 
-    // Position of a word's first two letters on the aa..zz scale (0..675).
+    // A word's first two letters as alphabet positions (a = 0 .. z = 25).
     // Accents are stripped and non-letters dropped; a one-letter word counts as "<letter>a".
-    function prefixIndex(word) {
+    function prefixLetters(word) {
         const letters = word.toLowerCase()
             .normalize('NFD').replace(/[̀-ͯ]/g, '')
             .replace(/[^a-z]/g, '');
-        const first  = letters.length > 0 ? letters.charCodeAt(0) - 97 : 0;
-        const second = letters.length > 1 ? letters.charCodeAt(1) - 97 : 0;
-        return first * 26 + second;
+        return {
+            first:  letters.length > 0 ? letters.charCodeAt(0) - 97 : 0,
+            second: letters.length > 1 ? letters.charCodeAt(1) - 97 : 0
+        };
+    }
+
+    // Closeness of two letters that differ (distance 1..25), from 1 (next to each other) to 0
+    // (a vs z). Logarithmic: the first steps away count the most.
+    function letterCloseness(distance) {
+        return 1 - Math.log1p(distance - 1) / Math.log1p(LETTER_SPAN - 1);
     }
 
     // How close a word is to the secret, judged only by the first two letters:
-    // 0 = cold (far away), 1 = hot (same two letters).
-    // Logarithmic on purpose: on a linear scale every late-game guess would look equally hot.
+    // 0 = cold (far away), 1 = hot (same two letters). The value falls in the band of its level
+    // (see HEAT_FUOCO / HEAT_FUOCHINO), and shades inside it so rows of one level still differ:
+    //   same two letters      -> 1                            ("fuoco")
+    //   same first letter     -> by the second letters' gap   ("fuochino")
+    //   different first letter -> by the first letters' gap   ("acqua")
     function heat(word) {
-        const distance = Math.abs(prefixIndex(word) - prefixIndex(game.secret.word));
-        return 1 - Math.log1p(distance) / Math.log1p(PREFIX_SPAN - 1);
+        const guess  = prefixLetters(word);
+        const secret = prefixLetters(game.secret.word);
+        let result;
+        if (guess.first !== secret.first) {
+            result = HEAT_ACQUA_TOP * letterCloseness(Math.abs(guess.first - secret.first));
+        } else if (guess.second !== secret.second) {
+            result = HEAT_FUOCHINO
+                + (HEAT_FUOCHINO_TOP - HEAT_FUOCHINO) * letterCloseness(Math.abs(guess.second - secret.second));
+        } else {
+            result = 1;
+        }
+        return result;
     }
 
     // --- Heat badge: the "acqua / fuochino / fuoco!" shout over the row just guessed ---
 
     // Heat (0..1) from which a guess is called out as "fuoco" or "fuochino"; below, "acqua".
-    // FUOCO:    same two-letter prefix as the secret, or the one right next to it.
-    // FUOCHINO: within about 35 prefixes, i.e. roughly one initial letter away.
+    // FUOCO:    same first two letters as the secret.
+    // FUOCHINO: same first letter only.
+    // ACQUA:    different first letter.
+    // The *_TOP values keep each band clear of the next one's threshold.
     // The row colors change band at these same points (--heat-scale in the CSS): keep them in sync.
-    const HEAT_FUOCO    = 0.85;
-    const HEAT_FUOCHINO = 0.45;
+    const HEAT_FUOCO        = 0.85;
+    const HEAT_FUOCHINO     = 0.45;
+    const HEAT_FUOCHINO_TOP = 0.84;
+    const HEAT_ACQUA_TOP    = 0.44;
     // How long the badge stays before leaving, and how long its exit animation lasts (ms)
     const BADGE_DURATION = 1500;
     const BADGE_EXIT     = 350;
@@ -656,6 +684,38 @@
         }
     }
 
+    // --- Difficulty explanations (start screen note + hints popup) ---
+
+    // Name a difficulty is shown with: the text of its option in the picker
+    function difficultyName(difficulty) {
+        const option = $difficulty.querySelector(`option[value="${difficulty}"]`);
+        return option ? option.textContent : difficulty;
+    }
+
+    // One line under the picker: what the chosen difficulty gives, read from DIFFICULTY
+    function updateDifficultyNote() {
+        const rules = DIFFICULTY[$difficulty.value];
+        $difficultyNote.textContent = rules.heatHint
+            ? `${rules.attempts} tentativi, con il suggerimento acqua o fuoco.`
+            : `${rules.attempts} tentativi, senza acqua o fuoco: solo prima o dopo.`;
+        $difficultyNote.classList.toggle('no-hint', !rules.heatHint);
+    }
+
+    // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
+    function fillHintsTable() {
+        Object.keys(DIFFICULTY).forEach(function (difficulty) {
+            const rules = DIFFICULTY[difficulty];
+            const row   = document.createElement('tr');
+            [difficultyName(difficulty), String(rules.attempts), rules.heatHint ? 'sì' : 'no'].forEach(function (text) {
+                const cell = document.createElement('td');
+                cell.textContent = text;
+                row.appendChild(cell);
+            });
+            if (!rules.heatHint) row.className = 'no-hint';
+            $hintsRows.appendChild(row);
+        });
+    }
+
     // --- Event bindings ---
     $newGame.addEventListener('click', newGame);
     $submit.addEventListener('click', submitGuess);
@@ -685,6 +745,19 @@
     $importDialog.addEventListener('click', function (ev) {
         if (ev.target === $importDialog) $importDialog.close();
     });
+
+    // Hints popup: the "HO CAPITO" button closes it by itself (form method="dialog")
+    $hintsOpen.addEventListener('click', function () {
+        $hintsDialog.showModal();
+        // Focus lands on the close button at the bottom: on a short screen, start reading from the top
+        $hintsDialog.scrollTop = 0;
+    });
+    $hintsDialog.addEventListener('click', function (ev) {
+        if (ev.target === $hintsDialog) $hintsDialog.close();
+    });
+    $difficulty.addEventListener('change', updateDifficultyNote);
+    fillHintsTable();
+    updateDifficultyNote();
 
     // Theme picker: shows the theme applied by theme.js, and switches (and remembers) it
     $theme.value = window.AbacoTheme.current();

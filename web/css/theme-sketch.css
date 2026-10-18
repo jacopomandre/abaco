@@ -328,6 +328,19 @@ select:focus {
     font-size: 19px;
 }
 
+/* Hints note and popup: the handwritten face needs the same bigger sizes as the rest */
+.difficulty-note,
+.hints-text,
+.hints-level,
+.hints-table {
+    font-size: 19px;
+}
+
+.hints-heading,
+.hints-table th {
+    font-size: 17px;
+}
+
 /* ---------- Heat badge: a teacher's pen remark ---------- */
 .heat-badge {
     --slant: translateY(-50%) rotate(-8deg);

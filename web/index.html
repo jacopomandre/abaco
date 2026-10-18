@@ -76,15 +76,23 @@
         <section id="start-screen" class="start-screen">
             <!-- Start a new game with chosen difficulty -->
             <div class="start-option">
-                <span class="start-option-title">NUOVA PARTITA</span>
+                <!-- Title + "i" button: opens the popup that explains the hints and the difficulties -->
+                <div class="start-option-head">
+                    <span class="start-option-title">NUOVA PARTITA</span>
+                    <button id="hints-open" type="button" class="quiet-btn info-btn"
+                            title="Come funzionano i suggerimenti" aria-label="Come funzionano i suggerimenti"
+                            aria-haspopup="dialog">i</button>
+                </div>
                 <label class="difficulty-label">
                     DIFFICOLTA:
-                    <select id="difficulty">
+                    <select id="difficulty" aria-describedby="difficulty-note">
                         <option value="EASY" selected>facile</option>
                         <option value="MEDIUM">medio</option>
                         <option value="HARD">difficile</option>
                     </select>
                 </label>
+                <!-- What the chosen difficulty gives: attempts and whether the color hint is on (app.js) -->
+                <p id="difficulty-note" class="difficulty-note" aria-live="polite"></p>
                 <button id="new-game" type="button">NUOVA PARTITA</button>
             </div>
 
@@ -178,6 +186,71 @@
             <div class="dialog-actions">
                 <button id="import-cancel" type="button">ANNULLA</button>
                 <button id="import-confirm" type="submit">IMPORTA</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Hints popup, opened from the "i" button of the start screen: how the game helps the player.
+         Reuses the import popup's look (import-dialog) so every theme styles it the same way. -->
+    <dialog id="hints-dialog" class="import-dialog hints-dialog" aria-labelledby="hints-dialog-title">
+        <form method="dialog" class="dialog-form">
+            <h2 id="hints-dialog-title" class="dialog-title">Come funzionano i suggerimenti</h2>
+
+            <section class="hints-section">
+                <h3 class="hints-heading">Prima o dopo</h3>
+                <p class="hints-text">
+                    A ogni tentativo scopri se la parola segreta viene <strong>prima</strong> o <strong>dopo</strong>
+                    la tua in ordine alfabetico. Le parole che vengono prima restano sopra la casella,
+                    quelle che vengono dopo sotto: la segreta è sempre in mezzo.
+                    Nella storia dei tentativi leggi <em>avanti</em> (vai più avanti nell'alfabeto)
+                    o <em>indietro</em>.
+                </p>
+            </section>
+
+            <section class="hints-section">
+                <h3 class="hints-heading">Acqua o fuoco</h3>
+                <p class="hints-text">
+                    Il colore della riga dice quanto ci sei vicino, guardando solo le
+                    <strong>prime due lettere</strong> della parola (gli accenti non contano).
+                    Dentro ogni fascia la tinta cambia un po': più la lettera è vicina
+                    nell'alfabeto, più la riga si scalda.
+                </p>
+                <ul class="hints-levels">
+                    <li class="hints-level">
+                        <span class="hint-swatch fuoco" aria-hidden="true"></span>
+                        <span><strong>a un passo</strong>: le prime due lettere sono quelle della segreta
+                            (con <em>casa</em>: <em>cane</em>, <em>cabina</em>)</span>
+                    </li>
+                    <li class="hints-level">
+                        <span class="hint-swatch fuochino" aria-hidden="true"></span>
+                        <span><strong>in pista</strong>: solo la prima lettera è giusta
+                            (con <em>casa</em>: <em>cielo</em>, <em>cuore</em>)</span>
+                    </li>
+                    <li class="hints-level">
+                        <span class="hint-swatch acqua" aria-hidden="true"></span>
+                        <span><strong>fuori strada</strong>: anche la prima lettera è diversa
+                            (con <em>casa</em>: <em>barca</em>, <em>galera</em>)</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="hints-section">
+                <h3 class="hints-heading">Difficoltà</h3>
+                <table class="hints-table">
+                    <thead>
+                        <tr><th scope="col">Livello</th><th scope="col">Tentativi</th><th scope="col">Acqua o fuoco</th></tr>
+                    </thead>
+                    <!-- Rows built by app.js from the DIFFICULTY table, so they never drift from the rules -->
+                    <tbody id="hints-difficulty-rows"></tbody>
+                </table>
+                <p class="hints-text hints-hard">
+                    In modalità <strong>difficile</strong> il suggerimento acqua o fuoco è spento:
+                    tutte le righe hanno lo stesso colore e sai solo se la parola viene prima o dopo.
+                </p>
+            </section>
+
+            <div class="dialog-actions">
+                <button id="hints-close" type="submit">HO CAPITO</button>
             </div>
         </form>
     </dialog>
