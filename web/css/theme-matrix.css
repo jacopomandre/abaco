@@ -209,19 +209,21 @@ button:hover:not(:disabled) {
     font-style: normal;
     font-weight: 700;
     font-size: 28px;
+    letter-spacing: 0.09em;
     --slant: translateY(-50%) rotate(-6deg);
 }
 
+/* Black outline and no glow: the glow blurred the letters into each other */
 .closeness-badge .closeness-letter {
     -webkit-text-stroke: 4px var(--edge);
-    text-shadow: 0 0 8px var(--fill), 0 0 16px var(--fill);
+    text-shadow: none;
 }
 
-/* Far in alarm red, then greener and brighter as the guess gets closer */
-.closeness-badge.far   { --fill: #ff3b3b; --edge: #2b0000; }
-.closeness-badge.near  { --fill: #b6ff00; --edge: #0d2600; }
+/* Far in alarm red, then greener and brighter as the guess gets closer; black outline on every level */
+.closeness-badge.far   { --fill: #ff3b3b; --edge: #000000; }
+.closeness-badge.near  { --fill: #b6ff00; --edge: #000000; }
 .closeness-badge.close,
-.closeness-badge.won   { --fill: #00ff41; --edge: #002b0a; }
+.closeness-badge.won   { --fill: #00ff41; --edge: #000000; }
 
 /* ---------- Reduced motion: no endless rain ---------- */
 @media (prefers-reduced-motion: reduce) {
