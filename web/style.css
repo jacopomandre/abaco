@@ -15,17 +15,17 @@
     --surface-sunk: #f3f3f3;
     --win-bg: #ecf6ec;
     --win-line: #2e7d32;
-    /* "Acqua / fuoco" heat map, from far (red) to close (green), in three bands that match the
-       heat badge levels of app.js (HEAT_FUOCHINO = 45%, HEAT_FUOCO = 85%): red "fuori strada" (other first letter),
+    /* Closeness scale, from far (red) to close (green), in three bands that match the
+       closeness badge levels of app.js (CLOSENESS_NEAR = 45%, CLOSENESS_CLOSE = 85%): red "fuori strada" (other first letter),
        amber "in pista" (same first letter), green "a un passo" (same first two). Each band shades slightly inside, so rows still differ.
        Soft, slightly muted tones, yet each stop stays dark enough to carry white text:
        going lighter (true pastels, pure yellow or cyan) would make the words unreadable. */
-    --heat-scale: #c95560 0%, #c86450 44%, #b8873f 46%, #9a8e40 84%, #4f9460 86%, #3a8058 100%;
+    --closeness-scale: #c95560 0%, #c86450 44%, #b8873f 46%, #9a8e40 84%, #4f9460 86%, #3a8058 100%;
     /* Revealed secret: guessed = the closest stop of the scale above (keep the two in sync),
        surrendered = neutral grey, off the scale. Both carry white text. */
     --reveal-won: #3a8058;
     --reveal-surrendered: #7b8089;
-    /* Warnings (few attempts left, import errors): red, apart from the heat scale */
+    /* Warnings (few attempts left, import errors): red, apart from the closeness scale */
     --alert: #c95560;
 
     /* Typography */
@@ -77,7 +77,7 @@ html, body {
     box-shadow:
         0 1px 2px rgba(0, 0, 0, 0.04),
         0 8px 24px rgba(0, 0, 0, 0.06);
-    /* The heat badge (.heat-badge) overhangs its row and flies in from the right: cut it at the
+    /* The closeness badge (.closeness-badge) overhangs its row and flies in from the right: cut it at the
        card's sides, or a narrow screen would scroll sideways. "clip" (unlike "hidden") leaves
        the vertical axis alone. */
     overflow-x: clip;
@@ -214,8 +214,8 @@ html, body {
         transform var(--t-fast) var(--ease);
 }
 
-/* Past attempts & initial bounds: locked rows, white text on the heat-map fill.
-   "Acqua / fuoco" hint: app.js sets --heat on each row (0 = far from the secret, 1 = very close). */
+/* Past attempts & initial bounds: locked rows, white text on the closeness fill.
+   Closeness hint: app.js sets --closeness on each row (0 = far from the secret, 1 = very close). */
 .word-input.bound {
     color: #fff;
     font-weight: 600;
@@ -226,16 +226,16 @@ html, body {
     padding-left: 36px;
     position: relative;
     border-color: transparent;
-    /* Fallback while --heat-scale is unavailable */
+    /* Fallback while --closeness-scale is unavailable */
     background-color: #4f6fb0;
-    /* Two layers: the leading white dot, then the heat color.
-       The heat layer is the --heat-scale gradient stretched 100x wider than the row and
-       slid by --heat, so the row shows (almost flat) the color found at that point of the scale. */
+    /* Two layers: the leading white dot, then the closeness color.
+       The closeness layer is the --closeness-scale gradient stretched 100x wider than the row and
+       slid by --closeness, so the row shows (almost flat) the color found at that point of the scale. */
     background-image:
         radial-gradient(circle, #fff 3px, transparent 3.5px),
-        linear-gradient(90deg, var(--heat-scale));
+        linear-gradient(90deg, var(--closeness-scale));
     background-repeat: no-repeat;
-    background-position: 16px center, calc(var(--heat, 0) * 100%) 0;
+    background-position: 16px center, calc(var(--closeness, 0) * 100%) 0;
     /* The dot needs an explicit size, or it would fill the row and land in its center */
     background-size: 8px 8px, 10000% 100%;
     background-clip: border-box;
@@ -243,7 +243,7 @@ html, body {
 
 /* Games without the color hint (hard): every locked row gets the same neutral fill.
    Only the dot layer is kept; the stale second position/size values are simply ignored. */
-.word-input.bound.no-heat {
+.word-input.bound.no-closeness {
     background-color: var(--ink);
     background-image: radial-gradient(circle, #fff 3px, transparent 3.5px);
 }
@@ -524,8 +524,8 @@ select:focus {
     }
     .word-input.bound {
         padding-left: 32px;
-        /* Both layers must be restated: a single value would also move the heat layer */
-        background-position: 14px center, calc(var(--heat, 0) * 100%) 0;
+        /* Both layers must be restated: a single value would also move the closeness layer */
+        background-position: 14px center, calc(var(--closeness, 0) * 100%) 0;
     }
     .actions {
         flex-wrap: wrap;
@@ -587,7 +587,7 @@ select:focus {
     border-radius: var(--r-md);
     /* Surrendered by default: grey, the word was never reached */
     background: var(--reveal-surrendered);
-    /* White text like the heat rows around it; children inherit it */
+    /* White text like the colored rows around it; children inherit it */
     color: #fff;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     font-family: var(--font-mono);
@@ -605,15 +605,15 @@ select:focus {
     }
 }
 
-/* Guessed correctly: "fuoco", the hot end of the heat scale */
+/* Guessed correctly: the green "close" end of the closeness scale */
 .dict-entry.won {
     background: var(--reveal-won);
-    /* Anchor of the "trovata" badge played on the winning guess (see .heat-badge) */
+    /* Anchor of the "trovata" badge played on the winning guess (see .closeness-badge) */
     position: relative;
 }
 
 /* The entry is tall: the winning badge sits on its top line instead of mid-height */
-.dict-entry .heat-badge {
+.dict-entry .closeness-badge {
     top: 30px;
 }
 
@@ -678,7 +678,7 @@ select:focus {
 }
 
 /* ---------- Attempts countdown, shown in the guess placeholder ---------- */
-/* Few attempts left: the placeholder turns to the "won/hot" red as a warning */
+/* Few attempts left: the placeholder turns red as a warning */
 .word-input.guess.low::placeholder {
     color: var(--alert);
     font-weight: 600;
@@ -858,8 +858,8 @@ select:focus {
     line-height: 1.45;
 }
 
-/* Sample of a row's color, drawn like .word-input.bound: the --heat-scale gradient slid by --heat.
-   Values sit inside each level's band of app.js (HEAT_FUOCHINO / HEAT_FUOCO). */
+/* Sample of a row's color, drawn like .word-input.bound: the --closeness-scale gradient slid by --closeness.
+   Values sit inside each level's band of app.js (CLOSENESS_NEAR / CLOSENESS_CLOSE). */
 .hint-swatch {
     flex-shrink: 0;
     width: 28px;
@@ -867,14 +867,14 @@ select:focus {
     margin-top: 1px;
     border-radius: var(--r-sm);
     background-color: #4f6fb0;
-    background-image: linear-gradient(90deg, var(--heat-scale));
+    background-image: linear-gradient(90deg, var(--closeness-scale));
     background-repeat: no-repeat;
     background-size: 10000% 100%;
-    background-position: calc(var(--heat, 0) * 100%) 0;
+    background-position: calc(var(--closeness, 0) * 100%) 0;
 }
-.hint-swatch.fuoco    { --heat: 1; }
-.hint-swatch.fuochino { --heat: 0.65; }
-.hint-swatch.acqua    { --heat: 0.2; }
+.hint-swatch.close { --closeness: 1; }
+.hint-swatch.near  { --closeness: 0.65; }
+.hint-swatch.far   { --closeness: 0.2; }
 
 .hints-table {
     width: 100%;
@@ -914,16 +914,16 @@ select:focus {
     color: var(--surface);
 }
 
-/* ---------- Heat badge ----------
-   Fighting-game style "acqua / fuochino / fuoco!" shout, shown for a moment over the right end
-   of the row just guessed. app.js builds it (createHeatBadge) and removes it when it has played. */
+/* ---------- Closeness badge ----------
+   Fighting-game style "fuori strada / in pista / a un passo" shout, shown for a moment over the right end
+   of the row just guessed. app.js builds it (createClosenessBadge) and removes it when it has played. */
 
 /* Wraps the freshly guessed row only: an <input> cannot hold the badge itself */
 .bound-wrap {
     position: relative;
 }
 
-.heat-badge {
+.closeness-badge {
     /* Vertical centering lives in here too, so every keyframe below keeps it */
     --slant: translateY(-50%) skewX(-14deg) rotate(-12deg);
     position: absolute;
@@ -947,19 +947,19 @@ select:focus {
     /* Rule for the whole badge: every animation below changes only transform or opacity, which
        the browser can play without repainting anything. Keep it that way. */
     will-change: transform, opacity;
-    animation: heat-badge-in 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+    animation: closeness-badge-in 0.3s cubic-bezier(0.2, 1.6, 0.4, 1) both;
 }
 
-/* Colors per level, matching the heat scale of the rows: red (far), amber (near), green (very
+/* Colors per level, matching the closeness scale of the rows: red (far), amber (near), green (very
    near). Brighter and fully saturated, with a dark outline: the badge must pop off its row. */
-.heat-badge.acqua    { --fill: #ff5a5a; --edge: #6e0b12; }
-.heat-badge.fuochino { --fill: #ffc21a; --edge: #6b3d00; }
-.heat-badge.fuoco    { --fill: #4dff7a; --edge: #0b4d24; }
-/* Winning shout ("trovata"): same green as "fuoco", it is where the heat scale ends */
-.heat-badge.vinto    { --fill: #4dff7a; --edge: #0b4d24; }
+.closeness-badge.far   { --fill: #ff5a5a; --edge: #6e0b12; }
+.closeness-badge.near  { --fill: #ffc21a; --edge: #6b3d00; }
+.closeness-badge.close { --fill: #4dff7a; --edge: #0b4d24; }
+/* Winning shout ("trovata"): same green as "close", it is where the closeness scale ends */
+.closeness-badge.won   { --fill: #4dff7a; --edge: #0b4d24; }
 
 /* Letters slam in one after the other: app.js sets --i, the letter's position */
-.heat-badge .heat-letter {
+.closeness-badge .closeness-letter {
     position: relative;
     z-index: 1;
     display: inline-block;
@@ -972,25 +972,25 @@ select:focus {
     color: var(--fill);
     text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
     will-change: transform, opacity;
-    animation: heat-letter-hit 0.22s calc(var(--i) * 55ms + 0.15s) cubic-bezier(0.2, 1.8, 0.4, 1) forwards;
+    animation: closeness-letter-hit 0.22s calc(var(--i) * 55ms + 0.15s) cubic-bezier(0.2, 1.8, 0.4, 1) forwards;
 }
 
 /* Exit: slides off to the other side and fades */
-.heat-badge.leaving {
-    animation: heat-badge-out 0.3s ease-in forwards;
+.closeness-badge.leaving {
+    animation: closeness-badge-out 0.3s ease-in forwards;
 }
 
-@keyframes heat-badge-in {
+@keyframes closeness-badge-in {
     from { transform: translateX(60px) var(--slant) scale(1.6); opacity: 0; }
     to   { transform: var(--slant); opacity: 1; }
 }
 
-@keyframes heat-letter-hit {
+@keyframes closeness-letter-hit {
     from { opacity: 0; transform: scale(2.4) translateY(-6px); }
     to   { opacity: 1; transform: scale(1); }
 }
 
-@keyframes heat-badge-out {
+@keyframes closeness-badge-out {
     from { transform: var(--slant); opacity: 1; }
     to   { transform: translateX(-60px) var(--slant) scale(0.6); opacity: 0; }
 }
@@ -1002,9 +1002,9 @@ select:focus {
         transition-duration: 0.01ms !important;
     }
 
-    /* Heat badge: plain still text */
-    .heat-badge,
-    .heat-badge .heat-letter {
+    /* Closeness badge: plain still text */
+    .closeness-badge,
+    .closeness-badge .closeness-letter {
         animation: none !important;
         opacity: 1;
     }

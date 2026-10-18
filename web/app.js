@@ -46,11 +46,11 @@
     const DICT_LAST  = 'zuzzurellone';
 
     // Rules per difficulty: attempts a game starts with (harder games get fewer) and
-    // whether the "acqua / fuoco" color hint is shown (hard games play without it)
+    // whether the closeness colors are shown (hard games play without them)
     const DIFFICULTY = {
-        EASY:   { attempts: 25, heatHint: true },
-        MEDIUM: { attempts: 20, heatHint: true },
-        HARD:   { attempts: 15, heatHint: false }
+        EASY:   { attempts: 25, closenessHint: true },
+        MEDIUM: { attempts: 20, closenessHint: true },
+        HARD:   { attempts: 15, closenessHint: false }
     };
     // From this many attempts left downwards, the countdown (in the guess placeholder) is highlighted
     const LOW_ATTEMPTS = 5;
@@ -143,7 +143,7 @@
         return [...guessed, game.baseUpper].sort(ITALIAN.compare);
     }
 
-    // --- "Acqua / fuoco" heat hint ---
+    // --- Closeness hint: row colors from far (red) to close (green) ---
 
     // Largest distance between two letters of the alphabet (a..z)
     const LETTER_SPAN = 25;
@@ -167,38 +167,38 @@
     }
 
     // How close a word is to the secret, judged only by the first two letters:
-    // 0 = cold (far away), 1 = hot (same two letters). The value falls in the band of its level
-    // (see HEAT_FUOCO / HEAT_FUOCHINO), and shades inside it so rows of one level still differ:
-    //   same two letters      -> 1                            ("fuoco")
-    //   same first letter     -> by the second letters' gap   ("fuochino")
-    //   different first letter -> by the first letters' gap   ("acqua")
-    function heat(word) {
+    // 0 = far away, 1 = close (same two letters). The value falls in the band of its level
+    // (see CLOSENESS_CLOSE / CLOSENESS_NEAR), and shades inside it so rows of one level still differ:
+    //   same two letters      -> 1                            ("close")
+    //   same first letter     -> by the second letters' gap   ("near")
+    //   different first letter -> by the first letters' gap   ("far")
+    function closeness(word) {
         const guess  = prefixLetters(word);
         const secret = prefixLetters(game.secret.word);
         let result;
         if (guess.first !== secret.first) {
-            result = HEAT_ACQUA_TOP * letterCloseness(Math.abs(guess.first - secret.first));
+            result = CLOSENESS_FAR_TOP * letterCloseness(Math.abs(guess.first - secret.first));
         } else if (guess.second !== secret.second) {
-            result = HEAT_FUOCHINO
-                + (HEAT_FUOCHINO_TOP - HEAT_FUOCHINO) * letterCloseness(Math.abs(guess.second - secret.second));
+            result = CLOSENESS_NEAR
+                + (CLOSENESS_NEAR_TOP - CLOSENESS_NEAR) * letterCloseness(Math.abs(guess.second - secret.second));
         } else {
             result = 1;
         }
         return result;
     }
 
-    // --- Heat badge: the "acqua / fuochino / fuoco!" shout over the row just guessed ---
+    // --- Closeness badge: the "fuori strada / in pista / a un passo" shout over the row just guessed ---
 
-    // Heat (0..1) from which a guess is called out as "fuoco" or "fuochino"; below, "acqua".
-    // FUOCO:    same first two letters as the secret.
-    // FUOCHINO: same first letter only.
-    // ACQUA:    different first letter.
+    // Closeness (0..1) from which a guess is called "close" or "near"; below, "far".
+    // CLOSE: same first two letters as the secret.
+    // NEAR:  same first letter only.
+    // FAR:   different first letter.
     // The *_TOP values keep each band clear of the next one's threshold.
-    // The row colors change band at these same points (--heat-scale in the CSS): keep them in sync.
-    const HEAT_FUOCO        = 0.85;
-    const HEAT_FUOCHINO     = 0.45;
-    const HEAT_FUOCHINO_TOP = 0.84;
-    const HEAT_ACQUA_TOP    = 0.44;
+    // The row colors change band at these same points (--closeness-scale in the CSS): keep them in sync.
+    const CLOSENESS_CLOSE    = 0.85;
+    const CLOSENESS_NEAR     = 0.45;
+    const CLOSENESS_NEAR_TOP = 0.84;
+    const CLOSENESS_FAR_TOP  = 0.44;
     // How long the badge stays before leaving, and how long its exit animation lasts (ms)
     const BADGE_DURATION = 1500;
     const BADGE_EXIT     = 350;
@@ -206,31 +206,31 @@
     const WIN_BADGE_DURATION = 3000;
 
     // Text shouted for each level, the same in every color theme (only its look changes);
-    // the keys double as CSS classes of the badge. "vinto" is not a heat level: it is the
+    // the keys double as CSS classes of the badge. "won" is not a closeness level: it is the
     // celebration played when the secret is found.
-    const HEAT_BADGE_TEXT = { acqua: 'fuori strada', fuochino: 'in pista', fuoco: 'a un passo', vinto: 'trovata' };
+    const CLOSENESS_BADGE_TEXT = { far: 'fuori strada', near: 'in pista', close: 'a un passo', won: 'trovata' };
 
-    // Level of a guess, from the same heat value that colors its row: the two never disagree
-    function heatLevel(word) {
-        const h = heat(word);
-        if (h >= HEAT_FUOCO)    return 'fuoco';
-        if (h >= HEAT_FUOCHINO) return 'fuochino';
-        return 'acqua';
+    // Level of a guess, from the same closeness value that colors its row: the two never disagree
+    function closenessLevel(word) {
+        const h = closeness(word);
+        if (h >= CLOSENESS_CLOSE) return 'close';
+        if (h >= CLOSENESS_NEAR)  return 'near';
+        return 'far';
     }
 
     // Build the animated badge for a level. It plays once, then removes itself from the page
     // after "duration" milliseconds.
-    function createHeatBadge(level, duration = BADGE_DURATION) {
-        const text  = HEAT_BADGE_TEXT[level];
+    function createClosenessBadge(level, duration = BADGE_DURATION) {
+        const text  = CLOSENESS_BADGE_TEXT[level];
         const badge = document.createElement('span');
-        badge.className = 'heat-badge ' + level;
+        badge.className = 'closeness-badge ' + level;
         // Announced once as a whole word; the single letters below are decoration
         badge.setAttribute('role', 'status');
         badge.setAttribute('aria-label', text);
         // One span per letter, so each can slam in after the previous one (--i = its position)
         [...text].forEach(function (letter, i) {
             const span = document.createElement('span');
-            span.className   = 'heat-letter';
+            span.className   = 'closeness-letter';
             span.textContent = letter;
             span.setAttribute('aria-hidden', 'true');
             span.style.setProperty('--i', i);
@@ -389,9 +389,9 @@
     }
 
     // Append a readonly bound row (starting bound or past attempt) to the stack.
-    // The row is colored on a heat map, far (red) to close (green), by how close the word is to the
+    // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
-    // isFresh = the row is the guess just made: with the hint on, it also gets the heat badge.
+    // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
         const input = document.createElement('input');
         input.type      = 'text';
@@ -399,19 +399,19 @@
         input.readOnly  = true;
         input.tabIndex  = -1;
         input.value     = word;
-        if (DIFFICULTY[game.difficulty].heatHint) {
-            // CSS turns --heat (0..1) into the actual color, see .word-input.bound
-            input.style.setProperty('--heat', heat(word).toFixed(3));
+        if (DIFFICULTY[game.difficulty].closenessHint) {
+            // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
+            input.style.setProperty('--closeness', closeness(word).toFixed(3));
         } else {
-            // --heat is not even set, so the distance cannot be read from the page either
-            input.classList.add('no-heat');
+            // --closeness is not even set, so the distance cannot be read from the page either
+            input.classList.add('no-closeness');
         }
-        if (isFresh && DIFFICULTY[game.difficulty].heatHint) {
+        if (isFresh && DIFFICULTY[game.difficulty].closenessHint) {
             // An <input> cannot hold children: wrap the row so the badge can sit over it
             const wrap = document.createElement('div');
             wrap.className = 'bound-wrap';
             wrap.appendChild(input);
-            wrap.appendChild(createHeatBadge(heatLevel(word)));
+            wrap.appendChild(createClosenessBadge(closenessLevel(word)));
             $boardStack.appendChild(wrap);
         } else {
             $boardStack.appendChild(input);
@@ -460,7 +460,7 @@
         const entry = document.createElement('article');
         entry.className = 'dict-entry' + (won ? ' won' : '');
         if (won && isFresh) {
-            entry.appendChild(createHeatBadge('vinto', WIN_BADGE_DURATION));
+            entry.appendChild(createClosenessBadge('won', WIN_BADGE_DURATION));
         }
 
         let outcomeText;
@@ -505,7 +505,7 @@
     }
 
     // Rebuild the board: lower bounds + (editable guess | revealed secret) + upper bounds.
-    // freshWord = the guess just made, if any: its row plays the heat badge.
+    // freshWord = the guess just made, if any: its row plays the closeness badge.
     function renderBoard(freshWord) {
         $boardStack.innerHTML = '';
         for (const w of lowerWords()) appendBoundRow(w, w === freshWord);
@@ -520,7 +520,7 @@
     }
 
     // Redraw board, history, buttons and banner from the current game.
-    // freshWord is passed only right after a guess, so the heat badge never replays on a
+    // freshWord is passed only right after a guess, so the closeness badge never replays on a
     // reload, an import or a surrender.
     function render(freshWord) {
         // Every change of the game goes through here: keep the saved copy in step
@@ -695,10 +695,10 @@
     // One line under the picker: what the chosen difficulty gives, read from DIFFICULTY
     function updateDifficultyNote() {
         const rules = DIFFICULTY[$difficulty.value];
-        $difficultyNote.textContent = rules.heatHint
-            ? `${rules.attempts} tentativi, con il suggerimento acqua o fuoco.`
-            : `${rules.attempts} tentativi, senza acqua o fuoco: solo prima o dopo.`;
-        $difficultyNote.classList.toggle('no-hint', !rules.heatHint);
+        $difficultyNote.textContent = rules.closenessHint
+            ? `${rules.attempts} tentativi, con i colori che dicono quanto sei vicino.`
+            : `${rules.attempts} tentativi, senza colori: solo prima o dopo.`;
+        $difficultyNote.classList.toggle('no-hint', !rules.closenessHint);
     }
 
     // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
@@ -706,12 +706,12 @@
         Object.keys(DIFFICULTY).forEach(function (difficulty) {
             const rules = DIFFICULTY[difficulty];
             const row   = document.createElement('tr');
-            [difficultyName(difficulty), String(rules.attempts), rules.heatHint ? 'sì' : 'no'].forEach(function (text) {
+            [difficultyName(difficulty), String(rules.attempts), rules.closenessHint ? 'sì' : 'no'].forEach(function (text) {
                 const cell = document.createElement('td');
                 cell.textContent = text;
                 row.appendChild(cell);
             });
-            if (!rules.heatHint) row.className = 'no-hint';
+            if (!rules.closenessHint) row.className = 'no-hint';
             $hintsRows.appendChild(row);
         });
     }

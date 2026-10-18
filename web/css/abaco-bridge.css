@@ -19,7 +19,7 @@
     --surface-sunk: var(--az-cream);
     --win-bg: #e3f4e6;
     --win-line: var(--az-green);
-    /* "Acqua / fuoco" heat map: --heat-scale is NOT remapped to the theme on purpose.
+    /* Closeness scale: --closeness-scale is NOT remapped to the theme on purpose.
        Rows are filled with it under white text, and the theme colors are too light for that. */
 
     /* Typography: theme font for UI chrome; mono stays on words so letters align */

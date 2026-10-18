@@ -202,32 +202,30 @@
                     A ogni tentativo scopri se la parola segreta viene <strong>prima</strong> o <strong>dopo</strong>
                     la tua in ordine alfabetico. Le parole che vengono prima restano sopra la casella,
                     quelle che vengono dopo sotto: la segreta è sempre in mezzo.
-                    Nella storia dei tentativi leggi <em>avanti</em> (vai più avanti nell'alfabeto)
-                    o <em>indietro</em>.
                 </p>
             </section>
 
             <section class="hints-section">
-                <h3 class="hints-heading">Acqua o fuoco</h3>
+                <h3 class="hints-heading">Il colore della riga</h3>
                 <p class="hints-text">
-                    Il colore della riga dice quanto ci sei vicino, guardando solo le
+                    Il colore dice quanto ci sei vicino, dal rosso al verde, guardando solo le
                     <strong>prime due lettere</strong> della parola (gli accenti non contano).
-                    Dentro ogni fascia la tinta cambia un po': più la lettera è vicina
-                    nell'alfabeto, più la riga si scalda.
+                    Dentro ogni colore la tinta cambia un po': più la lettera è vicina
+                    nell'alfabeto, più la riga tende al verde.
                 </p>
                 <ul class="hints-levels">
                     <li class="hints-level">
-                        <span class="hint-swatch fuoco" aria-hidden="true"></span>
+                        <span class="hint-swatch close" aria-hidden="true"></span>
                         <span><strong>a un passo</strong>: le prime due lettere sono quelle della segreta
                             (con <em>casa</em>: <em>cane</em>, <em>cabina</em>)</span>
                     </li>
                     <li class="hints-level">
-                        <span class="hint-swatch fuochino" aria-hidden="true"></span>
+                        <span class="hint-swatch near" aria-hidden="true"></span>
                         <span><strong>in pista</strong>: solo la prima lettera è giusta
                             (con <em>casa</em>: <em>cielo</em>, <em>cuore</em>)</span>
                     </li>
                     <li class="hints-level">
-                        <span class="hint-swatch acqua" aria-hidden="true"></span>
+                        <span class="hint-swatch far" aria-hidden="true"></span>
                         <span><strong>fuori strada</strong>: anche la prima lettera è diversa
                             (con <em>casa</em>: <em>barca</em>, <em>galera</em>)</span>
                     </li>
@@ -238,14 +236,14 @@
                 <h3 class="hints-heading">Difficoltà</h3>
                 <table class="hints-table">
                     <thead>
-                        <tr><th scope="col">Livello</th><th scope="col">Tentativi</th><th scope="col">Acqua o fuoco</th></tr>
+                        <tr><th scope="col">Livello</th><th scope="col">Tentativi</th><th scope="col">Colori</th></tr>
                     </thead>
                     <!-- Rows built by app.js from the DIFFICULTY table, so they never drift from the rules -->
                     <tbody id="hints-difficulty-rows"></tbody>
                 </table>
                 <p class="hints-text hints-hard">
-                    In modalità <strong>difficile</strong> il suggerimento acqua o fuoco è spento:
-                    tutte le righe hanno lo stesso colore e sai solo se la parola viene prima o dopo.
+                    In modalità <strong>difficile</strong> i colori sono spenti:
+                    tutte le righe sono uguali e sai solo se la parola viene prima o dopo.
                 </p>
             </section>
 

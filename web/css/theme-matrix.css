@@ -16,9 +16,9 @@
     --surface-sunk: #000000;
     --win-bg: #003b00;
     --win-line: #00ff41;
-    /* Heat map: dark green (far) to bright green (close). Capped at a mid green,
+    /* Closeness scale: dark green (far) to bright green (close). Capped at a mid green,
        so the light text on the rows stays readable on every stop. */
-    --heat-scale: #021a08, #04310f, #074a17, #0a611e, #0d7625, #108a2c;
+    --closeness-scale: #021a08, #04310f, #074a17, #0a611e, #0d7625, #108a2c;
     --reveal-won: #108a2c;
     /* Warnings in alarm red, the only non-green color of the theme */
     --alert: #ff3b3b;
@@ -98,7 +98,7 @@ body::before {
     text-shadow: var(--mx-glow);
 }
 
-/* ---------- Attempt rows: light green text with glow on the heat fill ---------- */
+/* ---------- Attempt rows: light green text with glow on the closeness fill ---------- */
 .word-input.bound {
     color: #d9ffe0;
     text-shadow: var(--mx-glow);
@@ -106,10 +106,10 @@ body::before {
     /* Dot as a green ">" prompt marker instead of the white disc */
     background-image:
         radial-gradient(circle, #00ff41 3px, transparent 3.5px),
-        linear-gradient(90deg, var(--heat-scale));
+        linear-gradient(90deg, var(--closeness-scale));
 }
 
-.word-input.bound.no-heat {
+.word-input.bound.no-closeness {
     background-color: #04310f;
     background-image: radial-gradient(circle, #00ff41 3px, transparent 3.5px);
 }
@@ -203,8 +203,8 @@ button:hover:not(:disabled) {
     background: rgba(0, 0, 0, 0.7);
 }
 
-/* ---------- Heat badge: glowing terminal message ---------- */
-.heat-badge {
+/* ---------- Closeness badge: glowing terminal message ---------- */
+.closeness-badge {
     font-family: var(--font-mono);
     font-style: normal;
     font-weight: 700;
@@ -212,16 +212,16 @@ button:hover:not(:disabled) {
     --slant: translateY(-50%) rotate(-6deg);
 }
 
-.heat-badge .heat-letter {
+.closeness-badge .closeness-letter {
     -webkit-text-stroke: 4px var(--edge);
     text-shadow: 0 0 8px var(--fill), 0 0 16px var(--fill);
 }
 
 /* Far in alarm red, then greener and brighter as the guess gets closer */
-.heat-badge.acqua    { --fill: #ff3b3b; --edge: #2b0000; }
-.heat-badge.fuochino { --fill: #b6ff00; --edge: #0d2600; }
-.heat-badge.fuoco,
-.heat-badge.vinto    { --fill: #00ff41; --edge: #002b0a; }
+.closeness-badge.far   { --fill: #ff3b3b; --edge: #2b0000; }
+.closeness-badge.near  { --fill: #b6ff00; --edge: #0d2600; }
+.closeness-badge.close,
+.closeness-badge.won   { --fill: #00ff41; --edge: #002b0a; }
 
 /* ---------- Reduced motion: no endless rain ---------- */
 @media (prefers-reduced-motion: reduce) {

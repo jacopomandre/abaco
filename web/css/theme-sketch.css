@@ -24,10 +24,10 @@
     --surface-sunk: #ebe7dc;
     --win-bg: #e3f1dc;
     --win-line: #2f855a;
-    /* Heat map in colored pencils, red (far) to green (close), in the same three bands as the
-       badge levels (see --heat-scale in style.css). Light tones: the text on the rows is dark
+    /* Closeness scale in colored pencils, red (far) to green (close), in the same three bands as the
+       badge levels (see --closeness-scale in style.css). Light tones: the text on the rows is dark
        graphite here, and the hatching lightens them further. */
-    --heat-scale: #e8817c 0%, #ea8e78 44%, #eea576 46%, #ebc27a 84%, #acd68f 86%, #86c98a 100%;
+    --closeness-scale: #e8817c 0%, #ea8e78 44%, #eea576 46%, #ebc27a 84%, #acd68f 86%, #86c98a 100%;
     --reveal-won: #86c98a;
     /* Warnings in red pen */
     --alert: #c0392b;
@@ -205,8 +205,8 @@ button:disabled {
     border-radius: var(--sk-wobbly-alt);
 }
 
-/* Attempt rows: colored-pencil hatching of the heat color, graphite text and dot.
-   Three layers: dot, hatching, heat color (see .word-input.bound in style.css). */
+/* Attempt rows: colored-pencil hatching of the closeness color, graphite text and dot.
+   Three layers: dot, hatching, closeness color (see .word-input.bound in style.css). */
 .word-input.bound {
     color: var(--ink);
     text-shadow: var(--sk-halo);
@@ -215,12 +215,12 @@ button:disabled {
     background-image:
         radial-gradient(circle, var(--ink) 3px, transparent 3.5px),
         var(--sk-hatch),
-        linear-gradient(90deg, var(--heat-scale));
-    background-position: 16px center, 0 0, calc(var(--heat, 0) * 100%) 0;
+        linear-gradient(90deg, var(--closeness-scale));
+    background-position: 16px center, 0 0, calc(var(--closeness, 0) * 100%) 0;
     background-size: 8px 8px, auto, 10000% 100%;
 }
 
-.word-input.bound.no-heat {
+.word-input.bound.no-closeness {
     background-color: #d6d3ca;
     background-image:
         radial-gradient(circle, var(--ink) 3px, transparent 3.5px),
@@ -341,8 +341,8 @@ select:focus {
     font-size: 17px;
 }
 
-/* ---------- Heat badge: a teacher's pen remark ---------- */
-.heat-badge {
+/* ---------- Closeness badge: a teacher's pen remark ---------- */
+.closeness-badge {
     --slant: translateY(-50%) rotate(-8deg);
     font-family: var(--font-ui);
     font-style: normal;
@@ -353,16 +353,16 @@ select:focus {
 }
 
 /* Paper-colored outline: keeps the pen strokes readable over the hatching */
-.heat-badge .heat-letter {
+.closeness-badge .closeness-letter {
     -webkit-text-stroke: 5px var(--edge);
     text-shadow: none;
 }
 
-/* Pen colors matching the heat scale of the rows: red (far), orange (near), green (very near and found) */
-.heat-badge.acqua    { --fill: #c0392b; --edge: #fbfaf6; }
-.heat-badge.fuochino { --fill: #d9741a; --edge: #fbfaf6; }
-.heat-badge.fuoco,
-.heat-badge.vinto    { --fill: #2f855a; --edge: #fbfaf6; }
+/* Pen colors matching the closeness scale of the rows: red (far), orange (near), green (very near and found) */
+.closeness-badge.far   { --fill: #c0392b; --edge: #fbfaf6; }
+.closeness-badge.near  { --fill: #d9741a; --edge: #fbfaf6; }
+.closeness-badge.close,
+.closeness-badge.won   { --fill: #2f855a; --edge: #fbfaf6; }
 
 /* ---------- Narrow screens ---------- */
 @media (max-width: 640px) {
@@ -373,10 +373,10 @@ select:focus {
     .word-input {
         font-size: 23px;
     }
-    /* Restates all three layers: a single value would also move the heat layer */
+    /* Restates all three layers: a single value would also move the closeness layer */
     .word-input.bound {
         padding-left: 32px;
-        background-position: 14px center, 0 0, calc(var(--heat, 0) * 100%) 0;
+        background-position: 14px center, 0 0, calc(var(--closeness, 0) * 100%) 0;
     }
     .tagline {
         font-size: 19px;

@@ -16,9 +16,9 @@
     --surface-sunk: #008080;
     --win-bg: #ffffff;
     --win-line: #008000;
-    /* Heat map on the web-safe colors of the time: red (far) to green (close), in the same three
-       bands as the badge levels (see --heat-scale in style.css). Dark enough for the white text. */
-    --heat-scale: #cc0000 0%, #b31a00 44%, #cc6600 46%, #996600 84%, #339900 86%, #008000 100%;
+    /* Closeness scale on the web-safe colors of the time: red (far) to green (close), in the same three
+       bands as the badge levels (see --closeness-scale in style.css). Dark enough for the white text. */
+    --closeness-scale: #cc0000 0%, #b31a00 44%, #cc6600 46%, #996600 84%, #339900 86%, #008000 100%;
     --reveal-won: #008000;
     --alert: #cc0000;
     --reveal-surrendered: #808080;
@@ -221,7 +221,7 @@ select:focus,
     border: none;
 }
 
-/* Attempt rows: web-safe heat fill inside a sunken frame, crisp text without shadow */
+/* Attempt rows: web-safe closeness fill inside a sunken frame, crisp text without shadow */
 .word-input.bound {
     box-shadow: var(--rt-sunken);
     text-shadow: none;
@@ -288,25 +288,25 @@ select:focus,
     color: #cc0000;
 }
 
-/* ---------- Heat badge: WordArt-like shout ---------- */
-/* Fill matching the heat scale of the rows: red (far), orange (near), green (very near).
+/* ---------- Closeness badge: WordArt-like shout ---------- */
+/* Fill matching the closeness scale of the rows: red (far), orange (near), green (very near).
    Black outline on every level: a colored outline of the same hue as the row vanished into it.
    A darker shade of the fill makes the WordArt-like 3D shadow. */
-.heat-badge.acqua    { --fill: #ff3333; --edge: #000000; --shade: #800000; }
-.heat-badge.fuochino { --fill: #ff9900; --edge: #000000; --shade: #804000; }
-.heat-badge.fuoco,
-.heat-badge.vinto    { --fill: #00ff00; --edge: #000000; --shade: #006600; }
+.closeness-badge.far   { --fill: #ff3333; --edge: #000000; --shade: #800000; }
+.closeness-badge.near  { --fill: #ff9900; --edge: #000000; --shade: #804000; }
+.closeness-badge.close,
+.closeness-badge.won   { --fill: #00ff00; --edge: #000000; --shade: #006600; }
 
 /* Wide upright letters with a thin outline: Impact's narrow letters, under the thick
    outline of the classic theme, closed up and could not be read */
-.heat-badge {
+.closeness-badge {
     --slant: translateY(-50%) rotate(-8deg);
     font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
     font-style: normal;
     font-size: 28px;
 }
 
-.heat-badge .heat-letter {
+.closeness-badge .closeness-letter {
     -webkit-text-stroke: 3px var(--edge);
     text-shadow: 3px 3px 0 var(--shade), 4px 4px 0 #000000;
 }
