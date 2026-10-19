@@ -62,7 +62,11 @@ body {
     /* Ruled sheet: red margin line in the left padding (--sk-margin from the edge),
        over a faint blue line every 32px starting below the top edge */
     --sk-margin: 30px;
+    /* Coffee stains first, so they sit over the ruling: a mug ring cut by the top-right corner
+       and a few splashes in the empty bottom-right corner. Content rows are opaque and cover them. */
     background:
+        url("../img/coffee-ring.svg") right -70px top -95px / 240px no-repeat,
+        url("../img/coffee-drops.svg") right 30px bottom 18px / 140px no-repeat,
         linear-gradient(90deg, transparent var(--sk-margin), rgba(220, 80, 80, 0.55) var(--sk-margin) calc(var(--sk-margin) + 2px), transparent calc(var(--sk-margin) + 2px)),
         repeating-linear-gradient(transparent 0 31px, rgba(120, 160, 210, 0.35) 31px 32px) 0 20px,
         var(--surface);
