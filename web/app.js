@@ -719,8 +719,8 @@
     function updateDifficultyNote() {
         const rules = DIFFICULTY[$difficulty.value];
         $difficultyNote.textContent = rules.closenessHint
-            ? `${rules.attempts} tentativi, con i colori che dicono quanto sei vicino.`
-            : `${rules.attempts} tentativi, senza colori: solo prima o dopo.`;
+            ? `${rules.attempts} tentativi, con i colori e le lettere giuste in grassetto.`
+            : `${rules.attempts} tentativi, senza aiuti: solo prima o dopo.`;
         $difficultyNote.classList.toggle('no-hint', !rules.closenessHint);
     }
 

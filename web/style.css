@@ -899,6 +899,16 @@ select:focus {
 .hint-swatch.near  { --closeness: 0.65; }
 .hint-swatch.far   { --closeness: 0.2; }
 
+/* Sample word with the shared prefix, typed like the rows: bold prefix, dimmed rest */
+.hint-word {
+    flex-shrink: 0;
+    min-width: 80px;
+    font-family: var(--font-mono);
+    font-weight: 400;
+}
+.hint-word .common-prefix { font-weight: 800; }
+.hint-word .word-rest     { opacity: 0.55; }
+
 .hints-table {
     width: 100%;
     border-collapse: collapse;

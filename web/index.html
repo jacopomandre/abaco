@@ -233,16 +233,37 @@
             </section>
 
             <section class="hints-section">
+                <h3 class="hints-heading">Le lettere giuste</h3>
+                <p class="hints-text">
+                    Le lettere iniziali che la tua parola ha in comune con la segreta, nello stesso
+                    posto, sono in <strong>grassetto</strong>; il resto della parola è più chiaro.
+                    Si contano dall'inizio e ci si ferma alla prima lettera diversa.
+                </p>
+                <!-- Samples styled like the rows (.common-prefix / .word-rest), secret "casa" -->
+                <ul class="hints-levels">
+                    <li class="hints-level">
+                        <span class="hint-word" aria-hidden="true"><span class="common-prefix">cas</span><span class="word-rest">cata</span></span>
+                        <span>con <em>casa</em>: le prime tre lettere sono giuste</span>
+                    </li>
+                    <li class="hints-level">
+                        <span class="hint-word" aria-hidden="true"><span class="common-prefix">c</span><span class="word-rest">osa</span></span>
+                        <span>con <em>casa</em>: solo la <em>c</em>; la <em>a</em> finale non conta,
+                            perché la <em>o</em> ha già interrotto la serie</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="hints-section">
                 <h3 class="hints-heading">Difficoltà</h3>
                 <table class="hints-table">
                     <thead>
-                        <tr><th scope="col">Livello</th><th scope="col">Tentativi</th><th scope="col">Colori</th></tr>
+                        <tr><th scope="col">Livello</th><th scope="col">Tentativi</th><th scope="col">Aiuti</th></tr>
                     </thead>
                     <!-- Rows built by app.js from the DIFFICULTY table, so they never drift from the rules -->
                     <tbody id="hints-difficulty-rows"></tbody>
                 </table>
                 <p class="hints-text hints-hard">
-                    In modalità <strong>difficile</strong> i colori sono spenti:
+                    In modalità <strong>difficile</strong> i colori e le lettere in grassetto sono spenti:
                     tutte le righe sono uguali e sai solo se la parola viene prima o dopo.
                 </p>
             </section>
