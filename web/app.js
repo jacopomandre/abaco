@@ -388,33 +388,56 @@
         }
     }
 
+    // Number of leading letters a word shares with the secret, position by position, stopping at the
+    // first difference (CASA vs COSA -> 1, CASA vs CASCATA -> 3). Letters must match exactly
+    // (case aside): an accented letter does not match its plain twin.
+    function commonPrefixLength(word) {
+        const a = Array.from(word.toLowerCase());
+        const b = Array.from(game.secret.word.toLowerCase());
+        let n = 0;
+        while (n < a.length && n < b.length && a[n] === b[n]) n++;
+        return n;
+    }
+
     // Append a readonly bound row (starting bound or past attempt) to the stack.
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
+    // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
-        const input = document.createElement('input');
-        input.type      = 'text';
-        input.className = 'word-input bound';
-        input.readOnly  = true;
-        input.tabIndex  = -1;
-        input.value     = word;
+        // A plain element rather than a readonly <input>: only part of its text has to be bold
+        const row = document.createElement('div');
+        row.className = 'word-input bound';
         if (DIFFICULTY[game.difficulty].closenessHint) {
             // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
-            input.style.setProperty('--closeness', closeness(word).toFixed(3));
+            row.style.setProperty('--closeness', closeness(word).toFixed(3));
+            const letters = Array.from(word);
+            const shared  = commonPrefixLength(word);
+            if (shared > 0) {
+                const prefix = document.createElement('span');
+                prefix.className   = 'common-prefix';
+                prefix.textContent = letters.slice(0, shared).join('');
+                row.appendChild(prefix);
+            }
+            // The rest is dimmed by CSS, so the shared letters read as "already found"
+            const rest = document.createElement('span');
+            rest.className   = 'word-rest';
+            rest.textContent = letters.slice(shared).join('');
+            row.appendChild(rest);
         } else {
-            // --closeness is not even set, so the distance cannot be read from the page either
-            input.classList.add('no-closeness');
+            // Neither --closeness nor the bold prefix: the distance cannot be read from the page either
+            row.classList.add('no-closeness');
+            row.textContent = word;
         }
         if (isFresh && DIFFICULTY[game.difficulty].closenessHint) {
-            // An <input> cannot hold children: wrap the row so the badge can sit over it
+            // Wrap the row so the badge can sit over it
             const wrap = document.createElement('div');
             wrap.className = 'bound-wrap';
-            wrap.appendChild(input);
+            wrap.appendChild(row);
             wrap.appendChild(createClosenessBadge(closenessLevel(word)));
             $boardStack.appendChild(wrap);
         } else {
-            $boardStack.appendChild(input);
+            $boardStack.appendChild(row);
         }
     }
 
