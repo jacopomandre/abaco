@@ -148,21 +148,6 @@ button::after  { content: " ]"; }
     content: none;
 }
 
-/* Hints "i" button: a bracketed command like the others, not the base theme's round serif badge
-   (its 26px circle squeezed the brackets in). Outlined in green like IMPORTA: bare green text
-   read as part of the card title next to it. Hover is the shared button one. */
-.start-option .info-btn {
-    width: auto;
-    height: auto;
-    padding: 2px 6px;
-    border: 1px solid var(--ink);
-    border-radius: 0;
-    font-family: var(--font-mono);
-    font-style: normal;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
 button:hover:not(:disabled) {
     background: var(--ink);
     color: #000;

@@ -83,10 +83,13 @@ html, body {
     overflow-x: clip;
 }
 
-/* ---------- Theme picker, top right of the card ---------- */
+/* ---------- Top bar, top right of the card: rules button + theme picker ---------- */
 .theme-bar {
     display: flex;
+    align-items: center;
     justify-content: flex-end;
+    gap: 12px;
+    white-space: nowrap;
     /* Pulled up into the card's top padding, so it sits in the corner */
     margin: -24px 0 12px;
 }
@@ -798,29 +801,6 @@ select:focus {
 }
 
 /* ---------- Hints: start screen note + popup ---------- */
-
-/* Card title with the "i" button pushed to the right */
-.start-option-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-}
-
-/* Round "i" button; beats `.start-option button { width: 100% }` */
-.start-option .info-btn {
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    flex-shrink: 0;
-    border-radius: 50%;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 14px;
-    font-style: italic;
-    font-weight: 700;
-    line-height: 1;
-    text-transform: none;
-}
 
 /* One line under the difficulty picker: what the chosen level gives */
 .difficulty-note {

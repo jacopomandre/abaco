@@ -50,8 +50,10 @@
 <!-- az-* classes come from the theme and are inert when its links are removed -->
 <body class="az-page">
     <main class="page az-card">
-        <!-- Theme picker, top right: the choice is remembered for the next visit (theme.js) -->
+        <!-- Top right, on every screen (start and game): the rules popup and the theme picker.
+             The theme choice is remembered for the next visit (theme.js) -->
         <div class="theme-bar">
+            <button id="hints-open" type="button" class="quiet-btn" aria-haspopup="dialog">COME SI GIOCA</button>
             <label class="theme-label">
                 TEMA:
                 <select id="theme-select">
@@ -76,13 +78,7 @@
         <section id="start-screen" class="start-screen">
             <!-- Start a new game with chosen difficulty -->
             <div class="start-option">
-                <!-- Title + "i" button: opens the popup that explains the hints and the difficulties -->
-                <div class="start-option-head">
-                    <span class="start-option-title">NUOVA PARTITA</span>
-                    <button id="hints-open" type="button" class="quiet-btn info-btn"
-                            title="Come funzionano i suggerimenti" aria-label="Come funzionano i suggerimenti"
-                            aria-haspopup="dialog">i</button>
-                </div>
+                <span class="start-option-title">NUOVA PARTITA</span>
                 <label class="difficulty-label">
                     DIFFICOLTA:
                     <select id="difficulty" aria-describedby="difficulty-note">
