@@ -241,6 +241,24 @@ html, body {
     background-clip: border-box;
 }
 
+/* Rows are <div>s, not <input>s: match the input box (one line, input line-height) */
+.word-input.bound {
+    display: block;
+    line-height: normal;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Closeness hint: the leading letters shared with the secret stand out against the rest of the word */
+.word-input.bound:not(.no-closeness) {
+    font-weight: 400;
+}
+
+.word-input.bound .common-prefix {
+    font-weight: 800;
+}
+
 /* Games without the color hint (hard): every locked row gets the same neutral fill.
    Only the dot layer is kept; the stale second position/size values are simply ignored. */
 .word-input.bound.no-closeness {
