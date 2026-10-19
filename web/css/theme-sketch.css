@@ -26,8 +26,8 @@
     --win-line: #2f855a;
     /* Closeness scale in colored pencils, red (far) to green (close), in the same three bands as the
        badge levels (see --closeness-scale in style.css). Light tones: the text on the rows is dark
-       graphite here, and the hatching lightens them further. */
-    --closeness-scale: #e8817c 0%, #ea8e78 44%, #eea576 46%, #ebc27a 84%, #acd68f 86%, #86c98a 100%;
+       graphite here, laid straight on the flat fill. */
+    --closeness-scale: #ec9d99 0%, #eea796 44%, #f1b994 46%, #efcf97 84%, #bfdea7 86%, #a1d5a3 100%;
     --reveal-won: #86c98a;
     /* Warnings in red pen */
     --alert: #c0392b;
@@ -205,19 +205,18 @@ button:disabled {
     border-radius: var(--sk-wobbly-alt);
 }
 
-/* Attempt rows: colored-pencil hatching of the closeness color, graphite text and dot.
-   Three layers: dot, hatching, closeness color (see .word-input.bound in style.css). */
+/* Attempt rows: flat closeness color (no hatching: the stripes fought with the letters),
+   graphite text and dot. Two layers: dot, closeness color (see .word-input.bound in style.css). */
 .word-input.bound {
     color: var(--ink);
-    text-shadow: var(--sk-halo);
+    text-shadow: none;
     border-color: var(--ink);
     padding-left: 36px;
     background-image:
         radial-gradient(circle, var(--ink) 3px, transparent 3.5px),
-        var(--sk-hatch),
         linear-gradient(90deg, var(--closeness-scale));
-    background-position: 16px center, 0 0, calc(var(--closeness, 0) * 100%) 0;
-    background-size: 8px 8px, auto, 10000% 100%;
+    background-position: 16px center, calc(var(--closeness, 0) * 100%) 0;
+    background-size: 8px 8px, 10000% 100%;
 }
 
 /* Graphite on a light fill keeps its contrast: the letters past the shared prefix can fade more */
@@ -226,10 +225,8 @@ button:disabled {
 }
 
 .word-input.bound.no-closeness {
-    background-color: #d6d3ca;
-    background-image:
-        radial-gradient(circle, var(--ink) 3px, transparent 3.5px),
-        var(--sk-hatch);
+    background-color: #e0ddd5;
+    background-image: radial-gradient(circle, var(--ink) 3px, transparent 3.5px);
 }
 
 /* Guess row: dashed outline, to be filled in; a highlighter mark while typing */
@@ -378,10 +375,10 @@ select:focus {
     .word-input {
         font-size: 23px;
     }
-    /* Restates all three layers: a single value would also move the closeness layer */
+    /* Restates both layers: a single value would also move the closeness layer */
     .word-input.bound {
         padding-left: 32px;
-        background-position: 14px center, 0 0, calc(var(--closeness, 0) * 100%) 0;
+        background-position: 14px center, calc(var(--closeness, 0) * 100%) 0;
     }
     .tagline {
         font-size: 19px;
