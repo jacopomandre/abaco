@@ -220,6 +220,11 @@ button:disabled {
     background-size: 8px 8px, auto, 10000% 100%;
 }
 
+/* Graphite on a light fill keeps its contrast: the letters past the shared prefix can fade more */
+.word-input.bound {
+    --word-rest-opacity: 0.6;
+}
+
 .word-input.bound.no-closeness {
     background-color: #d6d3ca;
     background-image:

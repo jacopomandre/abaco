@@ -109,6 +109,11 @@ body::before {
         linear-gradient(90deg, var(--closeness-scale));
 }
 
+/* Shared prefix glows, the rest of the word is a dimmer green without the glow */
+.word-input.bound .word-rest {
+    text-shadow: none;
+}
+
 .word-input.bound.no-closeness {
     background-color: #04310f;
     background-image: radial-gradient(circle, #00ff41 3px, transparent 3.5px);

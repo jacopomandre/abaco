@@ -402,7 +402,7 @@
     // Append a readonly bound row (starting bound or past attempt) to the stack.
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
-    // With the hint on, the leading letters shared with the secret are also set in bold.
+    // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
         // A plain element rather than a readonly <input>: only part of its text has to be bold
@@ -419,7 +419,11 @@
                 prefix.textContent = letters.slice(0, shared).join('');
                 row.appendChild(prefix);
             }
-            row.appendChild(document.createTextNode(letters.slice(shared).join('')));
+            // The rest is dimmed by CSS, so the shared letters read as "already found"
+            const rest = document.createElement('span');
+            rest.className   = 'word-rest';
+            rest.textContent = letters.slice(shared).join('');
+            row.appendChild(rest);
         } else {
             // Neither --closeness nor the bold prefix: the distance cannot be read from the page either
             row.classList.add('no-closeness');

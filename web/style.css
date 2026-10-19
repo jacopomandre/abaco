@@ -259,6 +259,11 @@ html, body {
     font-weight: 800;
 }
 
+/* Letters past the shared prefix: dimmed (lightness only, so it reads on every closeness color) */
+.word-input.bound .word-rest {
+    opacity: var(--word-rest-opacity, 0.72);
+}
+
 /* Games without the color hint (hard): every locked row gets the same neutral fill.
    Only the dot layer is kept; the stale second position/size values are simply ignored. */
 .word-input.bound.no-closeness {
