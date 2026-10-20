@@ -206,8 +206,6 @@ html, body {
     font-size: 17px;
     font-weight: 500;
     letter-spacing: 0.02em;
-    /* Words sit in the middle of the row, like the board frame's guide words (placeholder included) */
-    text-align: center;
     border: 1px solid var(--line-soft);
     border-radius: var(--r-md);
     background: var(--surface);
