@@ -404,12 +404,18 @@
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
     // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
+    // The dictionary's first and last words (the default bounds) never carry a hint: they are plain gray.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
         // A plain element rather than a readonly <input>: only part of its text has to be bold
         const row = document.createElement('div');
         row.className = 'word-input bound';
-        if (DIFFICULTY[game.difficulty].closenessHint) {
+        if (word === DICT_FIRST || word === DICT_LAST) {
+            // The dictionary's own ends frame the board, they are not guesses: plain gray, no hint at all
+            // (else "abaco" would light up for free whenever the secret starts with "a")
+            row.classList.add('dict-edge');
+            row.textContent = word;
+        } else if (DIFFICULTY[game.difficulty].closenessHint) {
             // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
             row.style.setProperty('--closeness', closeness(word).toFixed(3));
             const letters = Array.from(word);

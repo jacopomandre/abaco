@@ -274,6 +274,19 @@ html, body {
     background-image: radial-gradient(circle, #fff 3px, transparent 3.5px);
 }
 
+/* The dictionary's ends (abaco / zuzzurellone): the board's frame, not guesses.
+   Plain gray on every level and theme, no closeness color and no bold prefix (app.js adds no hint). */
+.word-input.bound.dict-edge {
+    color: var(--ink-muted);
+    font-weight: 500;
+    text-shadow: none;
+    border-color: var(--line-soft);
+    background-color: var(--surface-alt);
+    /* A gray drawn from each theme's own muted ink, so it stays in the theme's palette */
+    background-color: color-mix(in srgb, var(--ink-muted) 14%, var(--surface));
+    background-image: radial-gradient(circle, var(--ink-muted) 3px, transparent 3.5px);
+}
+
 /* Hover slightly darkens the fill */
 .word-input.bound:hover {
     filter: brightness(0.92);
