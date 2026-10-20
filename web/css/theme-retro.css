@@ -335,3 +335,14 @@ select:focus,
     border-bottom: 1px solid #ffffff;
     opacity: 1;
 }
+
+/* Frame word lined up with the rows' words: 36px padding, no border (32px on narrow screens) */
+.dict-edge {
+    --edge-indent: 36px;
+}
+
+@media (max-width: 640px) {
+    .dict-edge {
+        --edge-indent: 32px;
+    }
+}

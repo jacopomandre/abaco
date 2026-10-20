@@ -389,6 +389,8 @@ select:focus {
 .dict-edge {
     font-size: 18px;
     letter-spacing: 0.08em;
+    /* Lined up with the rows' words: 36px padding + 2px pencil border */
+    --edge-indent: 38px;
 }
 
 .dict-edge::before,
@@ -396,4 +398,11 @@ select:focus {
     height: 8px;
     border: none;
     background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='8'><path d='M0 4 Q15 1 30 4 T60 4 T90 5 T120 4' fill='none' stroke='%232b2b2b' stroke-width='1.6' stroke-linecap='round' opacity='0.75'/></svg>") repeat-x center;
+}
+
+/* Narrow screens: rows' padding drops to 32px (+ 2px border). After the rule above, so it wins */
+@media (max-width: 640px) {
+    .dict-edge {
+        --edge-indent: 34px;
+    }
 }
