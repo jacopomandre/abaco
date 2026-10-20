@@ -626,6 +626,15 @@ select:focus {
     width: 100%;
 }
 
+/* The difficulty picker and the game-code field face each other across the two cards:
+   same height, whatever padding and font each theme gives them */
+.start-option select,
+.start-option .code-input {
+    height: 36px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 /* The card's action (GIOCA / RIPRENDI) sits at the bottom: side by side, the two cards stretch
    to the same height, so both buttons line up whatever the content above them */
 .start-option > button:last-child {
