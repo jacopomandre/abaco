@@ -400,22 +400,34 @@
         return n;
     }
 
+    // Append one of the dictionary's ends (abaco / zuzzurellone) as a frame line, like the guide words
+    // printed at the top and bottom of a dictionary page: they are not guesses, so no row and no hint
+    // (else "abaco" would light up for free whenever the secret starts with "a").
+    function appendDictEdge(word) {
+        const edge  = document.createElement('div');
+        edge.className = 'dict-edge';
+        const label = document.createElement('span');
+        label.className   = 'dict-edge-word';
+        label.textContent = word;
+        edge.appendChild(label);
+        $boardStack.appendChild(edge);
+    }
+
     // Append a readonly bound row (starting bound or past attempt) to the stack.
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
     // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
-    // The dictionary's first and last words (the default bounds) never carry a hint: they are plain gray.
+    // The dictionary's first and last words (the default bounds) are not rows at all, see appendDictEdge.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
+        if (word === DICT_FIRST || word === DICT_LAST) {
+            appendDictEdge(word);
+            return;
+        }
         // A plain element rather than a readonly <input>: only part of its text has to be bold
         const row = document.createElement('div');
         row.className = 'word-input bound';
-        if (word === DICT_FIRST || word === DICT_LAST) {
-            // The dictionary's own ends frame the board, they are not guesses: plain gray, no hint at all
-            // (else "abaco" would light up for free whenever the secret starts with "a")
-            row.classList.add('dict-edge');
-            row.textContent = word;
-        } else if (DIFFICULTY[game.difficulty].closenessHint) {
+        if (DIFFICULTY[game.difficulty].closenessHint) {
             // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
             row.style.setProperty('--closeness', closeness(word).toFixed(3));
             const letters = Array.from(word);

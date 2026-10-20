@@ -388,3 +388,16 @@ select:focus {
         font-size: 19px;
     }
 }
+
+/* ---------- Board frame (abaco / zuzzurellone): wavy pencil line like the page rule ---------- */
+.dict-edge {
+    font-size: 18px;
+    letter-spacing: 0.08em;
+}
+
+.dict-edge::before,
+.dict-edge::after {
+    height: 8px;
+    border: none;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='8'><path d='M0 4 Q15 1 30 4 T60 4 T90 5 T120 4' fill='none' stroke='%232b2b2b' stroke-width='1.6' stroke-linecap='round' opacity='0.75'/></svg>") repeat-x center;
+}

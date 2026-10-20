@@ -236,3 +236,9 @@ button:hover:not(:disabled) {
         animation: none !important;
     }
 }
+
+/* ---------- Board frame (abaco / zuzzurellone): dashed green line, like a terminal separator ---------- */
+.dict-edge::before,
+.dict-edge::after {
+    border-top-style: dashed;
+}

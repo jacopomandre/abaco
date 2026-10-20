@@ -327,3 +327,11 @@ select:focus,
         padding-top: 52px;
     }
 }
+
+/* ---------- Board frame (abaco / zuzzurellone): etched line like the page rule ---------- */
+.dict-edge::before,
+.dict-edge::after {
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #ffffff;
+    opacity: 1;
+}
