@@ -16,18 +16,20 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
-    // Release signing key: kept OUTSIDE the project, in <user home>/.abaco-signing/
-    // (keystore.properties: storeFile, storePassword, keyAlias, keyPassword).
+    // Release (upload) signing key: kept in android/signing/, which is git-ignored
+    // (keystore.properties: storeFile, storePassword, keyAlias, keyPassword;
+    // storeFile is relative to that folder).
     // Without that folder the release build is still produced, but unsigned.
+    def signingDir = rootProject.file('signing')
     def signingProps = new Properties()
-    def signingPropsFile = new File(System.getProperty('user.home'), '.abaco-signing/keystore.properties')
+    def signingPropsFile = new File(signingDir, 'keystore.properties')
     if (signingPropsFile.exists()) {
         signingPropsFile.withInputStream { signingProps.load(it) }
     }
     signingConfigs {
         release {
             if (signingPropsFile.exists()) {
-                storeFile file(signingProps['storeFile'])
+                storeFile new File(signingDir, signingProps['storeFile'])
                 storePassword signingProps['storePassword']
                 keyAlias signingProps['keyAlias']
                 keyPassword signingProps['keyPassword']
