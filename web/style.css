@@ -607,6 +607,12 @@ select:focus {
     width: 100%;
 }
 
+/* The card's action (GIOCA / RIPRENDI) sits at the bottom: side by side, the two cards stretch
+   to the same height, so both buttons line up whatever the content above them */
+.start-option > button:last-child {
+    margin-top: auto;
+}
+
 /* Section label — matches .history-title typographic scale */
 .start-option-title {
     font-family: var(--font-ui);
