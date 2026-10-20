@@ -210,11 +210,17 @@ button:disabled {
 }
 
 /* Attempt rows: flat closeness color (no hatching: the stripes fought with the letters),
-   graphite text (see .word-input.bound in style.css). */
+   graphite text and dot. Two layers: dot, closeness color (see .word-input.bound in style.css). */
 .word-input.bound {
     color: var(--ink);
     text-shadow: none;
     border-color: var(--ink);
+    padding-left: 36px;
+    background-image:
+        radial-gradient(circle, var(--ink) 3px, transparent 3.5px),
+        linear-gradient(90deg, var(--closeness-scale));
+    background-position: 16px center, calc(var(--closeness, 0) * 100%) 0;
+    background-size: 8px 8px, 10000% 100%;
 }
 
 /* Graphite on a light fill keeps its contrast: the letters past the shared prefix can fade more */
@@ -224,7 +230,7 @@ button:disabled {
 
 .word-input.bound.no-closeness {
     background-color: #e0ddd5;
-    background-image: none;
+    background-image: radial-gradient(circle, var(--ink) 3px, transparent 3.5px);
 }
 
 /* Guess row: dashed outline, to be filled in; a highlighter mark while typing */
@@ -372,6 +378,11 @@ select:focus {
     }
     .word-input {
         font-size: 23px;
+    }
+    /* Restates both layers: a single value would also move the closeness layer */
+    .word-input.bound {
+        padding-left: 32px;
+        background-position: 14px center, calc(var(--closeness, 0) * 100%) 0;
     }
     .tagline {
         font-size: 19px;
