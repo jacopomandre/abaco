@@ -6,7 +6,8 @@ description: Git workflow rules — feature branches only, never commit on main,
 
 ## Branches
 - NEVER commit on `main`.
-- Every new feature or fix starts on a NEW branch created from `main` (e.g. `feature/<short-name>`, `fix/<short-name>`).
+- Every new feature or fix starts on a NEW branch created from the CURRENT branch, not from `main` (e.g. `feature/<short-name>`, `fix/<short-name>`).
+- Why: the user stacks features on top of each other's unmerged work; branching from `main` would drop it.
 - If the current branch is `main` when work starts, create and switch to a new branch BEFORE the first commit.
 
 ## Commit messages
