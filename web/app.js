@@ -48,8 +48,8 @@
     // Rules per difficulty: attempts a game starts with (harder games get fewer) and
     // whether the closeness colors are shown (hard games play without them)
     const DIFFICULTY = {
-        EASY:   { attempts: 25, closenessHint: true },
-        MEDIUM: { attempts: 20, closenessHint: true },
+        EASY:   { attempts: 20, closenessHint: true },
+        MEDIUM: { attempts: 15, closenessHint: true },
         HARD:   { attempts: 15, closenessHint: false }
     };
     // From this many attempts left downwards, the countdown (in the guess placeholder) is highlighted
@@ -276,20 +276,21 @@
             && (payload.v === CODE_VERSION || payload.v === 3)
             && isText(payload.l) && isText(payload.u)
             && Object.prototype.hasOwnProperty.call(DIFFICULTY, payload.g)
-            // a resumable game has at least one attempt left, and never more than its level grants
-            && Number.isInteger(payload.r)
-            && payload.r >= 1 && payload.r <= DIFFICULTY[payload.g].attempts
+            // a resumable game has at least one attempt left
+            && Number.isInteger(payload.r) && payload.r >= 1
             // the bounds must leave room for a word between them
             && ITALIAN.compare(payload.l, payload.u) < 0;
         if (!valid) {
             throw new Error('Codice partita non valido.');
         }
+        // Never more than the level grants today: a code exported when it granted more is cut down to it
+        const left = Math.min(payload.r, DIFFICULTY[payload.g].attempts);
         return {
             secret:       pickSecret(payload.g, payload.l, payload.u),
             baseLower:    payload.l,
             baseUpper:    payload.u,
             difficulty:   payload.g,
-            baseAttempts: DIFFICULTY[payload.g].attempts - payload.r,
+            baseAttempts: DIFFICULTY[payload.g].attempts - left,
             attempts:     [],
             status:       'IN_PROGRESS'
         };
