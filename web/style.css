@@ -240,17 +240,18 @@ html, body {
     background-clip: border-box;
 }
 
-/* Leading marker: a small diamond (a square turned 45 degrees) in the row's left padding.
+/* Leading marker: a small flat diamond in the row's left padding (a square turned 45 degrees, then
+   squashed vertically, so it reads as a rhombus and not as a tilted square).
    Each theme picks its color with --row-marker. */
 .word-input.bound::before {
     content: "";
     position: absolute;
-    left: 16px;
+    left: 14px;
     top: 50%;
-    width: 7px;
-    height: 7px;
+    width: 10px;
+    height: 10px;
     background: var(--row-marker, #fff);
-    transform: translateY(-50%) rotate(45deg);
+    transform: translateY(-50%) scaleY(0.55) rotate(45deg);
 }
 
 /* Rows are <div>s, not <input>s: match the input box (one line, input line-height) */
