@@ -863,8 +863,10 @@ select:focus {
 
 /* ---------- Hints: start screen note + popup ---------- */
 
-/* One line under the difficulty picker: what the chosen level gives */
-.difficulty-note {
+/* One line under the difficulty picker (what the chosen level gives)
+   and under the game-code field (where a code comes from) */
+.difficulty-note,
+.start-note {
     margin: -4px 0 0;
     font-size: 13px;
     line-height: 1.4;

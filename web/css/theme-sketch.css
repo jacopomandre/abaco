@@ -331,8 +331,9 @@ select:focus {
     font-size: 19px;
 }
 
-/* Hints note and popup: the handwritten face needs the same bigger sizes as the rest */
+/* Start-screen notes and hints popup: the handwritten face needs the same bigger sizes as the rest */
 .difficulty-note,
+.start-note,
 .hints-text,
 .hints-level,
 .hints-table {

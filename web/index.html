@@ -101,9 +101,14 @@
                     type="text"
                     placeholder="incolla il codice partita"
                     aria-label="Codice partita"
+                    aria-describedby="import-note"
                     autocomplete="off"
                     spellcheck="false"
                 >
+                <!-- Where a game code comes from, mirroring the difficulty note in the card beside -->
+                <p id="import-note" class="start-note">
+                    Durante una partita, ESPORTA copia il suo codice: incollalo qui per riprenderla.
+                </p>
                 <button id="import-game" type="button">RIPRENDI</button>
             </div>
         </section>
