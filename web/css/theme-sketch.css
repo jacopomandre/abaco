@@ -215,7 +215,7 @@ button:disabled {
     color: var(--ink);
     text-shadow: none;
     border-color: var(--ink);
-    padding-left: 36px;
+    padding-inline: 36px;
     background-image:
         radial-gradient(circle, var(--ink) 3px, transparent 3.5px),
         linear-gradient(90deg, var(--closeness-scale));
@@ -381,7 +381,7 @@ select:focus {
     }
     /* Restates both layers: a single value would also move the closeness layer */
     .word-input.bound {
-        padding-left: 32px;
+        padding-inline: 32px;
         background-position: 14px center, calc(var(--closeness, 0) * 100%) 0;
     }
     .tagline {

@@ -206,6 +206,8 @@ html, body {
     font-size: 17px;
     font-weight: 500;
     letter-spacing: 0.02em;
+    /* Words sit in the middle of the row, like the board frame's guide words (placeholder included) */
+    text-align: center;
     border: 1px solid var(--line-soft);
     border-radius: var(--r-md);
     background: var(--surface);
@@ -226,7 +228,7 @@ html, body {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
     cursor: default;
     user-select: none;
-    padding-left: 36px;
+    padding-inline: 36px;
     position: relative;
     border-color: transparent;
     /* Fallback while --closeness-scale is unavailable */
@@ -573,7 +575,7 @@ select:focus {
         padding: 12px 14px;
     }
     .word-input.bound {
-        padding-left: 32px;
+        padding-inline: 32px;
         /* Both layers must be restated: a single value would also move the closeness layer */
         background-position: 14px center, calc(var(--closeness, 0) * 100%) 0;
     }
