@@ -20,6 +20,8 @@
        so the light text on the rows stays readable on every stop. */
     --closeness-scale: #021a08, #04310f, #074a17, #0a611e, #0d7625, #108a2c;
     --reveal-won: #108a2c;
+    /* Diamond marker of the rows and of the revealed word: green instead of white */
+    --row-marker: #00ff41;
     /* Warnings in alarm red, the only non-green color of the theme */
     --alert: #ff3b3b;
     --reveal-surrendered: #1c2b1f;
@@ -103,8 +105,6 @@ body::before {
     color: #d9ffe0;
     text-shadow: var(--mx-glow);
     border-color: var(--line-soft);
-    /* Green marker instead of the white one */
-    --row-marker: #00ff41;
 }
 
 /* Shared prefix glows, the rest of the word is a dimmer green without the glow */

@@ -702,6 +702,18 @@ select:focus {
     line-height: 1.2;
 }
 
+/* The rows' flat diamond marker (see .word-input.bound::before), in front of the headword */
+.dict-word::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 12px;
+    vertical-align: middle;
+    background: var(--row-marker, #fff);
+    transform: scaleY(0.55) rotate(45deg);
+}
+
 /* Grammatical category (sostantivo, verbo, ...): plain upright line below the headword */
 .dict-category {
     margin: 2px 0 0;
