@@ -231,17 +231,26 @@ html, body {
     border-color: transparent;
     /* Fallback while --closeness-scale is unavailable */
     background-color: #4f6fb0;
-    /* Two layers: the leading white dot, then the closeness color.
-       The closeness layer is the --closeness-scale gradient stretched 100x wider than the row and
+    /* The closeness color: the --closeness-scale gradient stretched 100x wider than the row and
        slid by --closeness, so the row shows (almost flat) the color found at that point of the scale. */
-    background-image:
-        radial-gradient(circle, #fff 3px, transparent 3.5px),
-        linear-gradient(90deg, var(--closeness-scale));
+    background-image: linear-gradient(90deg, var(--closeness-scale));
     background-repeat: no-repeat;
-    background-position: 16px center, calc(var(--closeness, 0) * 100%) 0;
-    /* The dot needs an explicit size, or it would fill the row and land in its center */
-    background-size: 8px 8px, 10000% 100%;
+    background-position: calc(var(--closeness, 0) * 100%) 0;
+    background-size: 10000% 100%;
     background-clip: border-box;
+}
+
+/* Leading marker: a small diamond (a square turned 45 degrees) in the row's left padding.
+   Each theme picks its color with --row-marker. */
+.word-input.bound::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    background: var(--row-marker, #fff);
+    transform: translateY(-50%) rotate(45deg);
 }
 
 /* Rows are <div>s, not <input>s: match the input box (one line, input line-height) */
@@ -267,11 +276,10 @@ html, body {
     opacity: var(--word-rest-opacity, 0.72);
 }
 
-/* Games without the color hint (hard): every locked row gets the same neutral fill.
-   Only the dot layer is kept; the stale second position/size values are simply ignored. */
+/* Games without the color hint (hard): every locked row gets the same neutral fill */
 .word-input.bound.no-closeness {
     background-color: var(--ink);
-    background-image: radial-gradient(circle, #fff 3px, transparent 3.5px);
+    background-image: none;
 }
 
 /* The dictionary's ends (abaco / zuzzurellone): not rows but the board's frame, drawn like the guide
@@ -574,8 +582,9 @@ select:focus {
     }
     .word-input.bound {
         padding-left: 32px;
-        /* Both layers must be restated: a single value would also move the closeness layer */
-        background-position: 14px center, calc(var(--closeness, 0) * 100%) 0;
+    }
+    .word-input.bound::before {
+        left: 14px;
     }
     .actions {
         flex-wrap: wrap;

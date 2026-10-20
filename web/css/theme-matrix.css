@@ -103,10 +103,8 @@ body::before {
     color: #d9ffe0;
     text-shadow: var(--mx-glow);
     border-color: var(--line-soft);
-    /* Dot as a green ">" prompt marker instead of the white disc */
-    background-image:
-        radial-gradient(circle, #00ff41 3px, transparent 3.5px),
-        linear-gradient(90deg, var(--closeness-scale));
+    /* Green marker instead of the white one */
+    --row-marker: #00ff41;
 }
 
 /* Shared prefix glows, the rest of the word is a dimmer green without the glow */
@@ -116,7 +114,7 @@ body::before {
 
 .word-input.bound.no-closeness {
     background-color: #04310f;
-    background-image: radial-gradient(circle, #00ff41 3px, transparent 3.5px);
+    background-image: none;
 }
 
 /* Guess field: blinking green block cursor, like a terminal prompt.
