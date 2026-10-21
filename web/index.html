@@ -195,7 +195,9 @@
          Reuses the import popup's look (import-dialog) so every theme styles it the same way. -->
     <dialog id="hints-dialog" class="import-dialog hints-dialog" aria-labelledby="hints-dialog-title">
         <form method="dialog" class="dialog-form">
-            <h2 id="hints-dialog-title" class="dialog-title">Come funzionano i suggerimenti</h2>
+            <!-- autofocus: opening the popup focuses the title, not the close button at the bottom,
+                 so a phone does not scroll the popup down to reach it -->
+            <h2 id="hints-dialog-title" class="dialog-title" tabindex="-1" autofocus>Come funzionano i suggerimenti</h2>
 
             <section class="hints-section">
                 <h3 class="hints-heading">Prima o dopo</h3>

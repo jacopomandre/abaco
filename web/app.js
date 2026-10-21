@@ -792,9 +792,8 @@
 
     // Hints popup: the "HO CAPITO" button closes it by itself (form method="dialog")
     $hintsOpen.addEventListener('click', function () {
+        // Focus lands on the title (autofocus), so the popup opens at its top even on a short screen
         $hintsDialog.showModal();
-        // Focus lands on the close button at the bottom: on a short screen, start reading from the top
-        $hintsDialog.scrollTop = 0;
     });
     $hintsDialog.addEventListener('click', function (ev) {
         if (ev.target === $hintsDialog) $hintsDialog.close();

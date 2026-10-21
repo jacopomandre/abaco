@@ -828,6 +828,10 @@ select:focus {
     margin: 0;
     font-size: 20px;
 }
+/* The hints popup focuses its title on open (where reading starts): no focus ring on plain text */
+.dialog-title:focus {
+    outline: none;
+}
 
 .dialog-warning,
 .dialog-error {
