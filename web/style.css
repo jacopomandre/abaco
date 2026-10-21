@@ -878,6 +878,48 @@ select:focus {
     flex-shrink: 0;
 }
 
+/* Export, right after the code reached the clipboard (app.js adds .copied for a moment):
+   the copy icon gives way to a green check that draws itself, and the button pops once */
+.icon-check {
+    display: none;
+}
+
+#copy-code.copied,
+#copy-code.copied:hover:not(:disabled) {
+    background: var(--surface);
+    color: var(--copy-ok, var(--reveal-won));
+    border-color: currentColor;
+    animation: copiedPop 380ms var(--ease) 1;
+}
+
+#copy-code.copied .icon-copy {
+    display: none;
+}
+
+#copy-code.copied .icon-check {
+    display: block;
+}
+
+/* The check's stroke is hidden by its own dash, then slides in: the V is drawn left to right */
+.check-path {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+}
+
+#copy-code.copied .check-path {
+    animation: checkDraw 320ms var(--ease) 60ms forwards;
+}
+
+@keyframes checkDraw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes copiedPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
 /* Quieter secondary button — smaller than the main actions */
 .quiet-btn {
     padding: 6px 12px;

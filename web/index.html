@@ -129,12 +129,17 @@
                     </svg>
                 </button>
                 <button id="import-open" type="button" class="quiet-btn">IMPORTA</button>
-                <!-- The "copy" icon tells that exporting puts the game code on the clipboard -->
+                <!-- The "copy" icon tells that exporting puts the game code on the clipboard.
+                     Once copied, a green check draws itself in its place for a moment (app.js adds .copied). -->
                 <button id="copy-code" type="button" class="quiet-btn icon-btn" title="Copia il codice partita negli appunti">
-                    <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
+                    <svg class="btn-icon icon-copy" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
                          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="9" y="9" width="12" height="12" rx="2"></rect>
                         <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"></path>
+                    </svg>
+                    <svg class="btn-icon icon-check" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
+                         fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <path class="check-path" d="M4 12.5l5 5L20 6.5"></path>
                     </svg>
                     ESPORTA
                 </button>

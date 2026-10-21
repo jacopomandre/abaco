@@ -20,6 +20,8 @@
        so the light text on the rows stays readable on every stop. */
     --closeness-scale: #021a08, #04310f, #074a17, #0a611e, #0d7625, #108a2c;
     --reveal-won: #108a2c;
+    /* Export "copied" check: brighter than the text green, so the change shows on black */
+    --copy-ok: #7dff9b;
     /* Diamond marker of the rows and of the revealed word: green instead of white */
     --row-marker: #00ff41;
     /* Warnings in alarm red, the only non-green color of the theme */

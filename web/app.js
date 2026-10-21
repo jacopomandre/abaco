@@ -721,12 +721,27 @@
         return ok;
     }
 
+    // How long the export button shows the green check after a successful copy (ms)
+    const COPIED_DURATION = 1800;
+    let copiedTimer = null;
+
+    // Swap the export icon for the animated green check, then back. A second copy restarts it.
+    function flashCopied() {
+        clearTimeout(copiedTimer);
+        $copyCode.classList.remove('copied');
+        // Force a reflow, so removing and re-adding the class replays the animations
+        void $copyCode.offsetWidth;
+        $copyCode.classList.add('copied');
+        copiedTimer = setTimeout(function () { $copyCode.classList.remove('copied'); }, COPIED_DURATION);
+    }
+
     // Export the game code as text on the clipboard
     async function copyGameCode() {
         if (!game || game.status !== 'IN_PROGRESS') return;
         const code = buildGameCode();
         const ok = await copyText(code);
         if (ok) {
+            flashCopied();
             showBanner('Codice partita copiato negli appunti.', false);
         } else {
             // No silent failure: show the code so it can still be selected and copied by hand
