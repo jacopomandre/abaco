@@ -400,9 +400,11 @@
         return n;
     }
 
-    // Append one of the dictionary's ends (abaco / zuzzurellone) as a frame line, like the guide words
-    // printed at the top and bottom of a dictionary page: they are not guesses, so no row and no hint
-    // (else "abaco" would light up for free whenever the secret starts with "a").
+    // Append one of the game's starting bounds as a frame line, like the guide words printed at the
+    // top and bottom of a dictionary page: the dictionary's ends (abaco / zuzzurellone) for a new game,
+    // the imported bounds for an imported one. They are not guesses, so no row and no hint: else
+    // "abaco" would light up for free whenever the secret starts with "a", and importing the same code
+    // over and over (each import draws a new secret) would let the player shop for green bounds.
     function appendDictEdge(word) {
         const edge  = document.createElement('div');
         edge.className = 'dict-edge';
@@ -417,10 +419,10 @@
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
     // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
-    // The dictionary's first and last words (the default bounds) are not rows at all, see appendDictEdge.
+    // The game's starting bounds (dictionary ends or imported ones) are not rows at all, see appendDictEdge.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
-        if (word === DICT_FIRST || word === DICT_LAST) {
+        if (word === game.baseLower || word === game.baseUpper) {
             appendDictEdge(word);
             return;
         }
