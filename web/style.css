@@ -856,8 +856,16 @@ select:focus {
 
 .dialog-actions {
     display: flex;
+    /* Three buttons (confirm popup with its extra choice) may not fit one line on a phone */
+    flex-wrap: wrap;
     justify-content: flex-end;
     gap: 10px;
+}
+
+/* Confirmation popup: buttons share the width, so a third one wrapping to its own line
+   spans the popup instead of hanging on the right */
+#confirm-dialog .dialog-actions button {
+    flex: 1 1 auto;
 }
 
 /* Confirm is the primary action of the popup */

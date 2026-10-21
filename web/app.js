@@ -40,6 +40,7 @@
     const $confirmText     = document.getElementById('confirm-dialog-text');
     const $confirmOk       = document.getElementById('confirm-ok');
     const $confirmCancel   = document.getElementById('confirm-cancel');
+    const $confirmExtra    = document.getElementById('confirm-extra');
     const $hintsOpen       = document.getElementById('hints-open');
     const $hintsDialog     = document.getElementById('hints-dialog');
     const $hintsRows       = document.getElementById('hints-difficulty-rows');
@@ -654,20 +655,23 @@
         render(word);
     }
 
-    // Ask a yes/no question in the confirmation popup, the themed stand-in for window.confirm().
-    // Resolves to true only when the confirm button is pressed: cancel, Esc and a click on the
-    // backdrop all answer no.
-    function askConfirm(title, text, okLabel, cancelLabel) {
+    // Ask a question in the confirmation popup, the themed stand-in for window.confirm().
+    // extraLabel, if given, adds a third choice between cancel and confirm.
+    // Resolves to 'ok' (confirm), 'extra' (the third choice) or '' (cancel, Esc, a click on the backdrop).
+    function askConfirm(title, text, okLabel, cancelLabel, extraLabel) {
         $confirmTitle.textContent  = title;
         $confirmText.textContent   = text;
         $confirmOk.textContent     = okLabel;
         $confirmCancel.textContent = cancelLabel;
+        $confirmExtra.textContent  = extraLabel || '';
+        $confirmExtra.hidden       = !extraLabel;
         // returnValue keeps the last answer across openings: clear it, so Esc does not reuse an old "ok"
         $confirmDialog.returnValue = '';
         $confirmDialog.showModal();
         return new Promise(function (resolve) {
             $confirmDialog.addEventListener('close', function () {
-                resolve($confirmDialog.returnValue === 'ok');
+                const answer = $confirmDialog.returnValue;
+                resolve(answer === 'ok' || answer === 'extra' ? answer : '');
             }, { once: true });
         });
     }
@@ -675,24 +679,33 @@
     // Surrender current game after user confirmation: reveals the secret
     async function surrender() {
         if (!game || game.status !== 'IN_PROGRESS') return;
-        const ok = await askConfirm(
+        const answer = await askConfirm(
             'Ti arrendi?',
             'La parola segreta verrà svelata e la partita finisce qui.',
             'MI ARRENDO', 'CONTINUO');
-        if (!ok) return;
+        if (answer !== 'ok') return;
         game.status = 'SURRENDERED';
         render();
     }
 
     // Back to the start screen (back arrow, logo, "nuova partita"). Going back drops the saved game,
     // so one still being played is left only after user confirmation; a finished one goes right away.
+    // The popup also offers to export first: the game code lands on the clipboard, ready to paste
+    // in the start screen's field.
     async function leaveGame() {
         if (game && game.status === 'IN_PROGRESS') {
-            const ok = await askConfirm(
-                'Esci dalla partita?',
-                'La partita in corso andrà persa. Per riprenderla più tardi, prima copia il codice con ESPORTA.',
-                'ESCI', 'RESTA');
-            if (!ok) return;
+            const answer = await askConfirm(
+                'Abbandoni la caccia?',
+                'La parola segreta resterà un mistero.',
+                'ABBANDONO', 'CONTINUO', 'ESPORTA ED ESCI');
+            if (answer === '') return;
+            if (answer === 'extra') {
+                // Copy failed: stay in the game, where the banner shows the code to copy by hand
+                if (!await copyGameCode()) return;
+                showStartScreen();
+                showBanner('Codice partita copiato: incollalo qui per riprendere la partita.', false);
+                return;
+            }
         }
         showStartScreen();
     }
@@ -735,9 +748,9 @@
         copiedTimer = setTimeout(function () { $copyCode.classList.remove('copied'); }, COPIED_DURATION);
     }
 
-    // Export the game code as text on the clipboard
+    // Export the game code as text on the clipboard. Resolves to true when it got there.
     async function copyGameCode() {
-        if (!game || game.status !== 'IN_PROGRESS') return;
+        if (!game || game.status !== 'IN_PROGRESS') return false;
         const code = buildGameCode();
         const ok = await copyText(code);
         if (ok) {
@@ -747,6 +760,7 @@
             // No silent failure: show the code so it can still be selected and copied by hand
             showBanner(`Copia non riuscita. Seleziona e copia a mano il codice: ${code}`, true);
         }
+        return ok;
     }
 
     // --- Import ---
