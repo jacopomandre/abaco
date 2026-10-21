@@ -283,6 +283,12 @@ html, body {
     background-image: none;
 }
 
+/* An imported game's bounds: gray (the surrendered reveal's color), so they plainly give no hint */
+.word-input.bound.imported {
+    background-color: var(--reveal-surrendered);
+    background-image: none;
+}
+
 /* The dictionary's ends (abaco / zuzzurellone): not rows but the board's frame, drawn like the guide
    words of a dictionary page: a thin line with the word in small gray capitals (app.js, appendDictEdge) */
 .dict-edge {

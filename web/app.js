@@ -400,11 +400,10 @@
         return n;
     }
 
-    // Append a frame line, like the guide words printed at the top and bottom of a dictionary page.
-    // Every board is framed by the dictionary's ends (abaco / zuzzurellone); an imported game also gets
-    // an inner frame with its imported bounds. Neither is a guess, so no row and no hint: else "abaco"
-    // would light up for free whenever the secret starts with "a", and importing the same code over and
-    // over (each import draws a new secret) would let the player shop for green bounds.
+    // Append one of the dictionary's ends (abaco / zuzzurellone) as a frame line, like the guide words
+    // printed at the top and bottom of a dictionary page. Every board has them, imported games too:
+    // they are not guesses, so no row and no hint (else "abaco" would light up for free whenever the
+    // secret starts with "a").
     function appendDictEdge(word) {
         const edge  = document.createElement('div');
         edge.className = 'dict-edge';
@@ -419,19 +418,22 @@
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
     // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
-    // The dictionary's ends and the imported bounds are not rows at all: renderBoard draws them as
-    // the frame, see appendDictEdge.
+    // The dictionary's ends are not rows at all: renderBoard draws them as the frame, see appendDictEdge.
+    // An imported game's bounds are gray rows without the hint, so they plainly give none: each import
+    // draws a new secret, and colored bounds would let the player re-import the same code until they
+    // come up green.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
         if (word === DICT_FIRST || word === DICT_LAST) return;
-        if (word === game.baseLower || word === game.baseUpper) {
-            appendDictEdge(word);
-            return;
-        }
         // A plain element rather than a readonly <input>: only part of its text has to be bold
         const row = document.createElement('div');
         row.className = 'word-input bound';
-        if (DIFFICULTY[game.difficulty].closenessHint) {
+        const imported = word === game.baseLower || word === game.baseUpper;
+        const hinted   = DIFFICULTY[game.difficulty].closenessHint && !imported;
+        if (imported) {
+            row.classList.add('imported');
+            row.textContent = word;
+        } else if (hinted) {
             // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
             row.style.setProperty('--closeness', closeness(word).toFixed(3));
             const letters = Array.from(word);
@@ -452,7 +454,7 @@
             row.classList.add('no-closeness');
             row.textContent = word;
         }
-        if (isFresh && DIFFICULTY[game.difficulty].closenessHint) {
+        if (isFresh && hinted) {
             // Wrap the row so the badge can sit over it
             const wrap = document.createElement('div');
             wrap.className = 'bound-wrap';
