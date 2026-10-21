@@ -741,9 +741,7 @@
         const rules = DIFFICULTY[$difficulty.value];
         $difficultyNote.textContent = rules.closenessHint
             ? `${rules.attempts} tentativi, con i colori e le lettere giuste in grassetto.`
-            : `${rules.attempts} tentativi, senza aiuti: solo prima o dopo.`;
-        $difficultyNote.classList.toggle('no-hint', !rules.closenessHint);
-    }
+            : `${rules.attempts} tentativi, senza aiuti: solo prima o dopo.`;    }
 
     // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
     function fillHintsTable() {

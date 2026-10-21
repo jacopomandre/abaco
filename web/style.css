@@ -890,12 +890,6 @@ select:focus {
     color: var(--ink-muted);
 }
 
-/* Hard mode: the missing hint is the news, so it stands out */
-.difficulty-note.no-hint {
-    color: var(--alert);
-    font-weight: 600;
-}
-
 /* Taller than the import popup: scrolls inside on short screens */
 .hints-dialog {
     width: min(520px, calc(100vw - 32px));
