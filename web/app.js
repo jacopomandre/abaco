@@ -400,11 +400,10 @@
         return n;
     }
 
-    // Append one of the game's starting bounds as a frame line, like the guide words printed at the
-    // top and bottom of a dictionary page: the dictionary's ends (abaco / zuzzurellone) for a new game,
-    // the imported bounds for an imported one. They are not guesses, so no row and no hint: else
-    // "abaco" would light up for free whenever the secret starts with "a", and importing the same code
-    // over and over (each import draws a new secret) would let the player shop for green bounds.
+    // Append one of the dictionary's ends (abaco / zuzzurellone) as a frame line, like the guide words
+    // printed at the top and bottom of a dictionary page. Every board has them, imported games too:
+    // they are not guesses, so no row and no hint (else "abaco" would light up for free whenever the
+    // secret starts with "a").
     function appendDictEdge(word) {
         const edge  = document.createElement('div');
         edge.className = 'dict-edge';
@@ -419,17 +418,17 @@
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
     // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
-    // The game's starting bounds (dictionary ends or imported ones) are not rows at all, see appendDictEdge.
+    // The dictionary's ends are not rows at all: renderBoard draws them as the frame, see appendDictEdge.
+    // An imported game's bounds are plain rows without the hint: each import draws a new secret, so
+    // colored bounds would let the player re-import the same code until they come up green.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
-        if (word === game.baseLower || word === game.baseUpper) {
-            appendDictEdge(word);
-            return;
-        }
+        if (word === DICT_FIRST || word === DICT_LAST) return;
+        const imported = word === game.baseLower || word === game.baseUpper;
         // A plain element rather than a readonly <input>: only part of its text has to be bold
         const row = document.createElement('div');
         row.className = 'word-input bound';
-        if (DIFFICULTY[game.difficulty].closenessHint) {
+        if (DIFFICULTY[game.difficulty].closenessHint && !imported) {
             // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
             row.style.setProperty('--closeness', closeness(word).toFixed(3));
             const letters = Array.from(word);
@@ -548,10 +547,11 @@
         $guess = null;
     }
 
-    // Rebuild the board: lower bounds + (editable guess | revealed secret) + upper bounds.
+    // Rebuild the board: frame top + lower bounds + (editable guess | revealed secret) + upper bounds + frame bottom.
     // freshWord = the guess just made, if any: its row plays the closeness badge.
     function renderBoard(freshWord) {
         $boardStack.innerHTML = '';
+        appendDictEdge(DICT_FIRST);
         for (const w of lowerWords()) appendBoundRow(w, w === freshWord);
 
         if (game.status === 'IN_PROGRESS') {
@@ -561,6 +561,7 @@
         }
 
         for (const w of upperWords()) appendBoundRow(w, w === freshWord);
+        appendDictEdge(DICT_LAST);
     }
 
     // Redraw board, history, buttons and banner from the current game.
