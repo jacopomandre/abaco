@@ -703,7 +703,7 @@
                 // Copy failed: stay in the game, where the banner shows the code to copy by hand
                 if (!await copyGameCode()) return;
                 showStartScreen();
-                showBanner('Codice partita copiato: incollalo qui per riprendere la partita.', false);
+                showBanner('Partita salvata negli appunti: incolla il codice in “Importa partita” quando vuoi riprenderla.', false);
                 return;
             }
         }
