@@ -34,6 +34,12 @@
     const $startScreen     = document.getElementById('start-screen');
     const $theme           = document.getElementById('theme-select');
     const $difficultyNote  = document.getElementById('difficulty-note');
+    // Confirmation popup (surrender, leaving a game), filled in by askConfirm
+    const $confirmDialog   = document.getElementById('confirm-dialog');
+    const $confirmTitle    = document.getElementById('confirm-dialog-title');
+    const $confirmText     = document.getElementById('confirm-dialog-text');
+    const $confirmOk       = document.getElementById('confirm-ok');
+    const $confirmCancel   = document.getElementById('confirm-cancel');
     const $hintsOpen       = document.getElementById('hints-open');
     const $hintsDialog     = document.getElementById('hints-dialog');
     const $hintsRows       = document.getElementById('hints-difficulty-rows');
@@ -648,20 +654,45 @@
         render(word);
     }
 
+    // Ask a yes/no question in the confirmation popup, the themed stand-in for window.confirm().
+    // Resolves to true only when the confirm button is pressed: cancel, Esc and a click on the
+    // backdrop all answer no.
+    function askConfirm(title, text, okLabel, cancelLabel) {
+        $confirmTitle.textContent  = title;
+        $confirmText.textContent   = text;
+        $confirmOk.textContent     = okLabel;
+        $confirmCancel.textContent = cancelLabel;
+        // returnValue keeps the last answer across openings: clear it, so Esc does not reuse an old "ok"
+        $confirmDialog.returnValue = '';
+        $confirmDialog.showModal();
+        return new Promise(function (resolve) {
+            $confirmDialog.addEventListener('close', function () {
+                resolve($confirmDialog.returnValue === 'ok');
+            }, { once: true });
+        });
+    }
+
     // Surrender current game after user confirmation: reveals the secret
-    function surrender() {
+    async function surrender() {
         if (!game || game.status !== 'IN_PROGRESS') return;
-        if (!window.confirm('Sei sicuro di volerti arrendere?')) return;
+        const ok = await askConfirm(
+            'Ti arrendi?',
+            'La parola segreta verrà svelata e la partita finisce qui.',
+            'MI ARRENDO', 'CONTINUO');
+        if (!ok) return;
         game.status = 'SURRENDERED';
         render();
     }
 
     // Back to the start screen (back arrow, logo, "nuova partita"). Going back drops the saved game,
     // so one still being played is left only after user confirmation; a finished one goes right away.
-    function leaveGame() {
-        if (game && game.status === 'IN_PROGRESS'
-            && !window.confirm('Vuoi uscire dalla partita? Andrà persa: per riprenderla dopo, prima copia il codice con ESPORTA.')) {
-            return;
+    async function leaveGame() {
+        if (game && game.status === 'IN_PROGRESS') {
+            const ok = await askConfirm(
+                'Esci dalla partita?',
+                'La partita in corso andrà persa. Per riprenderla più tardi, prima copia il codice con ESPORTA.',
+                'ESCI', 'RESTA');
+            if (!ok) return;
         }
         showStartScreen();
     }
@@ -802,6 +833,11 @@
     // A click on the dimmed backdrop lands on the <dialog> itself, not on its content: close
     $importDialog.addEventListener('click', function (ev) {
         if (ev.target === $importDialog) $importDialog.close();
+    });
+
+    // Confirmation popup: its buttons close it by themselves (form method="dialog"); the backdrop answers no
+    $confirmDialog.addEventListener('click', function (ev) {
+        if (ev.target === $confirmDialog) $confirmDialog.close();
     });
 
     // Hints popup: the "HO CAPITO" button closes it by itself (form method="dialog")

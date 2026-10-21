@@ -178,14 +178,16 @@ button:disabled {
 /* Primary actions: shaded with pencil hatching, dark text (no solid fill in a sketch) */
 #submit-guess,
 #new-game,
-#import-confirm {
+#import-confirm ,
+#confirm-ok {
     background: repeating-linear-gradient(-45deg, rgba(43, 43, 43, 0.2) 0 2px, transparent 2px 6px);
     color: var(--ink);
 }
 
 #submit-guess:hover:not(:disabled),
 #new-game:hover:not(:disabled),
-#import-confirm:hover:not(:disabled) {
+#import-confirm:hover:not(:disabled) ,
+#confirm-ok:hover:not(:disabled) {
     background:
         repeating-linear-gradient(-45deg, rgba(43, 43, 43, 0.2) 0 2px, transparent 2px 6px),
         #fff59d;

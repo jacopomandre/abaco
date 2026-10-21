@@ -155,7 +155,8 @@ button:hover:not(:disabled) {
 /* Primary actions: filled green, black text */
 #submit-guess:hover:not(:disabled),
 #new-game:hover:not(:disabled),
-#import-confirm:hover:not(:disabled) {
+#import-confirm:hover:not(:disabled) ,
+#confirm-ok:hover:not(:disabled) {
     background: #7dff9b;
 }
 

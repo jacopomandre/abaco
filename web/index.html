@@ -191,6 +191,21 @@
         </form>
     </dialog>
 
+    <!-- Confirmation popup (surrender, leaving a game in progress), in place of the browser's confirm():
+         that one cannot be styled, and in the Android app its buttons read "OK" / "Cancel".
+         app.js (askConfirm) fills in the texts; the button pressed becomes the dialog's returnValue. -->
+    <dialog id="confirm-dialog" class="import-dialog" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-text">
+        <form method="dialog" class="dialog-form">
+            <h2 id="confirm-dialog-title" class="dialog-title"></h2>
+            <p id="confirm-dialog-text" class="dialog-warning"></p>
+            <div class="dialog-actions">
+                <!-- autofocus: Enter right after opening keeps the game, the safe choice -->
+                <button id="confirm-cancel" type="submit" value="cancel" autofocus></button>
+                <button id="confirm-ok" type="submit" value="ok"></button>
+            </div>
+        </form>
+    </dialog>
+
     <!-- Hints popup, opened from the "i" button of the start screen: how the game helps the player.
          Reuses the import popup's look (import-dialog) so every theme styles it the same way. -->
     <dialog id="hints-dialog" class="import-dialog hints-dialog" aria-labelledby="hints-dialog-title">

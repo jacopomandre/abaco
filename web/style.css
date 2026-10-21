@@ -861,7 +861,8 @@ select:focus {
 }
 
 /* Confirm is the primary action of the popup */
-#import-confirm {
+#import-confirm ,
+#confirm-ok {
     background: var(--ink);
     color: var(--surface);
 }

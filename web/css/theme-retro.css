@@ -184,9 +184,11 @@ button:disabled {
 #submit-guess,
 #new-game,
 #import-confirm,
+#confirm-ok,
 #submit-guess:hover:not(:disabled),
 #new-game:hover:not(:disabled),
-#import-confirm:hover:not(:disabled) {
+#import-confirm:hover:not(:disabled) ,
+#confirm-ok:hover:not(:disabled) {
     background: var(--surface);
     color: var(--ink);
     font-weight: 700;
