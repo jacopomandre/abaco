@@ -656,6 +656,16 @@
         render();
     }
 
+    // Back to the start screen (back arrow, logo, "nuova partita"). Going back drops the saved game,
+    // so one still being played is left only after user confirmation; a finished one goes right away.
+    function leaveGame() {
+        if (game && game.status === 'IN_PROGRESS'
+            && !window.confirm('Vuoi uscire dalla partita? Andrà persa: per riprenderla dopo, prima copia il codice con ESPORTA.')) {
+            return;
+        }
+        showStartScreen();
+    }
+
     // --- Export ---
 
     // Copy text to the clipboard. The async API needs a secure context and can be
@@ -768,12 +778,12 @@
     $newGame.addEventListener('click', newGame);
     $submit.addEventListener('click', submitGuess);
     $surrender.addEventListener('click', surrender);
-    $restart.addEventListener('click', showStartScreen);
-    $backHome.addEventListener('click', showStartScreen);
+    $restart.addEventListener('click', leaveGame);
+    $backHome.addEventListener('click', leaveGame);
     // The logo does the same as the back arrow, without reloading the page
     $logoLink.addEventListener('click', function (ev) {
         ev.preventDefault();
-        showStartScreen();
+        leaveGame();
     });
     $copyCode.addEventListener('click', copyGameCode);
     $importGame.addEventListener('click', importFromStartScreen);
