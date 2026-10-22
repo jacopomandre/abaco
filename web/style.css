@@ -278,14 +278,14 @@ html, body {
 }
 
 /* Rows without the color hint look all the same: every locked row of a hard game, and an imported
-   game's bounds (they plainly give no hint). A white row outlined in ink, so a hard board stays light
-   instead of a solid block of color. Each theme picks the fill with --row-plain-bg. */
+   game's bounds (they plainly give no hint). A light gray row outlined in ink, so a hard board stays light
+   instead of a solid block of color, and still apart from the white guess field. Each theme picks the fill with --row-plain-bg. */
 .word-input.bound.no-closeness,
 .word-input.bound.imported {
     --row-marker: var(--ink);
     color: var(--ink);
     text-shadow: none;
-    background-color: var(--row-plain-bg, #ffffff);
+    background-color: var(--row-plain-bg, #eef0f3);
     background-image: none;
     border-color: var(--ink);
     /* 1.5px outline without changing the row's height */

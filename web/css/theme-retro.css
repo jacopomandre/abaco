@@ -229,9 +229,10 @@ select:focus,
     text-shadow: none;
 }
 
-/* Rows without the hint: a white field in the same sunken frame, in place of the ink outline */
+/* Rows without the hint: a light gray field in the same sunken frame, in place of the ink outline */
 .word-input.bound.no-closeness,
 .word-input.bound.imported {
+    --row-plain-bg: #dfdfdf;
     border-color: transparent;
     box-shadow: var(--rt-sunken);
 }
