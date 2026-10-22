@@ -326,11 +326,6 @@ html, body {
     flex: 0 0 calc(var(--edge-indent) - 12px);
 }
 
-/* Hover slightly darkens the fill */
-.word-input.bound:hover {
-    filter: brightness(0.92);
-}
-
 /* Editable guess row — the star of the show */
 .word-input.guess {
     background: var(--surface);
