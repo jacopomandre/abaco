@@ -426,7 +426,7 @@
     // secret — unless the game's difficulty plays without that hint: then every row looks the same.
     // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
     // The dictionary's ends are not rows at all: renderBoard draws them as the frame, see appendDictEdge.
-    // An imported game's bounds are gray rows without the hint, so they plainly give none: each import
+    // An imported game's bounds are plain rows without the hint (drawn like a hard game's), so they plainly give none: each import
     // draws a new secret, and colored bounds would let the player re-import the same code until they
     // come up green.
     // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.

@@ -114,9 +114,11 @@ body::before {
     text-shadow: none;
 }
 
-.word-input.bound.no-closeness {
-    background-color: #04310f;
-    background-image: none;
+/* Rows without the hint: black, outlined and lit in green like the rest of the screen */
+.word-input.bound.no-closeness,
+.word-input.bound.imported {
+    --row-plain-bg: #000000;
+    text-shadow: var(--mx-glow);
 }
 
 /* Guess field: blinking green block cursor, like a terminal prompt.

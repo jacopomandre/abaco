@@ -229,6 +229,13 @@ select:focus,
     text-shadow: none;
 }
 
+/* Rows without the hint: a white field in the same sunken frame, in place of the ink outline */
+.word-input.bound.no-closeness,
+.word-input.bound.imported {
+    border-color: transparent;
+    box-shadow: var(--rt-sunken);
+}
+
 .word-input.guess.won,
 .word-input.guess.won:disabled {
     background: #ffffff;

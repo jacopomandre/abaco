@@ -264,7 +264,7 @@ html, body {
 }
 
 /* Closeness hint: the leading letters shared with the secret stand out against the rest of the word */
-.word-input.bound:not(.no-closeness) {
+.word-input.bound:not(.no-closeness):not(.imported) {
     font-weight: 400;
 }
 
@@ -277,16 +277,19 @@ html, body {
     opacity: var(--word-rest-opacity, 0.72);
 }
 
-/* Games without the color hint (hard): every locked row gets the same neutral fill */
-.word-input.bound.no-closeness {
-    background-color: var(--ink);
-    background-image: none;
-}
-
-/* An imported game's bounds: gray (the surrendered reveal's color), so they plainly give no hint */
+/* Rows without the color hint look all the same: every locked row of a hard game, and an imported
+   game's bounds (they plainly give no hint). A white row outlined in ink, so a hard board stays light
+   instead of a solid block of color. Each theme picks the fill with --row-plain-bg. */
+.word-input.bound.no-closeness,
 .word-input.bound.imported {
-    background-color: var(--reveal-surrendered);
+    --row-marker: var(--ink);
+    color: var(--ink);
+    text-shadow: none;
+    background-color: var(--row-plain-bg, #ffffff);
     background-image: none;
+    border-color: var(--ink);
+    /* 1.5px outline without changing the row's height */
+    box-shadow: inset 0 0 0 0.5px var(--ink);
 }
 
 /* The dictionary's ends (abaco / zuzzurellone): not rows but the board's frame, drawn like the guide

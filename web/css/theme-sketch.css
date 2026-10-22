@@ -229,9 +229,10 @@ button:disabled {
     --word-rest-opacity: 0.6;
 }
 
-.word-input.bound.no-closeness {
-    background-color: #e0ddd5;
-    background-image: none;
+/* Rows without the hint: blank paper inside the graphite outline */
+.word-input.bound.no-closeness,
+.word-input.bound.imported {
+    --row-plain-bg: #ffffff;
 }
 
 /* Guess row: dashed outline, to be filled in; a highlighter mark while typing */
