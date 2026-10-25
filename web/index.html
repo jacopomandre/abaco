@@ -110,13 +110,14 @@
                             <button type="button" class="step-btn" data-step="1" aria-label="Un tentativo in più">+</button>
                         </div>
                     </div>
-                    <label class="custom-check">
-                        <input id="custom-colors" type="checkbox">
-                        colori di vicinanza
+                    <!-- Hints as on/off switches: a checkbox underneath, drawn as a toggle by the CSS -->
+                    <label class="custom-field toggle-field">
+                        COLORI DI VICINANZA:
+                        <input id="custom-colors" class="toggle" type="checkbox" role="switch">
                     </label>
-                    <label class="custom-check">
-                        <input id="custom-bold" type="checkbox">
-                        lettere giuste in grassetto
+                    <label class="custom-field toggle-field">
+                        LETTERE IN GRASSETTO:
+                        <input id="custom-bold" class="toggle" type="checkbox" role="switch">
                     </label>
                 </fieldset>
                 <!-- What the chosen difficulty gives: attempts and hints (app.js) -->
