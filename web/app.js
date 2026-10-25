@@ -46,8 +46,6 @@
     const $attemptsStepper = document.getElementById('custom-attempts-stepper');
     const $customColors    = document.getElementById('custom-colors');
     const $customBold      = document.getElementById('custom-bold');
-    const $customCategory  = document.getElementById('custom-category');
-    const $categoryHint    = document.getElementById('category-hint');
     // Confirmation popup (surrender, leaving a game), filled in by askConfirm
     const $confirmDialog   = document.getElementById('confirm-dialog');
     const $confirmTitle    = document.getElementById('confirm-dialog-title');
@@ -71,17 +69,16 @@
     //   attempts: attempts the game starts with
     //   colors:   closeness hint, row colors and badge (both read the same closeness value)
     //   bold:     leading letters shared with the secret set in bold
-    //   category: the secret's grammatical category shown from the start
     // Presets per difficulty (harder games get fewer attempts and fewer hints).
     const DIFFICULTY = {
-        EASY:   { words: 'EASY',   attempts: 20, colors: true,  bold: true,  category: false },
-        MEDIUM: { words: 'MEDIUM', attempts: 15, colors: true,  bold: true,  category: false },
-        HARD:   { words: 'HARD',   attempts: 15, colors: false, bold: false, category: false }
+        EASY:   { words: 'EASY',   attempts: 20, colors: true,  bold: true  },
+        MEDIUM: { words: 'MEDIUM', attempts: 15, colors: true,  bold: true  },
+        HARD:   { words: 'HARD',   attempts: 15, colors: false, bold: false }
     };
     // Custom game: the player sets every rule; the game then carries its own rules
     const CUSTOM = 'CUSTOM';
-    const RULE_KEYS = ['words', 'attempts', 'colors', 'bold', 'category'];
-    const BOOLEAN_RULES = ['colors', 'bold', 'category'];
+    const RULE_KEYS = ['words', 'attempts', 'colors', 'bold'];
+    const BOOLEAN_RULES = ['colors', 'bold'];
     // Attempts a custom game may start with
     const CUSTOM_ATTEMPTS_MIN = 10;
     const CUSTOM_ATTEMPTS_MAX = 30;
@@ -101,7 +98,7 @@
     //  5: a custom game also carries its rules)
     const CODE_VERSION = 5;
     // Short keys of the rules in a game code (same order as RULE_KEYS)
-    const RULE_CODE_KEYS = { words: 'w', attempts: 'a', colors: 'h', bold: 'b', category: 'k' };
+    const RULE_CODE_KEYS = { words: 'w', attempts: 'a', colors: 'h', bold: 'b' };
 
     // Italian alphabetical order, ignoring case and accents: typing "citta" matches "città"
     // (same idea as the accent-free "chiave" field of the dictionary)
@@ -704,11 +701,6 @@
 
         // A finished game cannot be played, surrendered or exported
         const ended = game.status !== 'IN_PROGRESS';
-        // Category hint: while playing only, the revealed entry shows the category anyway.
-        // An entry without a category gives no hint.
-        const category = rulesOf(game).category && !ended ? game.secret.category : '';
-        $categoryHint.hidden = category === '';
-        $categoryHint.textContent = category ? `La parola segreta è un ${category}.` : '';
         $submit.disabled       = ended;
         $surrender.disabled    = ended;
         $copyCode.disabled     = ended;
@@ -946,7 +938,6 @@
         const names = [];
         if (rules.colors)   names.push('i colori');
         if (rules.bold)     names.push('le lettere giuste in grassetto');
-        if (rules.category) names.push('la categoria');
         return names;
     }
 
@@ -971,8 +962,7 @@
             words:    $customWords.value,
             attempts: customAttempts,
             colors:   $customColors.checked,
-            bold:     $customBold.checked,
-            category: $customCategory.checked
+            bold:     $customBold.checked
         };
         return isValidRules(rules) ? rules : null;
     }
@@ -983,7 +973,6 @@
         customAttempts          = rules.attempts;
         $customColors.checked   = rules.colors;
         $customBold.checked     = rules.bold;
-        $customCategory.checked = rules.category;
     }
 
     // Move the custom attempts by a step button, never past the limits
