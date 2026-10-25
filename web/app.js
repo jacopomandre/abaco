@@ -933,11 +933,12 @@
         return option ? option.textContent : difficulty;
     }
 
-    // Hints a set of rules turns on, as words for the notes
+    // Hints a set of rules turns on, as words for the notes: same names as the custom panel
+    // and the hints popup
     function hintNames(rules) {
         const names = [];
-        if (rules.colors)   names.push('i colori');
-        if (rules.bold)     names.push('le lettere giuste in grassetto');
+        if (rules.colors)   names.push('i colori di vicinanza');
+        if (rules.bold)     names.push('le lettere in grassetto');
         return names;
     }
 
