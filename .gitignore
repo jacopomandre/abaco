@@ -54,3 +54,7 @@ android/signing/
 
 ### Claude Code local settings ###
 .claude/settings.local.json
+
+### Local notes ###
+# Personal to-do list: kept on disk, never committed (the repository is public)
+TODO.md
