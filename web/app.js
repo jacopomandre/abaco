@@ -939,7 +939,7 @@
     function hintNames(rules) {
         const names = [];
         if (rules.colors)   names.push('i colori di vicinanza');
-        if (rules.bold)     names.push('le lettere in grassetto');
+        if (rules.bold)     names.push('le lettere giuste');
         return names;
     }
 
