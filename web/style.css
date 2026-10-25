@@ -263,8 +263,8 @@ html, body {
     text-overflow: ellipsis;
 }
 
-/* Closeness hint: the leading letters shared with the secret stand out against the rest of the word */
-.word-input.bound:not(.no-closeness):not(.imported) {
+/* Bold hint: the leading letters shared with the secret stand out against the rest of the word */
+.word-input.bound.bold-hint {
     font-weight: 400;
 }
 
@@ -462,6 +462,12 @@ select:focus {
 #new-game {
     background: var(--ink);
     color: var(--surface);
+}
+
+/* Disabled while the custom rules are not valid: the id rule above would keep it looking active */
+#new-game:disabled {
+    background: var(--surface);
+    color: var(--ink-muted);
 }
 
 /* ---------- History (collapsible) ---------- */
@@ -945,6 +951,73 @@ select:focus {
     color: var(--ink-muted);
 }
 
+/* The custom rules under the picker are not valid (attempts out of range) */
+.difficulty-note.error {
+    color: var(--alert);
+    font-weight: 600;
+}
+
+/* ---------- Custom game panel (start screen) ---------- */
+.custom-rules {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    min-width: 0;
+}
+
+/* A hidden fieldset must stay hidden despite display: flex above */
+.custom-rules[hidden] {
+    display: none;
+}
+
+/* Label on the left, control on the right, like the difficulty picker */
+.custom-field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+}
+
+.start-option .custom-field select,
+.start-option .custom-field input {
+    width: 8.5em;
+    height: 32px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.custom-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.start-option .custom-check input {
+    width: auto;
+    margin: 0;
+}
+
+.custom-field input[aria-invalid="true"] {
+    border-color: var(--alert);
+}
+
+/* Category hint of a custom game, above the board */
+.category-hint {
+    margin: 0;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--ink-muted);
+    text-align: center;
+}
+
 /* Taller than the import popup: scrolls inside on short screens */
 .hints-dialog {
     width: min(520px, calc(100vw - 32px));
@@ -1150,4 +1223,17 @@ select:focus {
         animation: none !important;
         opacity: 1;
     }
+}
+
+/* Read by screen readers only */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
 }

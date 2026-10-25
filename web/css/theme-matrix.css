@@ -164,7 +164,8 @@ button:hover:not(:disabled) {
     background: #7dff9b;
 }
 
-#submit-guess:disabled {
+#submit-guess:disabled,
+#new-game:disabled {
     background: transparent;
 }
 

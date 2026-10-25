@@ -195,7 +195,8 @@ button:disabled {
     outline: 1px solid #000;
 }
 
-#submit-guess:disabled {
+#submit-guess:disabled,
+#new-game:disabled {
     background: var(--surface);
     outline: none;
 }

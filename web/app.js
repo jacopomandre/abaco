@@ -6,8 +6,13 @@
 
     // Dictionary entries: { parola, chiave, categoria, descrizione, difficolta: [...] }
     const DICTIONARY = window.ABACO_DIZIONARIO || [];
-    // Difficulty of the UI -> label used in the "difficolta" field of the dictionary
-    const DIFFICULTY_LABEL = { EASY: 'facile', MEDIUM: 'media', HARD: 'difficile' };
+    // Word pools a game can draw from -> labels of the "difficolta" field of the dictionary
+    const WORD_POOLS = {
+        EASY:   ['facile'],
+        MEDIUM: ['media'],
+        HARD:   ['difficile'],
+        ALL:    ['facile', 'media', 'difficile']
+    };
 
     // DOM references
     const $difficulty      = document.getElementById('difficulty');
@@ -34,6 +39,14 @@
     const $startScreen     = document.getElementById('start-screen');
     const $theme           = document.getElementById('theme-select');
     const $difficultyNote  = document.getElementById('difficulty-note');
+    // Custom game panel, shown under the picker when "personalizzata" is chosen
+    const $customRules     = document.getElementById('custom-rules');
+    const $customWords     = document.getElementById('custom-words');
+    const $customAttempts  = document.getElementById('custom-attempts');
+    const $customColors    = document.getElementById('custom-colors');
+    const $customBold      = document.getElementById('custom-bold');
+    const $customCategory  = document.getElementById('custom-category');
+    const $categoryHint    = document.getElementById('category-hint');
     // Confirmation popup (surrender, leaving a game), filled in by askConfirm
     const $confirmDialog   = document.getElementById('confirm-dialog');
     const $confirmTitle    = document.getElementById('confirm-dialog-title');
@@ -52,23 +65,42 @@
     const DICT_FIRST = 'abaco';
     const DICT_LAST  = 'zuzzurellone';
 
-    // Rules per difficulty: attempts a game starts with (harder games get fewer) and
-    // whether the closeness colors are shown (hard games play without them)
+    // Rules a game plays by:
+    //   words:    key of WORD_POOLS, the words the secret is drawn from
+    //   attempts: attempts the game starts with
+    //   colors:   closeness hint, row colors and badge (both read the same closeness value)
+    //   bold:     leading letters shared with the secret set in bold
+    //   category: the secret's grammatical category shown from the start
+    // Presets per difficulty (harder games get fewer attempts and fewer hints).
     const DIFFICULTY = {
-        EASY:   { attempts: 20, closenessHint: true },
-        MEDIUM: { attempts: 15, closenessHint: true },
-        HARD:   { attempts: 15, closenessHint: false }
+        EASY:   { words: 'EASY',   attempts: 20, colors: true,  bold: true,  category: false },
+        MEDIUM: { words: 'MEDIUM', attempts: 15, colors: true,  bold: true,  category: false },
+        HARD:   { words: 'HARD',   attempts: 15, colors: false, bold: false, category: false }
     };
+    // Custom game: the player sets every rule; the game then carries its own rules
+    const CUSTOM = 'CUSTOM';
+    const RULE_KEYS = ['words', 'attempts', 'colors', 'bold', 'category'];
+    const BOOLEAN_RULES = ['colors', 'bold', 'category'];
+    // Attempts a custom game may start with
+    const CUSTOM_ATTEMPTS_MIN = 10;
+    const CUSTOM_ATTEMPTS_MAX = 30;
+    // Rules the custom panel shows the first time
+    const CUSTOM_DEFAULT = DIFFICULTY.MEDIUM;
     // From this many attempts left downwards, the countdown (in the guess placeholder) is highlighted
     const LOW_ATTEMPTS = 5;
 
     // localStorage key holding the game in progress
     const SAVE_KEY = 'abaco.partita';
+    // localStorage key holding the last custom rules, so the panel opens on them
+    const CUSTOM_SAVE_KEY = 'abaco.personalizzata';
 
     // Game code format version, bumped if the exported payload ever changes shape
     // (3: carries the difficulty, which sets both the attempts and the color hint;
-    //  4: no longer carries the secret, the importer draws a new one between the bounds)
-    const CODE_VERSION = 4;
+    //  4: no longer carries the secret, the importer draws a new one between the bounds;
+    //  5: a custom game also carries its rules)
+    const CODE_VERSION = 5;
+    // Short keys of the rules in a game code (same order as RULE_KEYS)
+    const RULE_CODE_KEYS = { words: 'w', attempts: 'a', colors: 'h', bold: 'b', category: 'k' };
 
     // Italian alphabetical order, ignoring case and accents: typing "citta" matches "città"
     // (same idea as the accent-free "chiave" field of the dictionary)
@@ -78,7 +110,8 @@
     // {
     //   secret: {word, category, definition},
     //   baseLower, baseUpper: bounds the game started from (dictionary edges, or the imported ones)
-    //   difficulty:           'EASY' | 'MEDIUM' | 'HARD', key of DIFFICULTY (attempts, color hint)
+    //   difficulty:           'EASY' | 'MEDIUM' | 'HARD' (key of DIFFICULTY) | 'CUSTOM'
+    //   rules:                custom games only: the rules chosen by the player (see DIFFICULTY)
     //   baseAttempts:         attempts already spent before this session (0, or the imported count)
     //   attempts: [{word, outcome}]  guesses made in this session
     //   status:   'IN_PROGRESS' | 'WON' | 'SURRENDERED' | 'LOST' (attempts ran out)
@@ -87,6 +120,31 @@
     let game = null;
     // Reference to the editable guess input (recreated on each render)
     let $guess = null;
+
+    // --- Rules ---
+
+    function hasOwn(object, key) {
+        return Object.prototype.hasOwnProperty.call(object, key);
+    }
+
+    // True when "rules" is a complete, well-formed rules object: exactly the RULE_KEYS, each with a
+    // value in range. Custom rules come from the player, from storage or from a pasted game code
+    // (hand-editable Base64), so every source goes through this one check.
+    function isValidRules(rules) {
+        return rules !== null && typeof rules === 'object' && !Array.isArray(rules)
+            && Object.keys(rules).length === RULE_KEYS.length
+            && RULE_KEYS.every(function (key) { return hasOwn(rules, key); })
+            && typeof rules.words === 'string' && hasOwn(WORD_POOLS, rules.words)
+            && Number.isInteger(rules.attempts)
+            && rules.attempts >= CUSTOM_ATTEMPTS_MIN && rules.attempts <= CUSTOM_ATTEMPTS_MAX
+            && BOOLEAN_RULES.every(function (key) { return typeof rules[key] === 'boolean'; });
+    }
+
+    // Rules of a game: a preset's are read live (a level's changes reach saved games too),
+    // a custom game carries its own
+    function rulesOf(target) {
+        return target.difficulty === CUSTOM ? target.rules : DIFFICULTY[target.difficulty];
+    }
 
     // --- Base64 helpers (UTF-8 safe: plain atob()/btoa() would mangle accented letters) ---
 
@@ -100,15 +158,15 @@
         return btoa(String.fromCharCode.apply(null, bytes));
     }
 
-    // Draw a random secret word among those of the chosen difficulty.
+    // Draw a random secret word from a word pool (key of WORD_POOLS).
     // With bounds (import), only words strictly between lower and upper count.
     // Throws when the dictionary is missing or no word of that level fits: an imported code
     // can then not be resumed (dictionary changed since the export, or code edited by hand).
-    function pickSecret(difficulty, lower, upper) {
-        const label      = DIFFICULTY_LABEL[difficulty];
+    function pickSecret(words, lower, upper) {
+        const labels     = WORD_POOLS[words];
         const bounded    = lower !== undefined;
         const candidates = DICTIONARY.filter(function (entry) {
-            return entry.difficolta.includes(label)
+            return entry.difficolta.some(function (label) { return labels.includes(label); })
                 && (!bounded
                     || (ITALIAN.compare(lower, entry.parola) < 0 && ITALIAN.compare(entry.parola, upper) < 0));
         });
@@ -135,7 +193,7 @@
 
     // Attempts still available: the countdown shown to the player
     function attemptsLeft() {
-        return DIFFICULTY[game.difficulty].attempts - attemptCount();
+        return rulesOf(game).attempts - attemptCount();
     }
 
     // Words known to come before the secret, in alphabetical order
@@ -253,7 +311,8 @@
     // Serialize the game as one Base64 blob: the two closest bounds and the attempts countdown.
     // The secret is NOT in it: decoding the code must not reveal the word. The importer draws
     // a new secret between the two bounds instead (see parseGameCode).
-    // Short keys keep the code compact: l=lower, u=upper, g=game difficulty, r=attempts left.
+    // Short keys keep the code compact: l=lower, u=upper, g=game difficulty, r=attempts left,
+    // c=rules (custom games only, keys from RULE_CODE_KEYS).
     function buildGameCode() {
         const lowers = lowerWords();
         const uppers = upperWords();
@@ -264,13 +323,33 @@
             g: game.difficulty,
             r: attemptsLeft()
         };
+        if (game.difficulty === CUSTOM) {
+            payload.c = {};
+            RULE_KEYS.forEach(function (key) { payload.c[RULE_CODE_KEYS[key]] = game.rules[key]; });
+        }
         return encodeBase64(JSON.stringify(payload));
+    }
+
+    // Rules read back from the "c" field of a game code; null when the field is not a
+    // well-formed rules object (missing, extra or out-of-range keys)
+    function rulesFromCode(coded) {
+        let result = null;
+        if (coded !== null && typeof coded === 'object' && !Array.isArray(coded)
+                && Object.keys(coded).length === RULE_KEYS.length) {
+            const rules = {};
+            RULE_KEYS.forEach(function (key) {
+                if (hasOwn(coded, RULE_CODE_KEYS[key])) rules[key] = coded[RULE_CODE_KEYS[key]];
+            });
+            if (isValidRules(rules)) result = rules;
+        }
+        return result;
     }
 
     // Turn a game code back into a game, with a fresh secret drawn between its two bounds.
     // Throws if the code is malformed or inconsistent, since it may come from a hand-edited file,
     // or if no dictionary word sits between the bounds.
-    // Older codes (version 3) are still accepted: the secret they carry is simply ignored.
+    // Older codes (versions 3 and 4) are still accepted for the preset levels: the secret a
+    // version 3 code carries is simply ignored.
     function parseGameCode(code) {
         let payload;
         try {
@@ -278,29 +357,40 @@
         } catch (_) {
             throw new Error('Codice partita non valido.');
         }
-        const isText = function (v) { return typeof v === 'string' && v.trim() !== ''; };
-        const valid = payload
-            && (payload.v === CODE_VERSION || payload.v === 3)
+        const isText   = function (v) { return typeof v === 'string' && v.trim() !== ''; };
+        const isObject = payload !== null && typeof payload === 'object' && !Array.isArray(payload);
+        const custom   = isObject && payload.v === CODE_VERSION && payload.g === CUSTOM;
+        // A custom game must carry valid rules; a preset game must carry none
+        const rules    = custom ? rulesFromCode(payload.c) : null;
+        const valid = isObject
+            && [3, 4, CODE_VERSION].includes(payload.v)
             && isText(payload.l) && isText(payload.u)
-            && Object.prototype.hasOwnProperty.call(DIFFICULTY, payload.g)
+            && (custom
+                ? rules !== null
+                : typeof payload.g === 'string' && hasOwn(DIFFICULTY, payload.g) && !hasOwn(payload, 'c'))
             // a resumable game has at least one attempt left
             && Number.isInteger(payload.r) && payload.r >= 1
+            // a custom game cannot have more attempts left than it started with
+            && (!custom || payload.r <= rules.attempts)
             // the bounds must leave room for a word between them
             && ITALIAN.compare(payload.l, payload.u) < 0;
         if (!valid) {
             throw new Error('Codice partita non valido.');
         }
+        const gameRules = custom ? rules : DIFFICULTY[payload.g];
         // Never more than the level grants today: a code exported when it granted more is cut down to it
-        const left = Math.min(payload.r, DIFFICULTY[payload.g].attempts);
-        return {
-            secret:       pickSecret(payload.g, payload.l, payload.u),
+        const left = Math.min(payload.r, gameRules.attempts);
+        const imported = {
+            secret:       pickSecret(gameRules.words, payload.l, payload.u),
             baseLower:    payload.l,
             baseUpper:    payload.u,
             difficulty:   payload.g,
-            baseAttempts: DIFFICULTY[payload.g].attempts - left,
+            baseAttempts: gameRules.attempts - left,
             attempts:     [],
             status:       'IN_PROGRESS'
         };
+        if (custom) imported.rules = rules;
+        return imported;
     }
 
     // --- Saved game (survives a reload, or the phone closing the app in background) ---
@@ -324,7 +414,9 @@
             const usable = saved
                 && saved.secret && typeof saved.secret.word === 'string'
                 && typeof saved.baseLower === 'string' && typeof saved.baseUpper === 'string'
-                && DIFFICULTY[saved.difficulty] !== undefined
+                && (saved.difficulty === CUSTOM
+                    ? isValidRules(saved.rules)
+                    : typeof saved.difficulty === 'string' && hasOwn(DIFFICULTY, saved.difficulty))
                 && Number.isInteger(saved.baseAttempts)
                 && Array.isArray(saved.attempts)
                 && ['IN_PROGRESS', 'WON', 'SURRENDERED', 'LOST'].includes(saved.status);
@@ -332,6 +424,22 @@
         } catch (_) {
             return null;
         }
+    }
+
+    // Last custom rules, so the panel opens on them; the defaults when none (or unusable) are stored
+    function loadCustomRules() {
+        let result = CUSTOM_DEFAULT;
+        try {
+            const saved = JSON.parse(localStorage.getItem(CUSTOM_SAVE_KEY));
+            if (isValidRules(saved)) result = saved;
+        } catch (_) { /* keep the defaults */ }
+        return result;
+    }
+
+    function saveCustomRules(rules) {
+        try {
+            localStorage.setItem(CUSTOM_SAVE_KEY, JSON.stringify(rules));
+        } catch (_) { /* the panel will just open on the defaults */ }
     }
 
     // --- Screen helpers ---
@@ -423,26 +531,33 @@
 
     // Append a readonly bound row (starting bound or past attempt) to the stack.
     // The row is colored on a scale, far (red) to close (green), by how close the word is to the
-    // secret — unless the game's difficulty plays without that hint: then every row looks the same.
-    // With the hint on, the leading letters shared with the secret are also set in bold, the rest dimmed.
+    // secret — unless the game's rules play without the colors: then every row looks the same.
+    // With the bold hint on, the leading letters shared with the secret are set in bold, the rest dimmed.
     // The dictionary's ends are not rows at all: renderBoard draws them as the frame, see appendDictEdge.
     // An imported game's bounds are plain rows without the hint (drawn like a hard game's), so they plainly give none: each import
     // draws a new secret, and colored bounds would let the player re-import the same code until they
     // come up green.
-    // isFresh = the row is the guess just made: with the hint on, it also gets the closeness badge.
+    // isFresh = the row is the guess just made: with the colors on, it also gets the closeness badge.
     function appendBoundRow(word, isFresh) {
         if (word === DICT_FIRST || word === DICT_LAST) return;
         // A plain element rather than a readonly <input>: only part of its text has to be bold
         const row = document.createElement('div');
         row.className = 'word-input bound';
+        const rules    = rulesOf(game);
         const imported = word === game.baseLower || word === game.baseUpper;
-        const hinted   = DIFFICULTY[game.difficulty].closenessHint && !imported;
+        const colored  = rules.colors && !imported;
+        const bolded   = rules.bold && !imported;
         if (imported) {
             row.classList.add('imported');
-            row.textContent = word;
-        } else if (hinted) {
+        } else if (colored) {
             // CSS turns --closeness (0..1) into the actual color, see .word-input.bound
             row.style.setProperty('--closeness', closeness(word).toFixed(3));
+        } else {
+            // No --closeness: the distance cannot be read from the row's color
+            row.classList.add('no-closeness');
+        }
+        if (bolded) {
+            row.classList.add('bold-hint');
             const letters = Array.from(word);
             const shared  = commonPrefixLength(word);
             if (shared > 0) {
@@ -457,11 +572,9 @@
             rest.textContent = letters.slice(shared).join('');
             row.appendChild(rest);
         } else {
-            // Neither --closeness nor the bold prefix: the distance cannot be read from the page either
-            row.classList.add('no-closeness');
             row.textContent = word;
         }
-        if (isFresh && hinted) {
+        if (isFresh && colored) {
             // Wrap the row so the badge can sit over it
             const wrap = document.createElement('div');
             wrap.className = 'bound-wrap';
@@ -588,6 +701,11 @@
 
         // A finished game cannot be played, surrendered or exported
         const ended = game.status !== 'IN_PROGRESS';
+        // Category hint: while playing only, the revealed entry shows the category anyway.
+        // An entry without a category gives no hint.
+        const category = rulesOf(game).category && !ended ? game.secret.category : '';
+        $categoryHint.hidden = category === '';
+        $categoryHint.textContent = category ? `La parola segreta è un ${category}.` : '';
         $submit.disabled       = ended;
         $surrender.disabled    = ended;
         $copyCode.disabled     = ended;
@@ -610,14 +728,18 @@
 
     // --- Game actions ---
 
-    // Start a new game with the selected difficulty
+    // Start a new game with the selected difficulty (or the custom panel's rules)
     function newGame() {
         clearBanner();
         try {
             const difficulty = $difficulty.value;
-            const secret = pickSecret(difficulty);
+            const custom     = difficulty === CUSTOM;
+            const rules      = custom ? readCustomRules() : DIFFICULTY[difficulty];
+            if (!rules) {
+                throw new Error(`i tentativi vanno da ${CUSTOM_ATTEMPTS_MIN} a ${CUSTOM_ATTEMPTS_MAX}.`);
+            }
             game = {
-                secret:       secret,
+                secret:       pickSecret(rules.words),
                 baseLower:    DICT_FIRST,
                 baseUpper:    DICT_LAST,
                 difficulty:   difficulty,
@@ -625,6 +747,10 @@
                 attempts:     [],
                 status:       'IN_PROGRESS'
             };
+            if (custom) {
+                game.rules = rules;
+                saveCustomRules(rules);
+            }
             render();
         } catch (e) {
             showBanner(`Errore avvio partita: ${e.message}`, true);
@@ -812,26 +938,87 @@
         return option ? option.textContent : difficulty;
     }
 
-    // One line under the picker: what the chosen difficulty gives, read from DIFFICULTY
+    // Hints a set of rules turns on, as words for the notes
+    function hintNames(rules) {
+        const names = [];
+        if (rules.colors)   names.push('i colori');
+        if (rules.bold)     names.push('le lettere giuste in grassetto');
+        if (rules.category) names.push('la categoria');
+        return names;
+    }
+
+    // One line describing a set of rules (attempts and hints)
+    function rulesSummary(rules) {
+        const names = hintNames(rules);
+        let hints;
+        if (names.length === 0) {
+            hints = 'senza aiuti: solo prima o dopo';
+        } else if (names.length === 1) {
+            hints = `con ${names[0]}`;
+        } else {
+            hints = `con ${names.slice(0, -1).join(', ')} e ${names[names.length - 1]}`;
+        }
+        return `${rules.attempts} tentativi, ${hints}.`;
+    }
+
+    // Custom panel -> rules; null when the attempts field is not a whole number in range
+    // (the field can be typed into freely, past its min/max)
+    function readCustomRules() {
+        const rules = {
+            words:    $customWords.value,
+            attempts: $customAttempts.value.trim() === '' ? NaN : Number($customAttempts.value),
+            colors:   $customColors.checked,
+            bold:     $customBold.checked,
+            category: $customCategory.checked
+        };
+        return isValidRules(rules) ? rules : null;
+    }
+
+    // Rules -> custom panel
+    function fillCustomPanel(rules) {
+        $customWords.value      = rules.words;
+        $customAttempts.value   = String(rules.attempts);
+        $customColors.checked   = rules.colors;
+        $customBold.checked     = rules.bold;
+        $customCategory.checked = rules.category;
+    }
+
+    // One line under the picker: what the chosen difficulty (or the custom panel) gives.
+    // The custom panel shows only while "personalizzata" is chosen; GIOCA waits for valid rules.
     function updateDifficultyNote() {
-        const rules = DIFFICULTY[$difficulty.value];
-        $difficultyNote.textContent = rules.closenessHint
-            ? `${rules.attempts} tentativi, con i colori e le lettere giuste in grassetto.`
-            : `${rules.attempts} tentativi, senza aiuti: solo prima o dopo.`;    }
+        const custom = $difficulty.value === CUSTOM;
+        const rules  = custom ? readCustomRules() : DIFFICULTY[$difficulty.value];
+        $customRules.hidden = !custom;
+        $customAttempts.setAttribute('aria-invalid', String(rules === null));
+        $difficultyNote.classList.toggle('error', rules === null);
+        $difficultyNote.textContent = rules
+            ? rulesSummary(rules)
+            : `I tentativi vanno da ${CUSTOM_ATTEMPTS_MIN} a ${CUSTOM_ATTEMPTS_MAX}.`;
+        $newGame.disabled = rules === null;
+    }
 
     // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
     function fillHintsTable() {
         Object.keys(DIFFICULTY).forEach(function (difficulty) {
             const rules = DIFFICULTY[difficulty];
+            const names = hintNames(rules);
             const row   = document.createElement('tr');
-            [difficultyName(difficulty), String(rules.attempts), rules.closenessHint ? 'sì' : 'no'].forEach(function (text) {
+            [difficultyName(difficulty), String(rules.attempts), names.length > 0 ? 'sì' : 'no'].forEach(function (text) {
                 const cell = document.createElement('td');
                 cell.textContent = text;
                 row.appendChild(cell);
             });
-            if (!rules.closenessHint) row.className = 'no-hint';
+            if (names.length === 0) row.className = 'no-hint';
             $hintsRows.appendChild(row);
         });
+        // The custom level: the player picks both
+        const custom = document.createElement('tr');
+        [difficultyName(CUSTOM), `${CUSTOM_ATTEMPTS_MIN}-${CUSTOM_ATTEMPTS_MAX}`, 'a scelta'].forEach(function (text) {
+            const cell = document.createElement('td');
+            cell.textContent = text;
+            custom.appendChild(cell);
+        });
+        $hintsRows.appendChild(custom);
     }
 
     // --- Event bindings ---
@@ -878,6 +1065,10 @@
         if (ev.target === $hintsDialog) $hintsDialog.close();
     });
     $difficulty.addEventListener('change', updateDifficultyNote);
+    // Every control of the custom panel updates the note (and the GIOCA button) as it changes
+    $customRules.addEventListener('input', updateDifficultyNote);
+    $customRules.addEventListener('change', updateDifficultyNote);
+    fillCustomPanel(loadCustomRules());
     fillHintsTable();
     updateDifficultyNote();
 

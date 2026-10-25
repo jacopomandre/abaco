@@ -85,9 +85,41 @@
                         <option value="EASY">facile</option>
                         <option value="MEDIUM" selected>medio</option>
                         <option value="HARD">difficile</option>
+                        <option value="CUSTOM">personalizzata</option>
                     </select>
                 </label>
-                <!-- What the chosen difficulty gives: attempts and whether the color hint is on (app.js) -->
+                <!-- Custom game: the player sets every rule. Shown only while "personalizzata" is chosen;
+                     app.js validates the values (attempts 10-30) and keeps GIOCA disabled until they are. -->
+                <fieldset id="custom-rules" class="custom-rules" hidden>
+                    <legend class="visually-hidden">Regole della partita personalizzata</legend>
+                    <label class="custom-field">
+                        PAROLE:
+                        <select id="custom-words">
+                            <option value="EASY">facili</option>
+                            <option value="MEDIUM">medie</option>
+                            <option value="HARD">difficili</option>
+                            <option value="ALL">tutte</option>
+                        </select>
+                    </label>
+                    <label class="custom-field">
+                        TENTATIVI:
+                        <input id="custom-attempts" type="number" min="10" max="30" step="1"
+                               inputmode="numeric" aria-describedby="difficulty-note">
+                    </label>
+                    <label class="custom-check">
+                        <input id="custom-colors" type="checkbox">
+                        colori di vicinanza
+                    </label>
+                    <label class="custom-check">
+                        <input id="custom-bold" type="checkbox">
+                        lettere giuste in grassetto
+                    </label>
+                    <label class="custom-check">
+                        <input id="custom-category" type="checkbox">
+                        categoria della parola
+                    </label>
+                </fieldset>
+                <!-- What the chosen difficulty gives: attempts and hints, or why the custom rules are not valid (app.js) -->
                 <p id="difficulty-note" class="difficulty-note" aria-live="polite"></p>
                 <button id="new-game" type="button">GIOCA</button>
             </div>
@@ -148,6 +180,9 @@
             <!-- Dynamic stack of locked attempt/bound rows with the editable guess in the middle.
                  The guess placeholder shows the attempts countdown (20 / 15 / 15 by difficulty).
                  Once the game is over, the guess row is replaced in place by the secret's dictionary entry. -->
+            <!-- Category hint of a custom game: the secret's grammatical category, while playing (app.js) -->
+            <p id="category-hint" class="category-hint" hidden></p>
+
             <div id="board-stack" class="board-stack" aria-live="polite"></div>
 
             <div class="actions">
@@ -287,6 +322,11 @@
                 <p class="hints-text hints-hard">
                     In modalità <strong>difficile</strong> i colori e le lettere in grassetto sono spenti:
                     tutte le righe sono uguali e sai solo se la parola viene prima o dopo.
+                </p>
+                <p class="hints-text">
+                    Con la partita <strong>personalizzata</strong> scegli tu le parole, i tentativi
+                    e gli aiuti: colori, grassetto e la <strong>categoria</strong> della parola
+                    (sostantivo, aggettivo o verbo), mostrata fin dall'inizio.
                 </p>
             </section>
 

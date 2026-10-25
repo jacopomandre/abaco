@@ -75,7 +75,8 @@ body.az-page {
 }
 
 /* style.css disabled state would leave white text on the cream surface */
-#submit-guess:disabled {
+#submit-guess:disabled,
+#new-game:disabled {
     background: var(--surface);
     border-color: var(--line-soft);
     color: var(--ink-muted);
