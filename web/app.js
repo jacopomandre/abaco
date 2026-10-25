@@ -947,7 +947,7 @@
         const names = hintNames(rules);
         let hints;
         if (names.length === 0) {
-            hints = 'senza aiuti: solo prima o dopo';
+            hints = 'senza aiuti';
         } else if (names.length === 1) {
             hints = `con ${names[0]}`;
         } else {
