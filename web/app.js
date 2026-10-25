@@ -39,7 +39,7 @@
     const $startScreen     = document.getElementById('start-screen');
     const $theme           = document.getElementById('theme-select');
     const $difficultyNote  = document.getElementById('difficulty-note');
-    // Custom game panel, shown under the picker when "personalizzata" is chosen
+    // Custom game panel, shown under the picker when "su misura" is chosen
     const $customRules     = document.getElementById('custom-rules');
     const $customWords     = document.getElementById('custom-words');
     const $customAttempts  = document.getElementById('custom-attempts');
@@ -90,7 +90,7 @@
     // localStorage key holding the game in progress
     const SAVE_KEY = 'abaco.partita';
     // localStorage key holding the last custom rules, so the panel opens on them
-    const CUSTOM_SAVE_KEY = 'abaco.personalizzata';
+    const CUSTOM_SAVE_KEY = 'abaco.su-misura';
 
     // Game code format version, bumped if the exported payload ever changes shape
     // (3: carries the difficulty, which sets both the attempts and the color hint;
@@ -985,7 +985,7 @@
     }
 
     // One line under the picker: what the chosen difficulty (or the custom panel) gives.
-    // The custom panel shows only while "personalizzata" is chosen.
+    // The custom panel shows only while "su misura" is chosen.
     function updateDifficultyNote() {
         const custom = $difficulty.value === CUSTOM;
         const rules  = custom ? readCustomRules() : DIFFICULTY[$difficulty.value];
