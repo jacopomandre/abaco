@@ -169,8 +169,9 @@ html, body {
 }
 
 .difficulty-label {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
     font-size: 13px;
     color: var(--ink-soft);
@@ -971,11 +972,13 @@ select:focus {
     color: var(--ink-soft);
 }
 
+/* The difficulty and word pickers share one size, so their right edges line up
+   (the height comes from .start-option select). A share of the row, not em: themes
+   with a bigger font would otherwise push the picker out of the card. */
+.start-option .difficulty-label select,
 .start-option .custom-field select {
-    width: 8.5em;
-    height: 32px;
-    padding-top: 0;
-    padding-bottom: 0;
+    width: 58%;
+    min-width: 0;
 }
 
 /* Hint switch: a checkbox drawn as a pill with a knob, off on the left, on (filled) on the right */
