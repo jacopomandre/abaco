@@ -1,0 +1,50 @@
+# Publishes the static site (web/) on GitHub Pages at every push to main.
+# The dictionary check runs first: an invalid dictionary fails the deploy, as it did on Netlify.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Manual run from the Actions tab (e.g. to redeploy without a new commit)
+  workflow_dispatch:
+
+# Least privilege: read the code, write only to Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push does not cancel a deploy already running
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Plain Node script, no npm dependencies needed
+      - name: Check dictionary
+        run: npm run check
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
