@@ -43,6 +43,7 @@
     const $customRules     = document.getElementById('custom-rules');
     const $customWords     = document.getElementById('custom-words');
     const $customAttempts  = document.getElementById('custom-attempts');
+    const $attemptsStepper = document.getElementById('custom-attempts-stepper');
     const $customColors    = document.getElementById('custom-colors');
     const $customBold      = document.getElementById('custom-bold');
     const $customCategory  = document.getElementById('custom-category');
@@ -120,6 +121,8 @@
     let game = null;
     // Reference to the editable guess input (recreated on each render)
     let $guess = null;
+    // Attempts chosen in the custom panel, moved only by its step buttons
+    let customAttempts = CUSTOM_DEFAULT.attempts;
 
     // --- Rules ---
 
@@ -736,7 +739,7 @@
             const custom     = difficulty === CUSTOM;
             const rules      = custom ? readCustomRules() : DIFFICULTY[difficulty];
             if (!rules) {
-                throw new Error(`i tentativi vanno da ${CUSTOM_ATTEMPTS_MIN} a ${CUSTOM_ATTEMPTS_MAX}.`);
+                throw new Error('regole della partita non valide.');
             }
             game = {
                 secret:       pickSecret(rules.words),
@@ -961,12 +964,12 @@
         return `${rules.attempts} tentativi, ${hints}.`;
     }
 
-    // Custom panel -> rules; null when the attempts field is not a whole number in range
-    // (the field can be typed into freely, past its min/max)
+    // Custom panel -> rules; null if they do not pass the check (the panel cannot produce
+    // invalid rules, but the game must never start from unchecked ones)
     function readCustomRules() {
         const rules = {
             words:    $customWords.value,
-            attempts: $customAttempts.value.trim() === '' ? NaN : Number($customAttempts.value),
+            attempts: customAttempts,
             colors:   $customColors.checked,
             bold:     $customBold.checked,
             category: $customCategory.checked
@@ -977,24 +980,34 @@
     // Rules -> custom panel
     function fillCustomPanel(rules) {
         $customWords.value      = rules.words;
-        $customAttempts.value   = String(rules.attempts);
+        customAttempts          = rules.attempts;
         $customColors.checked   = rules.colors;
         $customBold.checked     = rules.bold;
         $customCategory.checked = rules.category;
     }
 
+    // Move the custom attempts by a step button, never past the limits
+    function stepCustomAttempts(ev) {
+        const button = ev.target.closest('.step-btn');
+        if (!button) return;
+        const step = Number(button.dataset.step);
+        customAttempts = Math.min(CUSTOM_ATTEMPTS_MAX, Math.max(CUSTOM_ATTEMPTS_MIN, customAttempts + step));
+        updateDifficultyNote();
+    }
+
     // One line under the picker: what the chosen difficulty (or the custom panel) gives.
-    // The custom panel shows only while "personalizzata" is chosen; GIOCA waits for valid rules.
+    // The custom panel shows only while "personalizzata" is chosen.
     function updateDifficultyNote() {
         const custom = $difficulty.value === CUSTOM;
         const rules  = custom ? readCustomRules() : DIFFICULTY[$difficulty.value];
         $customRules.hidden = !custom;
-        $customAttempts.setAttribute('aria-invalid', String(rules === null));
-        $difficultyNote.classList.toggle('error', rules === null);
-        $difficultyNote.textContent = rules
-            ? rulesSummary(rules)
-            : `I tentativi vanno da ${CUSTOM_ATTEMPTS_MIN} a ${CUSTOM_ATTEMPTS_MAX}.`;
-        $newGame.disabled = rules === null;
+        $customAttempts.textContent = String(customAttempts);
+        // A limit reached turns off the buttons that would push past it
+        $attemptsStepper.querySelectorAll('.step-btn').forEach(function (button) {
+            const step = Number(button.dataset.step);
+            button.disabled = step < 0 ? customAttempts <= CUSTOM_ATTEMPTS_MIN : customAttempts >= CUSTOM_ATTEMPTS_MAX;
+        });
+        $difficultyNote.textContent = rules ? rulesSummary(rules) : '';
     }
 
     // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
@@ -1065,9 +1078,9 @@
         if (ev.target === $hintsDialog) $hintsDialog.close();
     });
     $difficulty.addEventListener('change', updateDifficultyNote);
-    // Every control of the custom panel updates the note (and the GIOCA button) as it changes
-    $customRules.addEventListener('input', updateDifficultyNote);
+    // Every control of the custom panel updates the note as it changes
     $customRules.addEventListener('change', updateDifficultyNote);
+    $attemptsStepper.addEventListener('click', stepCustomAttempts);
     fillCustomPanel(loadCustomRules());
     fillHintsTable();
     updateDifficultyNote();

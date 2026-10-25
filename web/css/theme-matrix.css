@@ -144,9 +144,11 @@ button {
 button::before { content: "[ "; }
 button::after  { content: " ]"; }
 
-/* Icon buttons (back arrow) stay bare */
+/* Icon buttons (back arrow) and the attempts - / + (bare signs read better) stay bare */
 .icon-btn::before,
-.icon-btn::after {
+.icon-btn::after,
+.step-btn::before,
+.step-btn::after {
     content: none;
 }
 
@@ -164,8 +166,7 @@ button:hover:not(:disabled) {
     background: #7dff9b;
 }
 
-#submit-guess:disabled,
-#new-game:disabled {
+#submit-guess:disabled {
     background: transparent;
 }
 

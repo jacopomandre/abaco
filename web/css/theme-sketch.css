@@ -195,8 +195,7 @@ button:disabled {
         #fff59d;
 }
 
-#submit-guess:disabled,
-#new-game:disabled {
+#submit-guess:disabled {
     background: transparent;
 }
 

@@ -88,8 +88,8 @@
                         <option value="CUSTOM">personalizzata</option>
                     </select>
                 </label>
-                <!-- Custom game: the player sets every rule. Shown only while "personalizzata" is chosen;
-                     app.js validates the values (attempts 10-30) and keeps GIOCA disabled until they are. -->
+                <!-- Custom game: the player sets every rule. Shown only while "personalizzata" is chosen.
+                     The attempts are set with steps only (no typing), so they never leave 10-30 (app.js). -->
                 <fieldset id="custom-rules" class="custom-rules" hidden>
                     <legend class="visually-hidden">Regole della partita personalizzata</legend>
                     <label class="custom-field">
@@ -101,11 +101,15 @@
                             <option value="ALL">tutte</option>
                         </select>
                     </label>
-                    <label class="custom-field">
-                        TENTATIVI:
-                        <input id="custom-attempts" type="number" min="10" max="30" step="1"
-                               inputmode="numeric" aria-describedby="difficulty-note">
-                    </label>
+                    <div class="custom-field" role="group" aria-labelledby="custom-attempts-label">
+                        <span id="custom-attempts-label">TENTATIVI:</span>
+                        <!-- Each button moves the count by its data-step; it turns off at the limit it points to -->
+                        <div id="custom-attempts-stepper" class="attempts-stepper">
+                            <button type="button" class="step-btn" data-step="-1" aria-label="Un tentativo in meno">−</button>
+                            <output id="custom-attempts" class="attempts-value" aria-live="polite"></output>
+                            <button type="button" class="step-btn" data-step="1" aria-label="Un tentativo in più">+</button>
+                        </div>
+                    </div>
                     <label class="custom-check">
                         <input id="custom-colors" type="checkbox">
                         colori di vicinanza

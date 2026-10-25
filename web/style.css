@@ -464,12 +464,6 @@ select:focus {
     color: var(--surface);
 }
 
-/* Disabled while the custom rules are not valid: the id rule above would keep it looking active */
-#new-game:disabled {
-    background: var(--surface);
-    color: var(--ink-muted);
-}
-
 /* ---------- History (collapsible) ---------- */
 .history-section {
     margin-top: 8px;
@@ -951,12 +945,6 @@ select:focus {
     color: var(--ink-muted);
 }
 
-/* The custom rules under the picker are not valid (attempts out of range) */
-.difficulty-note.error {
-    color: var(--alert);
-    font-weight: 600;
-}
-
 /* ---------- Custom game panel (start screen) ---------- */
 .custom-rules {
     display: flex;
@@ -1005,8 +993,29 @@ select:focus {
     margin: 0;
 }
 
-.custom-field input[aria-invalid="true"] {
-    border-color: var(--alert);
+/* Attempts: - [count] +, the count in the middle */
+.attempts-stepper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.start-option .attempts-stepper .step-btn {
+    width: auto;
+    min-width: 36px;
+    height: 32px;
+    padding: 0 6px;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.attempts-value {
+    min-width: 2.2em;
+    text-align: center;
+    font-size: 17px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
 }
 
 /* Category hint of a custom game, above the board */
