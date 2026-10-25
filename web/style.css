@@ -946,6 +946,26 @@ select:focus {
     color: var(--ink-muted);
 }
 
+/* The note and its invisible sizer share one grid cell: the cell is as tall as the tallest text */
+.difficulty-note,
+.note-sizer {
+    display: grid;
+}
+
+.difficulty-note > *,
+.note-sizer > * {
+    grid-area: 1 / 1;
+    margin: 0;
+}
+
+.note-sizer {
+    visibility: hidden;
+}
+
+.note-sizer[hidden] {
+    display: none;
+}
+
 /* ---------- Custom game panel (start screen) ---------- */
 .custom-rules {
     display: flex;

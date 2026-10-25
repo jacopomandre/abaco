@@ -39,6 +39,7 @@
     const $startScreen     = document.getElementById('start-screen');
     const $theme           = document.getElementById('theme-select');
     const $difficultyNote  = document.getElementById('difficulty-note');
+    const $noteSizer       = document.getElementById('difficulty-note-sizer');
     // Custom game panel, shown under the picker when "su misura" is chosen
     const $customRules     = document.getElementById('custom-rules');
     const $customWords     = document.getElementById('custom-words');
@@ -968,6 +969,18 @@
         return isValidRules(rules) ? rules : null;
     }
 
+    // Sizer under the note: every note the custom panel can show (each hint on or off, the most
+    // attempts), so the note keeps the height of the longest one and GIOCA stays put
+    function fillNoteSizer() {
+        [true, false].forEach(function (colors) {
+            [true, false].forEach(function (bold) {
+                const text = document.createElement('span');
+                text.textContent = rulesSummary({ attempts: CUSTOM_ATTEMPTS_MAX, colors: colors, bold: bold });
+                $noteSizer.appendChild(text);
+            });
+        });
+    }
+
     // Rules -> custom panel
     function fillCustomPanel(rules) {
         $customWords.value      = rules.words;
@@ -991,6 +1004,8 @@
         const custom = $difficulty.value === CUSTOM;
         const rules  = custom ? readCustomRules() : DIFFICULTY[$difficulty.value];
         $customRules.hidden = !custom;
+        // The preset notes never change under the player's hand: no room to keep for them
+        $noteSizer.hidden   = !custom;
         $customAttempts.textContent = String(customAttempts);
         // A limit reached turns off the buttons that would push past it
         $attemptsStepper.querySelectorAll('.step-btn').forEach(function (button) {
@@ -1072,6 +1087,7 @@
     $customRules.addEventListener('change', updateDifficultyNote);
     $attemptsStepper.addEventListener('click', stepCustomAttempts);
     fillCustomPanel(loadCustomRules());
+    fillNoteSizer();
     fillHintsTable();
     updateDifficultyNote();
 

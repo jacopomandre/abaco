@@ -121,7 +121,13 @@
                     </label>
                 </fieldset>
                 <!-- What the chosen difficulty gives: attempts and hints (app.js) -->
-                <p id="difficulty-note" class="difficulty-note" aria-live="polite"></p>
+                <!-- The sizer holds, invisible, every note the su misura panel can show, stacked in the same
+                     spot as the real note: the box takes the tallest one's height, so toggling a hint never
+                     moves GIOCA, whatever the theme's font or the screen width (app.js fills it) -->
+                <div class="difficulty-note">
+                    <p id="difficulty-note" aria-live="polite"></p>
+                    <div id="difficulty-note-sizer" class="note-sizer" aria-hidden="true" hidden></div>
+                </div>
                 <button id="new-game" type="button">GIOCA</button>
             </div>
 
