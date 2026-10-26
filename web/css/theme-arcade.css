@@ -1,0 +1,247 @@
+/* =========================================================================
+   Theme "arcade": an 80s arcade cabinet. Night-blue screen over a neon perspective grid,
+   magenta / cyan / yellow neon, chunky push buttons with a hard offset shadow.
+   Layered on style.css (loaded only while the theme is active, see theme.js).
+   ========================================================================= */
+
+@font-face {
+    font-family: 'Fredoka';
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../fonts/fredoka-latin.woff2') format('woff2');
+}
+
+:root {
+    /* Palette: night blue screen, neon magenta / cyan / yellow */
+    --ink: #f5f3ff;
+    --ink-soft: #cdc7ff;
+    --ink-muted: #9089d8;
+    --line: #22e6ff;
+    --line-soft: #3a2f7a;
+    --surface: #140b3d;
+    --surface-alt: #1b1152;
+    --surface-sunk: #0a0626;
+    --win-bg: #0d3346;
+    --win-line: #22e6ff;
+    /* Closeness scale in the three neon hues, darkened enough to carry white text:
+       magenta (far), amber (near), cyan (close), same bands as the badge levels */
+    --closeness-scale: #a8155b 0%, #b8236a 44%, #a86f00 46%, #b88500 84%, #0b8aa3 86%, #0a9fbb 100%;
+    --reveal-won: #0a9fbb;
+    --reveal-surrendered: #3d3570;
+    --alert: #ff4d6d;
+    --row-marker: #ffe14d;
+    --copy-ok: #22e6ff;
+    /* Neon colors, used outside the closeness scale */
+    --ar-pink: #ff3fa4;
+    --ar-cyan: #22e6ff;
+    --ar-yellow: #ffe14d;
+
+    --font-ui: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+    --font-mono: 'Courier New', ui-monospace, 'Cascadia Mono', monospace;
+
+    --r-sm: 4px;
+    --r-md: 6px;
+    --r-lg: 10px;
+}
+
+html,
+body {
+    background: var(--surface-sunk);
+}
+
+/* ---------- Neon floor: a perspective grid fading toward the horizon ---------- */
+body::before {
+    content: "";
+    position: fixed;
+    left: -50%;
+    right: -50%;
+    bottom: 0;
+    height: 45vh;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(90deg, rgba(255, 63, 164, 0.55) 0 2px, transparent 2px 60px),
+        repeating-linear-gradient(0deg, rgba(255, 63, 164, 0.55) 0 2px, transparent 2px 40px);
+    transform: perspective(260px) rotateX(62deg);
+    transform-origin: bottom;
+    -webkit-mask-image: linear-gradient(transparent, #000 70%);
+    mask-image: linear-gradient(transparent, #000 70%);
+    opacity: 0.6;
+}
+
+/* ---------- Card: the cabinet screen, double neon frame ---------- */
+.page {
+    position: relative;
+    background: rgba(20, 11, 61, 0.94);
+    border: 3px solid var(--ar-pink);
+    box-shadow:
+        0 0 0 3px var(--surface-sunk),
+        0 0 0 6px var(--ar-cyan),
+        0 0 40px rgba(255, 63, 164, 0.35);
+}
+
+.logo {
+    filter: drop-shadow(0 0 12px rgba(34, 230, 255, 0.45));
+}
+
+.tagline {
+    font-style: normal;
+    color: var(--ink-soft);
+}
+
+.rule,
+.dict-edge::before,
+.dict-edge::after {
+    border-color: var(--line-soft);
+}
+
+/* Small labels in arcade yellow */
+.theme-label,
+.difficulty-label,
+.start-option-title,
+.history-title {
+    color: var(--ar-yellow);
+    letter-spacing: 0.06em;
+}
+
+.start-option {
+    background: var(--surface-alt);
+    border: 2px solid var(--line-soft);
+}
+
+/* ---------- Buttons: arcade push buttons with a hard magenta shadow ---------- */
+button {
+    background: var(--surface-alt);
+    color: var(--ink);
+    border: 2px solid var(--ar-cyan);
+    box-shadow: 4px 4px 0 var(--ar-pink);
+    font-weight: 600;
+}
+
+button:hover:not(:disabled) {
+    background: var(--surface-alt);
+    color: var(--ar-cyan);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0 var(--ar-pink);
+}
+
+button:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--ar-pink);
+}
+
+button:disabled {
+    background: var(--surface-alt);
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+    box-shadow: none;
+}
+
+/* Primary actions: the big yellow start button */
+#submit-guess,
+#new-game,
+#import-confirm,
+#confirm-ok,
+#hints-close,
+#submit-guess:hover:not(:disabled),
+#new-game:hover:not(:disabled),
+#import-confirm:hover:not(:disabled),
+#confirm-ok:hover:not(:disabled),
+#hints-close:hover:not(:disabled) {
+    background: var(--ar-yellow);
+    color: var(--surface);
+    border-color: var(--ar-yellow);
+}
+
+#submit-guess:disabled {
+    background: var(--surface-alt);
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+}
+
+/* ---------- Fields and attempt rows ---------- */
+select,
+.code-input {
+    background-color: var(--surface-sunk);
+    color: var(--ink);
+    border: 2px solid var(--line-soft);
+}
+
+.word-input {
+    font-weight: 700;
+}
+
+.word-input.guess {
+    background: var(--surface-sunk);
+    color: var(--ink);
+    border: 2px solid var(--ar-cyan);
+    caret-color: var(--ar-yellow);
+}
+
+.word-input.guess:focus,
+.code-input:focus,
+select:focus {
+    transform: none;
+    box-shadow: 0 0 0 1px var(--ar-cyan), 0 0 18px rgba(34, 230, 255, 0.45);
+}
+
+/* Lit bars: white letters with a soft glow on the neon fill */
+.word-input.bound {
+    color: #ffffff;
+    border: none;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.25);
+}
+
+.word-input.bound.no-closeness,
+.word-input.bound.imported {
+    --row-plain-bg: #2a2160;
+    --row-marker: var(--ar-yellow);
+    color: var(--ink);
+}
+
+/* ---------- Revealed secret, history, banner, popup ---------- */
+.dict-entry {
+    text-shadow: none;
+    border-color: var(--ar-cyan);
+}
+
+.history-list li::before {
+    background: var(--ar-yellow);
+}
+
+.banner {
+    background: var(--surface-alt);
+    color: var(--ink);
+    border-left-color: var(--ar-cyan);
+}
+
+.import-dialog {
+    background: var(--surface);
+    color: var(--ink);
+    border: 3px solid var(--ar-cyan);
+    box-shadow: 6px 6px 0 var(--ar-pink);
+}
+
+.import-dialog::backdrop {
+    background: rgba(10, 6, 38, 0.75);
+}
+
+/* ---------- Closeness badge: an arcade score shout, small and blocky ---------- */
+.closeness-badge {
+    --slant: translateY(-50%) rotate(-6deg);
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+}
+
+.closeness-badge .closeness-letter {
+    -webkit-text-stroke: 3px var(--surface-sunk);
+    text-shadow: 3px 3px 0 var(--surface-sunk);
+}
+
+.closeness-badge.far   { --fill: var(--ar-pink); --edge: var(--surface-sunk); }
+.closeness-badge.near  { --fill: var(--ar-yellow); --edge: var(--surface-sunk); }
+.closeness-badge.close,
+.closeness-badge.won   { --fill: var(--ar-cyan); --edge: var(--surface-sunk); }

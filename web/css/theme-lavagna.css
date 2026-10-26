@@ -1,0 +1,238 @@
+/* =========================================================================
+   Theme "lavagna": a school chalkboard. Green slate in a wooden frame on a classroom wall,
+   chalk-white writing, rows like strokes of colored chalk.
+   Layered on style.css (loaded only while the theme is active, see theme.js).
+   ========================================================================= */
+
+@font-face {
+    font-family: 'Caveat';
+    font-weight: 600 700;
+    font-display: swap;
+    src: url('../fonts/caveat-latin.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Fredoka';
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../fonts/fredoka-latin.woff2') format('woff2');
+}
+
+:root {
+    /* Palette: green slate, chalk white, warm wood */
+    --ink: #f3f1e7;
+    --ink-soft: #dcd9cc;
+    --ink-muted: #a9b8aa;
+    --line: #f3f1e7;
+    --line-soft: #4d6a58;
+    --surface: #2e4a3a;
+    --surface-alt: #34523f;
+    --surface-sunk: #d8cdb4;
+    --win-bg: #3b5e48;
+    --win-line: #cfeec8;
+    /* Colored chalk, kept dark enough for the chalk-white letters: pink (far), ochre (near), blue (close) */
+    --closeness-scale: #a9505c 0%, #b05f56 44%, #a58430 46%, #9c8c3c 84%, #3f7d9c 86%, #36749a 100%;
+    --reveal-won: #36749a;
+    --reveal-surrendered: #5d6b62;
+    --alert: #ff9a9a;
+    --row-marker: #f3f1e7;
+    --copy-ok: #cfeec8;
+    /* Wooden frame */
+    --lv-wood: #8a5a33;
+    --lv-wood-dark: #5f3c20;
+
+    --font-ui: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+    --font-mono: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+    --lv-font-chalk: 'Caveat', 'Comic Sans MS', cursive;
+
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 6px;
+}
+
+/* Classroom wall */
+html,
+body {
+    background: var(--surface-sunk);
+}
+
+/* ---------- Card: the slate in its wooden frame, with faint chalk dust ---------- */
+.page {
+    position: relative;
+    background:
+        radial-gradient(ellipse at 20% 15%, rgba(255, 255, 255, 0.07), transparent 55%),
+        radial-gradient(ellipse at 80% 85%, rgba(255, 255, 255, 0.05), transparent 50%),
+        var(--surface);
+    border: 14px solid var(--lv-wood);
+    border-radius: 8px;
+    box-shadow:
+        inset 0 0 0 2px var(--lv-wood-dark),
+        inset 0 0 50px rgba(0, 0, 0, 0.35),
+        0 12px 30px rgba(60, 40, 20, 0.35);
+}
+
+.tagline {
+    font-family: var(--lv-font-chalk);
+    font-style: normal;
+    font-size: 21px;
+    line-height: 1.3;
+    color: var(--ink);
+}
+
+.rule,
+.dict-edge::before,
+.dict-edge::after {
+    border-color: rgba(243, 241, 231, 0.35);
+}
+
+.start-option {
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px dashed rgba(243, 241, 231, 0.35);
+}
+
+.start-option-title,
+.history-title,
+.dialog-title {
+    font-family: var(--lv-font-chalk);
+    font-size: 24px;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: var(--ink);
+}
+
+.theme-label,
+.difficulty-label {
+    color: var(--ink-soft);
+}
+
+/* ---------- Buttons: chalk outlines ---------- */
+button {
+    background: transparent;
+    color: var(--ink);
+    border: 2px solid rgba(243, 241, 231, 0.85);
+}
+
+button:hover:not(:disabled) {
+    background: rgba(243, 241, 231, 0.12);
+    color: var(--ink);
+    box-shadow: none;
+}
+
+button:disabled {
+    background: transparent;
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+}
+
+/* Primary actions: filled with chalk */
+#submit-guess,
+#new-game,
+#import-confirm,
+#confirm-ok,
+#hints-close,
+#submit-guess:hover:not(:disabled),
+#new-game:hover:not(:disabled),
+#import-confirm:hover:not(:disabled),
+#confirm-ok:hover:not(:disabled),
+#hints-close:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--surface);
+    border-color: var(--ink);
+}
+
+#submit-guess:disabled {
+    background: transparent;
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+}
+
+/* ---------- Fields and attempt rows ---------- */
+select,
+.code-input {
+    background-color: rgba(0, 0, 0, 0.18);
+    color: var(--ink);
+    border: 2px solid rgba(243, 241, 231, 0.45);
+}
+
+.word-input {
+    font-size: 19px;
+    font-weight: 600;
+}
+
+/* Guess field: a dashed chalk box, to be written in */
+.word-input.guess {
+    background: rgba(0, 0, 0, 0.15);
+    color: var(--ink);
+    border: 2px dashed rgba(243, 241, 231, 0.8);
+    caret-color: var(--ink);
+}
+
+.word-input.guess:focus,
+.code-input:focus,
+select:focus {
+    transform: none;
+    border-style: solid;
+    box-shadow: 0 0 0 3px rgba(243, 241, 231, 0.2);
+}
+
+.word-input.bound {
+    color: var(--ink);
+    border: none;
+    text-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.word-input.bound.no-closeness,
+.word-input.bound.imported {
+    --row-plain-bg: #44604f;
+}
+
+/* ---------- Revealed secret, history, banner, popup ---------- */
+.dict-entry {
+    font-family: var(--font-ui);
+    text-shadow: none;
+}
+
+.history-list li::before {
+    background: var(--ink);
+}
+
+.banner {
+    background: var(--surface-alt);
+    color: var(--ink);
+    border-left-color: var(--ink);
+}
+
+.import-dialog {
+    background: var(--surface);
+    color: var(--ink);
+    border: 10px solid var(--lv-wood);
+    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3), 0 20px 48px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- Closeness badge: a chalk scribble on the board ---------- */
+.closeness-badge {
+    --slant: translateY(-50%) rotate(-7deg);
+    font-family: var(--lv-font-chalk);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 34px;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.closeness-badge .closeness-letter {
+    -webkit-text-stroke: 4px var(--edge);
+    text-shadow: none;
+}
+
+.closeness-badge.far   { --fill: #ff9aa6; --edge: #2e4a3a; }
+.closeness-badge.near  { --fill: #ffe08a; --edge: #2e4a3a; }
+.closeness-badge.close,
+.closeness-badge.won   { --fill: #a8dcff; --edge: #2e4a3a; }
+
+/* ---------- Narrow screens: a thinner wooden frame ---------- */
+@media (max-width: 640px) {
+    .page {
+        border-width: 9px;
+    }
+}

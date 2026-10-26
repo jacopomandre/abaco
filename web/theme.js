@@ -13,7 +13,10 @@
         classico: '#FDF8EB',
         hacker:   '#000000',
         retro:    '#008080',
-        sketch:   '#F1EEE6'
+        sketch:   '#F1EEE6',
+        arcade:   '#0A0626',
+        lavagna:  '#D8CDB4',
+        notte:    '#0C1020'
     };
 
     // Old theme names still saved on some devices -> the theme that replaced them

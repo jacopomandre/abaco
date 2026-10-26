@@ -1,0 +1,206 @@
+/* =========================================================================
+   Theme "notte": a calm dark theme for playing in the evening. Deep night blue under a few
+   faint stars, soft bright pastels for the rows, a moon-gold accent on the main buttons.
+   Layered on style.css (loaded only while the theme is active, see theme.js).
+   ========================================================================= */
+
+@font-face {
+    font-family: 'Fredoka';
+    font-weight: 400 700;
+    font-display: swap;
+    src: url('../fonts/fredoka-latin.woff2') format('woff2');
+}
+
+:root {
+    /* Palette: night blue, moonlight text, moon gold */
+    --ink: #e8ebf5;
+    --ink-soft: #b7bdd1;
+    --ink-muted: #7f88a2;
+    --line: #e8ebf5;
+    --line-soft: #2b3252;
+    --surface: #171c30;
+    --surface-alt: #1d2339;
+    --surface-sunk: #0c1020;
+    --win-bg: #1b3a34;
+    --win-line: #7fd6b0;
+    /* Muted pastels, dark enough for the light letters: rose (far), amber (near), teal (close) */
+    --closeness-scale: #a8566e 0%, #ab6563 44%, #a07f3c 46%, #948d45 84%, #3b8a74 86%, #2f856c 100%;
+    --reveal-won: #2f856c;
+    --reveal-surrendered: #3c4463;
+    --alert: #ff8fa8;
+    --row-marker: #e8ebf5;
+    --copy-ok: #7fe3c0;
+    --nt-gold: #f2c46d;
+
+    --font-ui: 'Fredoka', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 22px;
+}
+
+/* ---------- Sky: night gradient and a few faint stars ---------- */
+html,
+body {
+    background:
+        radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.7), transparent),
+        radial-gradient(1px 1px at 78% 12%, rgba(255, 255, 255, 0.55), transparent),
+        radial-gradient(1.5px 1.5px at 62% 34%, rgba(255, 255, 255, 0.5), transparent),
+        radial-gradient(1px 1px at 28% 72%, rgba(255, 255, 255, 0.45), transparent),
+        radial-gradient(1.5px 1.5px at 88% 64%, rgba(255, 255, 255, 0.5), transparent),
+        radial-gradient(1px 1px at 46% 90%, rgba(255, 255, 255, 0.4), transparent),
+        linear-gradient(180deg, #121833 0%, var(--surface-sunk) 100%) fixed;
+}
+
+/* ---------- Card: a soft panel floating on the sky ---------- */
+.page {
+    background: rgba(23, 28, 48, 0.94);
+    border: 1px solid var(--line-soft);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.logo {
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
+}
+
+.tagline {
+    color: var(--ink-soft);
+}
+
+.rule,
+.dict-edge::before,
+.dict-edge::after {
+    border-color: var(--line-soft);
+}
+
+.start-option {
+    background: var(--surface-alt);
+    border: 1px solid var(--line-soft);
+}
+
+.start-option-title,
+.history-title {
+    color: var(--nt-gold);
+}
+
+/* ---------- Buttons: soft pills, gold for the main actions ---------- */
+button {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid #3b4468;
+    border-radius: 999px;
+}
+
+button:hover:not(:disabled) {
+    background: #242b47;
+    color: var(--ink);
+    box-shadow: none;
+}
+
+button:disabled {
+    background: transparent;
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+}
+
+#submit-guess,
+#new-game,
+#import-confirm,
+#confirm-ok,
+#hints-close,
+#submit-guess:hover:not(:disabled),
+#new-game:hover:not(:disabled),
+#import-confirm:hover:not(:disabled),
+#confirm-ok:hover:not(:disabled),
+#hints-close:hover:not(:disabled) {
+    background: var(--nt-gold);
+    color: var(--surface);
+    border-color: var(--nt-gold);
+}
+
+#submit-guess:disabled {
+    background: transparent;
+    color: var(--ink-muted);
+    border-color: var(--line-soft);
+}
+
+/* ---------- Fields and attempt rows ---------- */
+select,
+.code-input {
+    background-color: var(--surface-sunk);
+    color: var(--ink);
+    border: 1px solid #3b4468;
+}
+
+.word-input.guess {
+    background: var(--surface-sunk);
+    color: var(--ink);
+    border: 1px solid #3b4468;
+    caret-color: var(--nt-gold);
+}
+
+.word-input.guess:focus,
+.code-input:focus,
+select:focus {
+    transform: none;
+    border-color: var(--nt-gold);
+    box-shadow: 0 0 0 3px rgba(242, 196, 109, 0.18);
+}
+
+.word-input.bound {
+    color: #ffffff;
+    border: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.word-input.bound.no-closeness,
+.word-input.bound.imported {
+    --row-plain-bg: #252c48;
+    color: var(--ink);
+}
+
+/* ---------- Revealed secret, history, banner, popup ---------- */
+.dict-entry {
+    text-shadow: none;
+}
+
+.history-list li::before {
+    background: var(--nt-gold);
+}
+
+.banner {
+    background: var(--surface-alt);
+    color: var(--ink);
+    border-left-color: var(--nt-gold);
+}
+
+.import-dialog {
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-soft);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.import-dialog::backdrop {
+    background: rgba(5, 8, 20, 0.7);
+}
+
+/* ---------- Closeness badge: rounded and soft, like the rest ---------- */
+.closeness-badge {
+    --slant: translateY(-50%) rotate(-6deg);
+    font-family: var(--font-ui);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 0.02em;
+}
+
+.closeness-badge .closeness-letter {
+    -webkit-text-stroke: 4px var(--edge);
+    text-shadow: none;
+}
+
+.closeness-badge.far   { --fill: #ff9fb4; --edge: var(--surface-sunk); }
+.closeness-badge.near  { --fill: #ffd57a; --edge: var(--surface-sunk); }
+.closeness-badge.close,
+.closeness-badge.won   { --fill: #84e8c6; --edge: var(--surface-sunk); }
