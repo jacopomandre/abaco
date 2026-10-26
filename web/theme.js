@@ -12,7 +12,6 @@
     const THEME_COLOR = {
         classico: '#FDF8EB',
         hacker:   '#000000',
-        retro:    '#008080',
         sketch:   '#F1EEE6',
         arcade:   '#0A0626',
         lavagna:  '#D8CDB4',
@@ -20,7 +19,7 @@
     };
 
     // Old theme names still saved on some devices -> the theme that replaced them
-    const RENAMED = { matrix: 'hacker' };
+    const RENAMED = { matrix: 'hacker', retro: 'arcade' };
 
     // Saved theme, or the default one when none (or an unknown one) is stored.
     // Storage can be unavailable (private mode, blocked site data): every access is guarded.

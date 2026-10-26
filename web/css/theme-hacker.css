@@ -5,6 +5,8 @@
    ========================================================================= */
 
 :root {
+    /* Dark theme: native controls (the list a select opens, scrollbars) are drawn dark too */
+    color-scheme: dark;
     /* Palette: phosphor green on black */
     --ink: #00ff41;
     --ink-soft: #00c832;
@@ -62,10 +64,15 @@ body {
     background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
 }
 
-/* Logo recolored green, with a glow */
+/* Logo recolored green, with a glow. The recolor turns the navy "abaco" into a very dark green
+   that sank into the black: a thin phosphor outline (drop-shadows with no blur, pushed in eight
+   directions, follow the drawing's shape) brings its letters back, like a lit sticker */
 .logo {
     filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5) brightness(0.95)
-            drop-shadow(0 0 6px rgba(0, 255, 65, 0.6));
+            drop-shadow(2px 0 0 #00ff41) drop-shadow(-2px 0 0 #00ff41)
+            drop-shadow(0 2px 0 #00ff41) drop-shadow(0 -2px 0 #00ff41)
+            drop-shadow(1px 1px 0 #00ff41) drop-shadow(-1px -1px 0 #00ff41)
+            drop-shadow(0 0 8px rgba(0, 255, 65, 0.6));
 }
 
 .tagline {
@@ -143,8 +150,10 @@ button:hover:not(:disabled) {
     background: #7dff9b;
 }
 
+/* Disabled (game over): the primary's black text would vanish on the transparent fill */
 #submit-guess:disabled {
     background: transparent;
+    color: var(--ink-muted);
 }
 
 /* ---------- Revealed secret, history, banner, popup ---------- */
@@ -216,4 +225,10 @@ button:hover:not(:disabled) {
 .dict-edge::before,
 .dict-edge::after {
     border-top-style: dashed;
+}
+
+/* Options of the opened list: same dark field as the select, light text */
+select option {
+    background-color: #000000;
+    color: var(--ink);
 }

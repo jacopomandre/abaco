@@ -12,6 +12,8 @@
 }
 
 :root {
+    /* Dark theme: native controls (the list a select opens, scrollbars) are drawn dark too */
+    color-scheme: dark;
     /* Palette: night blue screen, neon magenta / cyan / yellow */
     --ink: #f5f3ff;
     --ink-soft: #cdc7ff;
@@ -79,8 +81,16 @@ body::before {
         0 0 40px rgba(255, 63, 164, 0.35);
 }
 
+/* Logo as a white die-cut sticker (drop-shadows with no blur, pushed in eight directions,
+   follow the drawing's shape): the navy "abaco" would sink into the night-blue screen.
+   A cyan glow around the sticker keeps it in the neon world. */
 .logo {
-    filter: drop-shadow(0 0 12px rgba(34, 230, 255, 0.45));
+    filter:
+        drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff)
+        drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff)
+        drop-shadow(2px 2px 0 #fff) drop-shadow(-2px -2px 0 #fff)
+        drop-shadow(2px -2px 0 #fff) drop-shadow(-2px 2px 0 #fff)
+        drop-shadow(0 0 14px rgba(34, 230, 255, 0.55));
 }
 
 .tagline {
@@ -245,3 +255,9 @@ select:focus {
 .closeness-badge.near  { --fill: var(--ar-yellow); --edge: var(--surface-sunk); }
 .closeness-badge.close,
 .closeness-badge.won   { --fill: var(--ar-cyan); --edge: var(--surface-sunk); }
+
+/* Options of the opened list: same dark field as the select, light text */
+select option {
+    background-color: #0a0626;
+    color: var(--ink);
+}

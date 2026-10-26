@@ -12,6 +12,8 @@
 }
 
 :root {
+    /* Dark theme: native controls (the list a select opens, scrollbars) are drawn dark too */
+    color-scheme: dark;
     /* Palette: night blue, moonlight text, moon gold */
     --ink: #e8ebf5;
     --ink-soft: #b7bdd1;
@@ -59,8 +61,15 @@ body {
     box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
+/* Logo as a white die-cut sticker (drop-shadows with no blur, pushed in eight directions,
+   follow the drawing's shape): the navy "abaco" would sink into the night blue */
 .logo {
-    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.45));
+    filter:
+        drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff)
+        drop-shadow(0 3px 0 #fff) drop-shadow(0 -3px 0 #fff)
+        drop-shadow(2px 2px 0 #fff) drop-shadow(-2px -2px 0 #fff)
+        drop-shadow(2px -2px 0 #fff) drop-shadow(-2px 2px 0 #fff)
+        drop-shadow(0 6px 16px rgba(0, 0, 0, 0.5));
 }
 
 .tagline {
@@ -204,3 +213,9 @@ select:focus {
 .closeness-badge.near  { --fill: #ffd57a; --edge: var(--surface-sunk); }
 .closeness-badge.close,
 .closeness-badge.won   { --fill: #84e8c6; --edge: var(--surface-sunk); }
+
+/* Options of the opened list: same dark field as the select, light text */
+select option {
+    background-color: #0c1020;
+    color: var(--ink);
+}

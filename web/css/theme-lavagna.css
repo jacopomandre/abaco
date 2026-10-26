@@ -19,6 +19,8 @@
 }
 
 :root {
+    /* Dark theme: native controls (the list a select opens, scrollbars) are drawn dark too */
+    color-scheme: dark;
     /* Palette: green slate, chalk white, warm wood */
     --ink: #f3f1e7;
     --ink-soft: #dcd9cc;
@@ -69,6 +71,18 @@ body {
         inset 0 0 0 2px var(--lv-wood-dark),
         inset 0 0 50px rgba(0, 0, 0, 0.35),
         0 12px 30px rgba(60, 40, 20, 0.35);
+}
+
+/* Logo as a chalk-white die-cut sticker stuck on the slate (drop-shadows with no blur, pushed in
+   eight directions, follow the drawing's shape): the navy "abaco" would sink into the dark green */
+.logo {
+    filter:
+        drop-shadow(3px 0 0 var(--ink)) drop-shadow(-3px 0 0 var(--ink))
+        drop-shadow(0 3px 0 var(--ink)) drop-shadow(0 -3px 0 var(--ink))
+        drop-shadow(2px 2px 0 var(--ink)) drop-shadow(-2px -2px 0 var(--ink))
+        drop-shadow(2px -2px 0 var(--ink)) drop-shadow(-2px 2px 0 var(--ink))
+        drop-shadow(1px 4px 6px rgba(0, 0, 0, 0.35));
+    transform: rotate(-2deg);
 }
 
 .tagline {
@@ -147,11 +161,23 @@ button:disabled {
 }
 
 /* ---------- Fields and attempt rows ---------- */
+/* Solid dark slate, not a see-through tint: the list a select opens takes this color,
+   and on a see-through one it opened white, with the chalk-white options unreadable on it */
 select,
 .code-input {
-    background-color: rgba(0, 0, 0, 0.18);
+    background-color: #263f31;
     color: var(--ink);
     border: 2px solid rgba(243, 241, 231, 0.45);
+}
+
+select option {
+    background-color: #263f31;
+    color: var(--ink);
+}
+
+/* Game codes stay in a typewriter font: they are random letters, the rounded face would blur them */
+.code-input {
+    font-family: 'Courier New', ui-monospace, monospace;
 }
 
 .word-input {
