@@ -1,5 +1,5 @@
 /* =========================================================================
-   Theme "matrix": green phosphor terminal, falling code rain behind the card.
+   Theme "hacker": green phosphor terminal on a plain black screen.
    Layered on style.css (loaded only while the theme is active, see theme.js).
    Mostly remaps the style.css tokens, then restyles the few parts with a look of their own.
    ========================================================================= */
@@ -28,7 +28,7 @@
     --alert: #ff3b3b;
     --reveal-surrendered: #1c2b1f;
     /* Glow used by text and borders */
-    --mx-glow: 0 0 6px rgba(0, 255, 65, 0.7);
+    --hk-glow: 0 0 6px rgba(0, 255, 65, 0.7);
 
     /* Typography: terminal monospace everywhere (fonts already on the device) */
     --font-ui: 'Courier New', ui-monospace, 'Cascadia Mono', monospace;
@@ -45,30 +45,7 @@ body {
     background: #000;
 }
 
-/* ---------- Code rain ----------
-   Two layers of the same glyph tile, scrolled down at different speeds: the background moves,
-   nothing is redrawn. The tile height (480px) is the loop length, so the scroll is seamless. */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.35;
-    background-image:
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='480' font-family='monospace' font-size='16' fill='%2300ff41'><text x='8' y='10' writing-mode='tb' opacity='0.9'>アイウエオ01カキクケコ</text><text x='38' y='200' writing-mode='tb' opacity='0.5'>サシスセソ1タチツ</text><text x='68' y='60' writing-mode='tb' opacity='0.7'>ナニヌネノ0ハヒフヘホ</text><text x='98' y='300' writing-mode='tb' opacity='0.4'>マミムメ10モヤ</text><text x='128' y='120' writing-mode='tb' opacity='0.8'>ラリルレロ0ワヲン</text><text x='158' y='20' writing-mode='tb' opacity='0.5'>ゼロ01アカサタナ</text><text x='188' y='240' writing-mode='tb' opacity='0.7'>ハマヤラワ1キシ</text><text x='218' y='90' writing-mode='tb' opacity='0.4'>チニヒミリ0イウ</text></svg>"),
-        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='480' font-family='monospace' font-size='16' fill='%2300ff41'><text x='8' y='10' writing-mode='tb' opacity='0.9'>アイウエオ01カキクケコ</text><text x='38' y='200' writing-mode='tb' opacity='0.5'>サシスセソ1タチツ</text><text x='68' y='60' writing-mode='tb' opacity='0.7'>ナニヌネノ0ハヒフヘホ</text><text x='98' y='300' writing-mode='tb' opacity='0.4'>マミムメ10モヤ</text><text x='128' y='120' writing-mode='tb' opacity='0.8'>ラリルレロ0ワヲン</text><text x='158' y='20' writing-mode='tb' opacity='0.5'>ゼロ01アカサタナ</text><text x='188' y='240' writing-mode='tb' opacity='0.7'>ハマヤラワ1キシ</text><text x='218' y='90' writing-mode='tb' opacity='0.4'>チニヒミリ0イウ</text></svg>");
-    /* Second layer smaller and shifted sideways, so the two never line up */
-    background-size: 240px 480px, 160px 320px;
-    animation: mx-rain 16s linear infinite;
-}
-
-/* Layer 1 moves one tile (480px), layer 2 three of its tiles (960px): different speeds */
-@keyframes mx-rain {
-    from { background-position: 0 0, 90px 0; }
-    to   { background-position: 0 480px, 90px 960px; }
-}
-
-/* ---------- Card: terminal window, rain faintly visible through it ---------- */
+/* ---------- Card: terminal window ---------- */
 .page {
     position: relative;
     background: rgba(0, 6, 2, 0.9);
@@ -99,13 +76,13 @@ body::before {
 .difficulty-label,
 .start-option-title,
 .history-title {
-    text-shadow: var(--mx-glow);
+    text-shadow: var(--hk-glow);
 }
 
 /* ---------- Attempt rows: light green text with glow on the closeness fill ---------- */
 .word-input.bound {
     color: #d9ffe0;
-    text-shadow: var(--mx-glow);
+    text-shadow: var(--hk-glow);
     border-color: var(--line-soft);
 }
 
@@ -118,7 +95,7 @@ body::before {
 .word-input.bound.no-closeness,
 .word-input.bound.imported {
     --row-plain-bg: #000000;
-    text-shadow: var(--mx-glow);
+    text-shadow: var(--hk-glow);
 }
 
 /* Guess field: blinking green block cursor, like a terminal prompt.
@@ -127,7 +104,7 @@ body::before {
     background: #000;
     caret-color: var(--ink);
     caret-shape: block;
-    text-shadow: var(--mx-glow);
+    text-shadow: var(--hk-glow);
 }
 
 .word-input.guess:focus,
@@ -173,7 +150,7 @@ button:hover:not(:disabled) {
 /* ---------- Revealed secret, history, banner, popup ---------- */
 .dict-entry {
     color: #d9ffe0;
-    text-shadow: var(--mx-glow);
+    text-shadow: var(--hk-glow);
     border-color: var(--ink);
 }
 
@@ -234,13 +211,6 @@ button:hover:not(:disabled) {
 .closeness-badge.near  { --fill: #b6ff00; --edge: #000000; }
 .closeness-badge.close,
 .closeness-badge.won   { --fill: #00ff41; --edge: #000000; }
-
-/* ---------- Reduced motion: no endless rain ---------- */
-@media (prefers-reduced-motion: reduce) {
-    body::before {
-        animation: none !important;
-    }
-}
 
 /* ---------- Board frame (abaco / zuzzurellone): dashed green line, like a terminal separator ---------- */
 .dict-edge::before,

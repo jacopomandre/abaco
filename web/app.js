@@ -607,7 +607,7 @@
         input.setAttribute('autocorrect', 'off');
         input.enterKeyHint = 'send';
         // Countdown only, kept short: a longer text gets cut off on a phone screen.
-        // Leading "...": keeps the text clear of the caret (a wide block in the Matrix theme).
+        // Leading "...": keeps the text clear of the caret (a wide block in the hacker theme).
         input.placeholder  = left === 1
             ? '...ultimo tentativo'
             : `...${left} tentativi rimasti`;

@@ -11,16 +11,20 @@
     // Its keys are also the list of valid theme names.
     const THEME_COLOR = {
         classico: '#FDF8EB',
-        matrix:   '#000000',
+        hacker:   '#000000',
         retro:    '#008080',
         sketch:   '#F1EEE6'
     };
+
+    // Old theme names still saved on some devices -> the theme that replaced them
+    const RENAMED = { matrix: 'hacker' };
 
     // Saved theme, or the default one when none (or an unknown one) is stored.
     // Storage can be unavailable (private mode, blocked site data): every access is guarded.
     function readSaved() {
         try {
-            const saved = localStorage.getItem(THEME_KEY);
+            const stored = localStorage.getItem(THEME_KEY);
+            const saved = RENAMED[stored] || stored;
             return THEME_COLOR[saved] ? saved : DEFAULT_THEME;
         } catch (_) {
             return DEFAULT_THEME;
