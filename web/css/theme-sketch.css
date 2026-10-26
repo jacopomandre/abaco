@@ -177,22 +177,27 @@ button:disabled {
     border-style: dashed;
 }
 
-/* Primary actions: shaded with pencil hatching, dark text (no solid fill in a sketch) */
+/* Primary actions: a stroke of yellow highlighter across the word, over light pencil hatching
+   (no solid fill in a sketch); on hover the highlighter covers the whole button */
 #submit-guess,
 #new-game,
-#import-confirm ,
-#confirm-ok {
-    background: repeating-linear-gradient(-45deg, rgba(43, 43, 43, 0.2) 0 2px, transparent 2px 6px);
+#import-confirm,
+#confirm-ok,
+#hints-close {
+    background:
+        linear-gradient(transparent 42%, rgba(253, 224, 71, 0.9) 42% 82%, transparent 82%),
+        repeating-linear-gradient(-45deg, rgba(43, 43, 43, 0.12) 0 2px, transparent 2px 6px);
     color: var(--ink);
 }
 
 #submit-guess:hover:not(:disabled),
 #new-game:hover:not(:disabled),
-#import-confirm:hover:not(:disabled) ,
-#confirm-ok:hover:not(:disabled) {
+#import-confirm:hover:not(:disabled),
+#confirm-ok:hover:not(:disabled),
+#hints-close:hover:not(:disabled) {
     background:
-        repeating-linear-gradient(-45deg, rgba(43, 43, 43, 0.2) 0 2px, transparent 2px 6px),
-        #fff59d;
+        repeating-linear-gradient(-45deg, rgba(43, 43, 43, 0.12) 0 2px, transparent 2px 6px),
+        #fde047;
 }
 
 #submit-guess:disabled {
@@ -410,4 +415,78 @@ select:focus {
     .dict-edge {
         --edge-indent: 34px;
     }
+}
+
+/* ---------- Custom game panel: pencil-drawn controls ---------- */
+/* Labels as big as the difficulty one right above them: handwriting reads small */
+.custom-field {
+    font-size: 19px;
+}
+
+/* Hint switch: a pill traced in pencil with a hatched knob; on = a highlighter swipe inside */
+.start-option .custom-field .toggle {
+    width: 54px;
+    height: 30px;
+    border: 2px solid var(--ink);
+    border-radius: var(--sk-wobbly);
+    background: transparent;
+    box-shadow: var(--sk-retrace);
+}
+
+.toggle::before {
+    top: 4px;
+    left: 4px;
+    width: 18px;
+    height: 18px;
+    background: repeating-linear-gradient(-45deg, var(--ink) 0 1.5px, transparent 1.5px 4px);
+    border: 2px solid var(--ink);
+    box-sizing: border-box;
+}
+
+.start-option .custom-field .toggle:checked {
+    background: #fde047;
+    border-color: var(--ink);
+}
+
+.toggle:checked::before {
+    transform: translateX(24px);
+    background: var(--ink);
+}
+
+/* Attempts stepper: hand-drawn - and + boxes, the count written big in between */
+.start-option .attempts-stepper .step-btn {
+    min-width: 40px;
+    height: 36px;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.attempts-value {
+    font-size: 26px;
+}
+
+/* ---------- Notebook touches ---------- */
+/* Card titles underlined with a quick wavy pencil stroke */
+.start-option-title {
+    padding-bottom: 6px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='8'><path d='M2 5 Q20 1 40 5 T80 4 T120 5 T158 3' fill='none' stroke='%232b2b2b' stroke-width='1.8' stroke-linecap='round' opacity='0.7'/></svg>") no-repeat left bottom / 160px 8px;
+}
+
+/* A little pencil doodled at the right end of the guess field, where the next word gets written */
+.word-input.guess {
+    padding-right: 52px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34' fill='none' stroke='%232b2b2b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M7 27 L9 20 L24 5 L29 10 L14 25 Z'/><path d='M21 8 L26 13'/><path d='M9 20 L14 25'/><path d='M7 27 L11 26'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 30px 30px;
+}
+
+/* While typing, the highlighter band of the focus rule stays and the pencil stays beside it */
+.word-input.guess:focus {
+    background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='34' viewBox='0 0 34 34' fill='none' stroke='%232b2b2b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M7 27 L9 20 L24 5 L29 10 L14 25 Z'/><path d='M21 8 L26 13'/><path d='M9 20 L14 25'/><path d='M7 27 L11 26'/></svg>"),
+        linear-gradient(transparent 62%, rgba(253, 224, 71, 0.55) 62%);
+    background-repeat: no-repeat, no-repeat;
+    background-position: right 12px center, 0 0;
+    background-size: 30px 30px, 100% 100%;
 }
