@@ -71,7 +71,7 @@ If PARTIAL: surface the gap to the user. Apply the trivial nits inline (≤ 3 li
 
 ### 5 — Bookkeeping (always, after final PASS)
 
-- `reviewer-ilaria` should already have updated `TODO.md` (resolved items removed, new follow-ups added, numbering refreshed). Verify it did.
+- `reviewer-ilaria` should already have updated `TODO.md` (resolved items removed, new follow-ups added with the lowest free number, other numbers unchanged). Verify it did.
 - `supervisor-demarinis` should already have updated `docs/*.md` if the change was observable. Verify it did when the change touched: a REST endpoint, a DTO field, a domain rule, or a contract.
 - Pure refactors / DI cleanup / comment translations / test reorders → no docs update expected.
 
