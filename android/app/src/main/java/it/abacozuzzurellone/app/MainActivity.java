@@ -1,4 +1,4 @@
-package it.abaco.zuzzurellone;
+package it.abacozuzzurellone.app;
 
 import android.graphics.Color;
 import android.os.Bundle;
