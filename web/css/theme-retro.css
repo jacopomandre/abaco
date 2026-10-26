@@ -308,17 +308,19 @@ select:focus,
 .closeness-badge.won   { --fill: #00ff00; --edge: #000000; --shade: #000000; }
 
 /* Wide upright letters with a thin outline: Impact's narrow letters, under the thick
-   outline of the classic theme, closed up and could not be read */
+   outline of the classic theme, closed up and could not be read.
+   Arial Black is far wider than the other themes' faces: at their size "fuori strada" covered
+   the whole row, so it runs smaller, with outline and shadow scaled down to match */
 .closeness-badge {
-    --slant: translateY(-50%) rotate(-8deg);
+    --slant: translateY(-50%) rotate(-6deg);
     font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
     font-style: normal;
-    font-size: 28px;
+    font-size: 19px;
 }
 
 .closeness-badge .closeness-letter {
-    -webkit-text-stroke: 3px var(--edge);
-    text-shadow: 3px 3px 0 var(--shade), 4px 4px 0 #000000;
+    -webkit-text-stroke: 2px var(--edge);
+    text-shadow: 2px 2px 0 var(--shade), 3px 3px 0 #000000;
 }
 
 /* ---------- Reduced motion: no endless marquee or blinking ---------- */
