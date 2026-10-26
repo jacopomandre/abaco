@@ -1050,6 +1050,16 @@ select:focus {
     cursor: pointer;
 }
 
+/* A toggle that cannot be switched now (the right letters without the colors) */
+.toggle-field.locked {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.start-option .custom-field .toggle:disabled {
+    cursor: not-allowed;
+}
+
 /* Attempts: - [count] +, the count in the middle */
 .attempts-stepper {
     display: flex;

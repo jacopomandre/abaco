@@ -69,7 +69,8 @@
     //   words:    key of WORD_POOLS, the words the secret is drawn from
     //   attempts: attempts the game starts with
     //   colors:   closeness hint, row colors and badge (both read the same closeness value)
-    //   bold:     leading letters shared with the secret set in bold
+    //   bold:     leading letters shared with the secret set in bold; only together with colors,
+    //             since it extends the same hint past the first two letters
     // Presets per difficulty (harder games get fewer attempts and fewer hints).
     const DIFFICULTY = {
         EASY:   { words: 'EASY',   attempts: 20, colors: true,  bold: true  },
@@ -138,7 +139,9 @@
             && typeof rules.words === 'string' && hasOwn(WORD_POOLS, rules.words)
             && Number.isInteger(rules.attempts)
             && rules.attempts >= CUSTOM_ATTEMPTS_MIN && rules.attempts <= CUSTOM_ATTEMPTS_MAX
-            && BOOLEAN_RULES.every(function (key) { return typeof rules[key] === 'boolean'; });
+            && BOOLEAN_RULES.every(function (key) { return typeof rules[key] === 'boolean'; })
+            // The right letters build on the colors: never one without the other
+            && (rules.colors || !rules.bold);
     }
 
     // Rules of a game: a preset's are read live (a level's changes reach saved games too),
@@ -974,6 +977,7 @@
     function fillNoteSizer() {
         [true, false].forEach(function (colors) {
             [true, false].forEach(function (bold) {
+                if (bold && !colors) return; // not a valid combination, see isValidRules
                 const text = document.createElement('span');
                 text.textContent = rulesSummary({ attempts: CUSTOM_ATTEMPTS_MAX, colors: colors, bold: bold });
                 $noteSizer.appendChild(text);
@@ -1001,6 +1005,10 @@
     // One line under the picker: what the chosen difficulty (or the custom panel) gives.
     // The custom panel shows only while "su misura" is chosen.
     function updateDifficultyNote() {
+        // Without the colors the right letters cannot be on: switch them off and lock them
+        if (!$customColors.checked) $customBold.checked = false;
+        $customBold.disabled = !$customColors.checked;
+        $customBold.closest('.toggle-field').classList.toggle('locked', $customBold.disabled);
         const custom = $difficulty.value === CUSTOM;
         const rules  = custom ? readCustomRules() : DIFFICULTY[$difficulty.value];
         $customRules.hidden = !custom;
