@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Abaco Zuzzurellone - the site is a single page. Update <lastmod> when the page changes. -->
+<!-- Abaco Zuzzurellone - the game page and its privacy policy. Update <lastmod> when a page changes. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://abacozuzzurellone.it/</loc>
-    <lastmod>2026-10-12</lastmod>
+    <lastmod>2026-10-26</lastmod>
+  </url>
+  <url>
+    <loc>https://abacozuzzurellone.it/privacy.html</loc>
+    <lastmod>2026-10-26</lastmod>
   </url>
 </urlset>
