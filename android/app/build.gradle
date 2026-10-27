@@ -1,5 +1,15 @@
 apply plugin: 'com.android.application'
 
+// App version: change only this, as major.minor.patch (each part 0-99).
+// versionCode is derived from it (major * 10000 + minor * 100 + patch, so 1.5.0 -> 10500): Play needs it
+// to grow on every upload, and it stays in step with the version shown to users.
+def appVersion = '1.5.0'
+def appVersionParts = appVersion.tokenize('.')*.toInteger()
+if (appVersionParts.size() != 3 || appVersionParts.any { it < 0 || it > 99 }) {
+    throw new GradleException("appVersion must be major.minor.patch with parts 0-99, got '${appVersion}'")
+}
+def appVersionCode = appVersionParts[0] * 10000 + appVersionParts[1] * 100 + appVersionParts[2]
+
 android {
     namespace "it.abacozuzzurellone.app"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +17,8 @@ android {
         applicationId "it.abacozuzzurellone.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 9
-        versionName "1.5"
+        versionCode appVersionCode
+        versionName appVersion
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
