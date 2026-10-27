@@ -236,25 +236,7 @@ select:focus {
     background: rgba(10, 6, 38, 0.75);
 }
 
-/* ---------- Closeness badge: an arcade score shout, small and blocky ---------- */
-.closeness-badge {
-    --slant: translateY(-50%) rotate(-6deg);
-    font-family: var(--font-mono);
-    font-style: normal;
-    font-weight: 700;
-    font-size: 22px;
-    letter-spacing: 0.04em;
-}
-
-.closeness-badge .closeness-letter {
-    -webkit-text-stroke: 3px var(--surface-sunk);
-    text-shadow: 3px 3px 0 var(--surface-sunk);
-}
-
-.closeness-badge.far   { --fill: var(--ar-pink); --edge: var(--surface-sunk); }
-.closeness-badge.near  { --fill: var(--ar-yellow); --edge: var(--surface-sunk); }
-.closeness-badge.close,
-.closeness-badge.won   { --fill: var(--ar-cyan); --edge: var(--surface-sunk); }
+/* Closeness badge: the classic one of style.css */
 
 /* Options of the opened list: same dark field as the select, light text */
 select option {

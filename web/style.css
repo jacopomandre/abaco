@@ -1196,6 +1196,15 @@ select:focus {
     color: var(--surface);
 }
 
+/* Closeness badge face (see .closeness-badge below): bundled, so it also works offline.
+   Latin subset, SIL Open Font License 1.1 (Vernon Adams). */
+@font-face {
+    font-family: 'Bangers';
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/bangers-latin.woff2') format('woff2');
+}
+
 /* ---------- Closeness badge ----------
    Fighting-game style "fuori strada / in pista / a un passo" shout, shown for a moment over the right end
    of the row just guessed. app.js builds it (createClosenessBadge) and removes it when it has played. */
@@ -1216,14 +1225,17 @@ select:focus {
     z-index: 1;
     display: inline-flex;
     pointer-events: none;
-    /* Typeface exactly as in the original demo: heavy condensed italic, fighting-game style */
-    font-family: Impact, "Arial Black", sans-serif;
-    font-style: italic;
-    font-weight: 900;
+    /* Bangers, a comic-book display face (the classic look, shared by every theme without a badge of
+       its own): the same fighting-game shout as Impact, and it is bundled (Impact does not exist on
+       Android). Upright style: Bangers is drawn slanted already, and the badge's skew adds the rest. */
+    font-family: 'Bangers', Impact, "Arial Black", sans-serif;
+    font-style: normal;
+    font-weight: 400;
     /* Bigger than the demo, to read as a shout: about as tall as the row it sits on */
     font-size: 32px;
     line-height: 1;
-    letter-spacing: 0.03em;
+    /* A bit of room between the letters: the thick outline closed them up */
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     transform: var(--slant);
     /* Rule for the whole badge: every animation below changes only transform or opacity, which
@@ -1233,12 +1245,13 @@ select:focus {
 }
 
 /* Colors per level, matching the closeness scale of the rows: red (far), amber (near), green (very
-   near). Brighter and fully saturated, with a dark outline: the badge must pop off its row. */
-.closeness-badge.far   { --fill: #ff5a5a; --edge: #6e0b12; }
-.closeness-badge.near  { --fill: #ffc21a; --edge: #6b3d00; }
-.closeness-badge.close { --fill: #4dff7a; --edge: #0b4d24; }
+   near). Brighter and fully saturated, with a black outline on every level: the badge must pop off
+   its row, and a dark outline of the row's own hue blended into it. */
+.closeness-badge.far   { --fill: #ff5a5a; --edge: #000000; }
+.closeness-badge.near  { --fill: #ffc21a; --edge: #000000; }
+.closeness-badge.close { --fill: #4dff7a; --edge: #000000; }
 /* Winning shout ("trovata"): same green as "close", it is where the closeness scale ends */
-.closeness-badge.won   { --fill: #4dff7a; --edge: #0b4d24; }
+.closeness-badge.won   { --fill: #4dff7a; --edge: #000000; }
 
 /* Letters slam in one after the other: app.js sets --i, the letter's position */
 .closeness-badge .closeness-letter {
@@ -1252,7 +1265,8 @@ select:focus {
     -webkit-text-stroke: 6px var(--edge);
     paint-order: stroke fill;
     color: var(--fill);
-    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+    /* No drop shadow: it read as a second, one-sided outline next to the black one */
+    text-shadow: none;
     will-change: transform, opacity;
     animation: closeness-letter-hit 0.22s calc(var(--i) * 55ms + 0.15s) cubic-bezier(0.2, 1.8, 0.4, 1) forwards;
 }

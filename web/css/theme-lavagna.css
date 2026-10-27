@@ -234,26 +234,28 @@ select:focus {
     box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.3), 0 20px 48px rgba(0, 0, 0, 0.35);
 }
 
-/* ---------- Closeness badge: a chalk scribble on the board ---------- */
+/* ---------- Closeness badge: the teacher's pen remark of the quaderno theme ---------- */
 .closeness-badge {
-    --slant: translateY(-50%) rotate(-7deg);
+    --slant: translateY(-50%) rotate(-8deg);
     font-family: var(--lv-font-chalk);
     font-style: normal;
     font-weight: 700;
-    font-size: 34px;
+    font-size: 38px;
     text-transform: none;
     letter-spacing: 0;
 }
 
+/* Paper-colored outline around the pen strokes, as in quaderno: it also lifts them off the slate */
 .closeness-badge .closeness-letter {
-    -webkit-text-stroke: 4px var(--edge);
+    -webkit-text-stroke: 5px var(--edge);
     text-shadow: none;
 }
 
-.closeness-badge.far   { --fill: #ff9aa6; --edge: #2e4a3a; }
-.closeness-badge.near  { --fill: #ffe08a; --edge: #2e4a3a; }
+/* Pen colors of quaderno: red (far), orange (near), green (very near and found) */
+.closeness-badge.far   { --fill: #c0392b; --edge: #faf5e8; }
+.closeness-badge.near  { --fill: #d9741a; --edge: #faf5e8; }
 .closeness-badge.close,
-.closeness-badge.won   { --fill: #a8dcff; --edge: #2e4a3a; }
+.closeness-badge.won   { --fill: #2f855a; --edge: #faf5e8; }
 
 /* ---------- Narrow screens: a thinner wooden frame ---------- */
 @media (max-width: 640px) {

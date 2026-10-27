@@ -7,14 +7,6 @@
    To go back to the B/W look, remove the two theme <link> tags in index.html.
    ========================================================================= */
 
-/* Closeness badge face (see .closeness-badge below): bundled, so it also works offline */
-@font-face {
-    font-family: 'Bangers';
-    font-weight: 400;
-    font-display: swap;
-    src: url('../fonts/bangers-latin.woff2') format('woff2');
-}
-
 :root {
     /* Palette: style.css tokens remapped to the theme colors */
     --ink: var(--az-navy);
@@ -95,31 +87,7 @@ select:focus {
     background: #fdecee;
 }
 
-/* ---------- Closeness badge ---------- */
-/* Bangers, a comic-book display face, instead of Impact: the same fighting-game shout, and it is
-   bundled (Impact does not exist on Android, where the badge fell back to the system font).
-   Bundled in web/fonts like the others, latin subset, SIL Open Font License 1.1 (Vernon Adams).
-   Upright style: Bangers is drawn slanted already, and the badge's skew adds the rest.
-   Black outline on every level, and a bit of room between the letters: a dark outline of the
-   same hue as the row blended into it, and the thick outline closed the letters up */
-.closeness-badge {
-    font-family: 'Bangers', var(--az-font-body);
-    font-style: normal;
-    font-weight: 400;
-    letter-spacing: 0.06em;
-}
-
-.closeness-badge.far,
-.closeness-badge.near,
-.closeness-badge.close,
-.closeness-badge.won {
-    --edge: #000000;
-}
-
-/* No drop shadow: it read as a second, one-sided outline next to the black one */
-.closeness-badge .closeness-letter {
-    text-shadow: none;
-}
+/* Closeness badge: the classic Bangers shout is the base badge of style.css */
 
 @media (max-width: 640px) {
     .title.az-wordmark {
