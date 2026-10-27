@@ -1373,3 +1373,194 @@ select:focus {
 .site-footer a {
     color: var(--ink-muted);
 }
+
+/* ---------- Game menu and phone-only bar items ---------- */
+/* The attempts counter and the "..." menu exist only on the phone game screen (below); on a wide
+   screen the page scrolls, and IMPORTA / ESPORTA / the history have room of their own */
+.attempts-count,
+.menu-btn {
+    display: none;
+}
+
+.menu-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.menu-history .history-title {
+    margin: 0 0 8px;
+    cursor: default;
+}
+
+/* Always open here: no disclosure arrow */
+.menu-history .history-title::before {
+    display: none;
+}
+
+/* No attempts yet: say so instead of showing an empty list */
+.menu-history .history-list:empty::before {
+    content: "Nessun tentativo ancora.";
+    color: var(--ink-muted);
+    font-size: 14px;
+}
+
+/* Collapsed far rows of the phone game screen (app.js, fitBoard): "+ 4 parole prima  balena ... gatto".
+   Tapping one opens its rows again; the board then scrolls. */
+.more-words {
+    flex: none;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 5px 12px;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1.5px dashed currentColor;
+    border-radius: var(--r-md);
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: 0;
+    box-shadow: none;
+}
+
+.more-words-range {
+    color: var(--ink-muted);
+    font-weight: 400;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- Phone game screen: the whole game in one fixed screen ---------- */
+/* While a game is shown (app.js sets body.playing), a phone gets no page scroll at all:
+   - top: back arrow, attempts left, "..." menu;
+   - middle: the board, filling what is left; far rows collapse into .more-words to fit (app.js, fitBoard);
+   - bottom: the action buttons, right above the keyboard (which shrinks the page, see the viewport meta).
+   Logo, tagline, theme bar, history and footer stay on the start screen; the menu holds the rest.
+   --app-height (app.js) follows the visible area, keyboard included, also where the page is not shrunk. */
+@media (max-width: 640px) {
+    html:has(body.playing),
+    body.playing {
+        height: var(--app-height, 100dvh);
+        overflow: hidden;
+    }
+
+    body.playing .page {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 16px);
+        margin: 8px;
+        padding: 12px 14px;
+        overflow: hidden;
+    }
+
+    body.playing .theme-bar,
+    body.playing .header,
+    body.playing .rule,
+    body.playing .history-section,
+    body.playing .site-footer,
+    body.playing #import-open,
+    body.playing #copy-code {
+        display: none;
+    }
+
+    body.playing .board {
+        flex: 1;
+        min-height: 0;
+        gap: 10px;
+    }
+
+    body.playing .code-actions {
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+    body.playing .attempts-count,
+    body.playing .menu-btn {
+        display: block;
+    }
+
+    body.playing .menu-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+    }
+
+    /* Centered between the arrow and the menu; the arrow's auto margin is not needed any more */
+    body.playing .back-btn {
+        margin-right: 0;
+    }
+
+    body.playing .attempts-count {
+        flex: 1;
+        margin: 0;
+        text-align: center;
+        font-size: 15px;
+        color: var(--ink-soft);
+    }
+
+    body.playing .attempts-count b {
+        font-size: 18px;
+        color: var(--ink);
+    }
+
+    body.playing .attempts-count.low b {
+        color: var(--alert);
+    }
+
+    /* The board takes the free height and centers its rows; it scrolls only when it still cannot fit
+       (a row group opened by hand, or the long definition of the revealed word) */
+    body.playing .board-stack {
+        flex: 1;
+        min-height: 0;
+        justify-content: safe center;
+        overflow-y: auto;
+        /* The closeness badge overhangs its row to the right: no sideways scrollbar for it */
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        /* Stretched over the card's side padding, so the badge still has room to stick out past the
+           rows (the card cuts it at its edge, as on the start of the page); 4px above and below for
+           the guess field's focus ring */
+        margin: 0 -14px;
+        padding: 4px 14px;
+    }
+
+    body.playing .board-stack > * {
+        flex: none;
+    }
+
+    body.playing .actions {
+        margin-top: 0;
+        flex-wrap: nowrap;
+    }
+
+    body.playing .actions button {
+        flex: 1;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* During the game: TENTA and ARRENDITI (the back arrow starts over); once it is over: NUOVA PARTITA */
+    body.playing:not(.ended) #restart-game,
+    body.playing.ended #submit-guess,
+    body.playing.ended #surrender {
+        display: none;
+    }
+
+    /* Messages (copied code, errors) float over the board instead of pushing the screen down;
+       a tap closes them */
+    body.playing .banner {
+        position: fixed;
+        left: 16px;
+        right: 16px;
+        top: 64px;
+        z-index: 2;
+        margin: 0;
+        max-height: 50%;
+        overflow-y: auto;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+    }
+}

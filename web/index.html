@@ -2,7 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- interactive-widget: the phone keyboard shrinks the page instead of covering it, so the fixed
+         game screen (style.css, "Phone game screen") keeps the guess and the buttons above it -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
     <!-- Search engines: the title and the description are what Google shows in its results -->
     <title>Abaco Zuzzurellone - Indovina la parola segreta</title>
     <meta name="description" content="Gioco di parole gratuito in italiano: indovina la parola segreta scoprendo a ogni tentativo se viene prima o dopo la tua in ordine alfabetico.">
@@ -169,6 +171,8 @@
                         <path d="M12 19l-7-7 7-7"></path>
                     </svg>
                 </button>
+                <!-- Phone game screen only: attempts left, in the middle of the bar -->
+                <p id="attempts-count" class="attempts-count" aria-live="polite"></p>
                 <button id="import-open" type="button" class="quiet-btn">IMPORTA</button>
                 <!-- The "copy" icon tells that exporting puts the game code on the clipboard.
                      Once copied, a green check draws itself in its place for a moment (app.js adds .copied). -->
@@ -183,6 +187,15 @@
                         <path class="check-path" d="M4 12.5l5 5L20 6.5"></path>
                     </svg>
                     ESPORTA
+                </button>
+                <!-- Phone game screen only: IMPORTA, ESPORTA, the rules and the history move into this menu -->
+                <button id="menu-open" type="button" class="quiet-btn menu-btn" aria-haspopup="dialog"
+                        title="Altre azioni" aria-label="Altre azioni">
+                    <svg class="btn-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="currentColor">
+                        <circle cx="5" cy="12" r="2"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                        <circle cx="19" cy="12" r="2"></circle>
+                    </svg>
                 </button>
             </div>
 
@@ -255,6 +268,26 @@
                 <!-- Optional third choice (e.g. "esporta ed esci"), shown only when askConfirm gets a label -->
                 <button id="confirm-extra" type="submit" value="extra" hidden></button>
                 <button id="confirm-ok" type="submit" value="ok"></button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Game menu, opened from the "..." button of the phone game screen: what the fixed screen has no
+         room for. Reuses the import popup's look (import-dialog) so every theme styles it the same way. -->
+    <dialog id="menu-dialog" class="import-dialog menu-dialog" aria-labelledby="menu-dialog-title">
+        <form method="dialog" class="dialog-form">
+            <h2 id="menu-dialog-title" class="dialog-title">Partita</h2>
+            <div class="menu-actions">
+                <button id="menu-import" type="button">IMPORTA</button>
+                <button id="menu-export" type="button">ESPORTA</button>
+                <button id="menu-hints" type="button">COME SI GIOCA</button>
+            </div>
+            <section class="menu-history">
+                <h3 class="history-title">STORIA TENTATIVI</h3>
+                <ul id="menu-history" class="history-list"></ul>
+            </section>
+            <div class="dialog-actions">
+                <button id="menu-close" type="submit">CHIUDI</button>
             </div>
         </form>
     </dialog>

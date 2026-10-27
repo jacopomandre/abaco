@@ -60,6 +60,17 @@
     // board and history sections (no id, select by class)
     const $board           = document.querySelector('.board');
     const $historySection  = document.querySelector('.history-section');
+    // Phone game screen: attempts counter and "..." menu (see "Phone game screen" in style.css)
+    const $attemptsCount   = document.getElementById('attempts-count');
+    const $menuOpen        = document.getElementById('menu-open');
+    const $menuDialog      = document.getElementById('menu-dialog');
+    const $menuImport      = document.getElementById('menu-import');
+    const $menuExport      = document.getElementById('menu-export');
+    const $menuHints       = document.getElementById('menu-hints');
+    const $menuHistory     = document.getElementById('menu-history');
+
+    // Same width as the "Phone game screen" media query of style.css: below it the game is one fixed screen
+    const PHONE = window.matchMedia('(max-width: 640px)');
 
     // Dictionary edges: the outer bounds a brand-new game starts from
     const DICT_FIRST = 'abaco';
@@ -452,6 +463,7 @@
     function showStartScreen() {
         game = null;
         saveGame();
+        document.body.classList.remove('playing', 'ended');
         $startScreen.hidden    = false;
         $board.hidden          = true;
         $historySection.hidden = true;
@@ -464,6 +476,8 @@
         $startScreen.hidden    = true;
         $board.hidden          = false;
         $historySection.hidden = false;
+        // On a phone the game screen becomes one fixed screen (style.css, "Phone game screen")
+        document.body.classList.add('playing');
     }
 
     // --- Outcome / history helpers ---
@@ -499,13 +513,144 @@
     // --- Board rendering ---
 
     // Render attempts history list (this session only: imported attempts are just a count)
+    // The same list goes in the phone game menu, where the fixed screen keeps the history
     function renderHistory() {
-        $history.innerHTML = '';
-        for (const a of game.attempts) {
-            const li = document.createElement('li');
-            li.textContent = `${a.word} (${outcomeLabel(a.outcome)})`;
-            $history.appendChild(li);
+        for (const list of [$history, $menuHistory]) {
+            list.innerHTML = '';
+            for (const a of game.attempts) {
+                const li = document.createElement('li');
+                li.textContent = `${a.word} (${outcomeLabel(a.outcome)})`;
+                list.appendChild(li);
+            }
         }
+    }
+
+    // Attempts counter of the phone game screen's top bar: "13 / 20 tentativi" while playing,
+    // the attempts spent once the game is over
+    function renderAttemptsCount() {
+        const left  = attemptsLeft();
+        const count = attemptCount();
+        const big   = document.createElement('b');
+        let rest;
+        if (game.status === 'IN_PROGRESS') {
+            big.textContent = String(left);
+            rest = ` / ${rulesOf(game).attempts} ${left === 1 ? 'tentativo' : 'tentativi'}`;
+        } else {
+            big.textContent = String(count);
+            rest = count === 1 ? ' tentativo' : ' tentativi';
+        }
+        $attemptsCount.replaceChildren(big, rest);
+        $attemptsCount.classList.toggle('low', game.status === 'IN_PROGRESS' && left <= LOW_ATTEMPTS);
+    }
+
+    // --- Phone game screen: far rows collapse to fit ---
+
+    // Sides whose collapsed rows the player opened by tapping their counter, until the next guess
+    const openedSides = { lower: false, upper: false };
+
+    // Counter standing for the far rows of one side: "+ 4 parole prima  balena ... gatto".
+    // Tapping it opens them again (the board scrolls from then on).
+    function moreWordsButton(side, rows) {
+        const button = document.createElement('button');
+        button.type      = 'button';
+        button.className = 'more-words';
+        // A fresh row is wrapped with its badge (.bound-wrap): read the row only, not the badge's letters
+        const words = rows.map(function (r) { return (r.querySelector('.word-input') || r).textContent; });
+        const label = document.createElement('span');
+        label.textContent = `+ ${rows.length} ${rows.length === 1 ? 'parola' : 'parole'} ${side === 'lower' ? 'prima' : 'dopo'}`;
+        const range = document.createElement('span');
+        range.className   = 'more-words-range';
+        range.textContent = words.length === 1 ? words[0] : `${words[0]} … ${words[words.length - 1]}`;
+        button.append(label, range);
+        button.addEventListener('click', function () {
+            openedSides[side] = true;
+            fitBoard();
+        });
+        return button;
+    }
+
+    // Fit the board into the phone game screen without scrolling: keep the rows closest to the guess
+    // (or to the revealed word) and fold the farther ones of each side into a counter, one row at a time,
+    // until the board fits. At least the closest row of each side always stays: the two bounds are what
+    // the player plays against. Wide screens scroll the page instead: every row stays.
+    function fitBoard() {
+        $boardStack.querySelectorAll('.more-words').forEach(function (b) { b.remove(); });
+        const items  = Array.from($boardStack.children);
+        items.forEach(function (el) { el.hidden = false; });
+        if (!PHONE.matches || !game) return;
+
+        const center = items.findIndex(function (el) {
+            return el === $guess || el.classList.contains('dict-entry');
+        });
+        // The guess just played (wrapped with its badge, .bound-wrap) never folds, even when it lands
+        // outside the bounds: the player must see where it went and its badge
+        const isRow = function (el) {
+            return !el.classList.contains('dict-edge') && !el.classList.contains('bound-wrap');
+        };
+        // Rows ordered from the farthest to the closest one, on each side
+        const sides = {
+            lower: items.slice(0, center).filter(isRow),
+            upper: items.slice(center + 1).filter(isRow).reverse()
+        };
+        const folded   = { lower: 0, upper: 0 };
+        const counters = { lower: [], upper: [] };
+        const overflows = function () { return $boardStack.scrollHeight > $boardStack.clientHeight + 1; };
+
+        while (overflows()) {
+            // Fold on the side keeping more rows, so the guess stays near the middle
+            const canFold = function (side) {
+                return !openedSides[side] && sides[side].length - folded[side] > 1;
+            };
+            const keptLower = sides.lower.length - folded.lower;
+            const keptUpper = sides.upper.length - folded.upper;
+            let side = keptLower >= keptUpper ? 'lower' : 'upper';
+            if (!canFold(side)) side = side === 'lower' ? 'upper' : 'lower';
+            if (!canFold(side)) break;
+
+            folded[side]++;
+            const hidden = sides[side].slice(0, folded[side]);
+            hidden.forEach(function (el) { el.hidden = true; });
+            counters[side].forEach(function (c) { c.remove(); });
+            // One counter per run of folded rows, in their place: two runs when the guess just played
+            // stays visible between them. Runs read in alphabetical (board) order, whatever the side.
+            const runs = [];
+            let run = null;
+            items.forEach(function (el) {
+                if (hidden.includes(el)) {
+                    if (!run) runs.push(run = []);
+                    run.push(el);
+                } else {
+                    run = null;
+                }
+            });
+            counters[side] = runs.map(function (rows) {
+                const counter = moreWordsButton(side, rows);
+                rows[0].before(counter);
+                return counter;
+            });
+        }
+
+        // Still too tall (rows opened by hand, a long definition): show the guess or the revealed word
+        if (overflows() && items[center]) {
+            items[center].scrollIntoView({ block: 'center' });
+        }
+    }
+
+    // The visible height, keyboard excluded: the phone game screen sizes itself on it (--app-height),
+    // also where the keyboard covers the page instead of shrinking it (iOS)
+    function updateAppHeight() {
+        const height = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        document.documentElement.style.setProperty('--app-height', `${Math.round(height)}px`);
+    }
+
+    // Screen resized (keyboard opened or closed, phone turned): refit, once per frame
+    let refitFrame = 0;
+    function onViewportChange() {
+        cancelAnimationFrame(refitFrame);
+        refitFrame = requestAnimationFrame(function () {
+            updateAppHeight();
+            if (game) fitBoard();
+        });
     }
 
     // Number of leading letters a word shares with the secret, position by position, stopping at the
@@ -701,10 +846,18 @@
         saveGame();
         renderBoard(freshWord);
         renderHistory();
+        renderAttemptsCount();
         showGameScreen();
 
         // A finished game cannot be played, surrendered or exported
         const ended = game.status !== 'IN_PROGRESS';
+        document.body.classList.toggle('ended', ended);
+        $menuExport.disabled   = ended;
+        // A new board: the rows opened by hand fold again, then the board fits the phone screen
+        openedSides.lower = false;
+        openedSides.upper = false;
+        updateAppHeight();
+        fitBoard();
         $submit.disabled       = ended;
         $surrender.disabled    = ended;
         $copyCode.disabled     = ended;
@@ -1090,6 +1243,38 @@
     $hintsDialog.addEventListener('click', function (ev) {
         if (ev.target === $hintsDialog) $hintsDialog.close();
     });
+    // Phone game menu: each choice closes it first, then does what the hidden bar button did
+    $menuOpen.addEventListener('click', function () { $menuDialog.showModal(); });
+    $menuDialog.addEventListener('click', function (ev) {
+        if (ev.target === $menuDialog) $menuDialog.close();
+    });
+    $menuImport.addEventListener('click', function () { $menuDialog.close(); openImportDialog(); });
+    $menuExport.addEventListener('click', function () { $menuDialog.close(); copyGameCode(); });
+    $menuHints.addEventListener('click', function () { $menuDialog.close(); $hintsDialog.showModal(); });
+
+    // Phone game screen: the keyboard stays open while playing. Closing a popup gives the focus
+    // back to the guess, and TENTA does not take the focus away from it (that would close the keyboard)
+    [$menuDialog, $importDialog, $confirmDialog, $hintsDialog].forEach(function (dialog) {
+        dialog.addEventListener('close', function () {
+            if (PHONE.matches && $guess && !$guess.disabled && !document.querySelector('dialog[open]')) {
+                $guess.focus({ preventScroll: true });
+            }
+        });
+    });
+    $submit.addEventListener('pointerdown', function (ev) {
+        if (PHONE.matches && $guess) ev.preventDefault();
+    });
+    // A message floating over the phone game screen closes with a tap
+    $banner.addEventListener('click', function () {
+        if (PHONE.matches && document.body.classList.contains('playing')) clearBanner();
+    });
+    // Keyboard opened or closed, phone turned, screen crossing the phone width: fit the board again
+    window.addEventListener('resize', onViewportChange);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', onViewportChange);
+    PHONE.addEventListener('change', onViewportChange);
+    // Row heights change once the theme's web font arrives
+    if (document.fonts) document.fonts.ready.then(onViewportChange);
+
     $difficulty.addEventListener('change', updateDifficultyNote);
     // Every control of the custom panel updates the note as it changes
     $customRules.addEventListener('change', updateDifficultyNote);
