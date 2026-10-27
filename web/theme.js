@@ -11,7 +11,7 @@
     // Its keys are also the list of valid theme names.
     const THEME_COLOR = {
         classico: '#FDF8EB',
-        sketch:   '#DDD2B8',
+        sketch:   '#E4DCC8',
         arcade:   '#0A0626',
         lavagna:  '#D8CDB4',
         notte:    '#0C1020'
