@@ -1,5 +1,5 @@
 /* =========================================================================
-   Theme "sketch": a pencil drawing on paper. Wobbly hand-drawn outlines traced twice,
+   Theme "quaderno": a pencil drawing in an old school notebook. Wobbly hand-drawn outlines traced twice,
    colored-pencil hatching on the attempt rows, handwriting (Caveat) everywhere.
    Layered on style.css (loaded only while the theme is active, see theme.js).
    ========================================================================= */
@@ -37,15 +37,15 @@
     /* Warnings in red pen */
     --alert: #c0392b;
     /* Paper-colored halo around graphite text: keeps it readable over the hatching */
-    --sk-halo: 1px 0 0 #faf5e8, -1px 0 0 #faf5e8, 0 1px 0 #faf5e8, 0 -1px 0 #faf5e8,
+    --qd-halo: 1px 0 0 #faf5e8, -1px 0 0 #faf5e8, 0 1px 0 #faf5e8, 0 -1px 0 #faf5e8,
                1px 1px 0 #faf5e8, -1px -1px 0 #faf5e8, 1px -1px 0 #faf5e8, -1px 1px 0 #faf5e8;
     --reveal-surrendered: #c9c6bd;
     /* Pencil hatching laid over a fill (paper-colored stripes let the fill show as strokes) */
-    --sk-hatch: repeating-linear-gradient(-45deg, rgba(250, 245, 232, 0.55) 0 3px, transparent 3px 7px);
+    --qd-hatch: repeating-linear-gradient(-45deg, rgba(250, 245, 232, 0.55) 0 3px, transparent 3px 7px);
     /* Hand-drawn outline: uneven corners, then a second fainter trace slightly off the first */
-    --sk-wobbly: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    --sk-wobbly-alt: 15px 225px 15px 255px / 225px 15px 255px 15px;
-    --sk-retrace: 2px 3px 0 -1px rgba(43, 43, 43, 0.45);
+    --qd-wobbly: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    --qd-wobbly-alt: 15px 225px 15px 255px / 225px 15px 255px 15px;
+    --qd-retrace: 2px 3px 0 -1px rgba(43, 43, 43, 0.45);
 
     /* Typography: handwriting for everything */
     --font-ui: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
@@ -64,13 +64,13 @@ body {
 /* ---------- Card: a sheet of paper outlined in pencil, traced twice ---------- */
 .page {
     position: relative;
-    /* Ruled sheet: red margin line in the left padding (--sk-margin from the edge),
+    /* Ruled sheet: red margin line in the left padding (--qd-margin from the edge),
        over a faint blue line every 32px starting below the top edge */
-    --sk-margin: 30px;
+    --qd-margin: 30px;
     /* No coffee stains: on a phone there is no free corner, and they sat under the theme picker
        and the footer text. The paper grain below gives the sheet its used look instead. */
     background:
-        linear-gradient(90deg, transparent var(--sk-margin), rgba(220, 80, 80, 0.55) var(--sk-margin) calc(var(--sk-margin) + 2px), transparent calc(var(--sk-margin) + 2px)),
+        linear-gradient(90deg, transparent var(--qd-margin), rgba(220, 80, 80, 0.55) var(--qd-margin) calc(var(--qd-margin) + 2px), transparent calc(var(--qd-margin) + 2px)),
         repeating-linear-gradient(transparent 0 31px, rgba(120, 160, 210, 0.35) 31px 32px) 0 20px,
         /* Ageing, uneven like real paper: a few brown foxing spots, a faint fold across the sheet,
            one corner yellowed more than the other, edges darker than the middle */
@@ -87,7 +87,7 @@ body {
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 0.09 0'/></filter><rect width='180' height='180' filter='url(%23g)'/></svg>") 0 0 / 180px 180px,
         var(--surface);
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly);
+    border-radius: var(--qd-wobbly);
     box-shadow: 3px 4px 0 -1px rgba(43, 43, 43, 0.35);
 }
 
@@ -98,7 +98,7 @@ body {
     position: absolute;
     inset: 4px 3px 3px 5px;
     border: 1px solid rgba(43, 43, 43, 0.4);
-    border-radius: var(--sk-wobbly-alt);
+    border-radius: var(--qd-wobbly-alt);
     transform: rotate(-0.4deg);
     pointer-events: none;
 }
@@ -144,8 +144,8 @@ body {
 .start-option {
     background: transparent;
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly-alt);
-    box-shadow: var(--sk-retrace);
+    border-radius: var(--qd-wobbly-alt);
+    box-shadow: var(--qd-retrace);
 }
 
 /* ---------- Buttons: hand-drawn outlines, a highlighter swipe on hover ---------- */
@@ -154,7 +154,7 @@ select {
     font-size: 21px;
     font-weight: 700;
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly);
+    border-radius: var(--qd-wobbly);
     background-color: transparent;
     letter-spacing: 0.02em;
 }
@@ -162,7 +162,7 @@ select {
 button {
     padding: 4px 18px;
     text-transform: none;
-    box-shadow: var(--sk-retrace);
+    box-shadow: var(--qd-retrace);
 }
 
 select {
@@ -179,7 +179,7 @@ button:hover:not(:disabled) {
     background: #fff59d;
     color: var(--ink);
     transform: rotate(-1.5deg);
-    box-shadow: var(--sk-retrace);
+    box-shadow: var(--qd-retrace);
 }
 
 button:disabled {
@@ -189,7 +189,7 @@ button:disabled {
 }
 
 /* Primary actions: a stroke of yellow highlighter across the word, over light pencil hatching
-   (no solid fill in a sketch); on hover the highlighter covers the whole button */
+   (no solid fill in a pencil drawing); on hover the highlighter covers the whole button */
 #submit-guess,
 #new-game,
 #import-confirm,
@@ -221,14 +221,14 @@ button:disabled {
     font-weight: 700;
     padding: 6px 18px;
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly);
-    box-shadow: var(--sk-retrace);
+    border-radius: var(--qd-wobbly);
+    box-shadow: var(--qd-retrace);
 }
 
 /* Every other row bends the other way, so the stack does not look stamped */
 .board-stack > :nth-child(even) .word-input,
 .board-stack > .word-input:nth-child(even) {
-    border-radius: var(--sk-wobbly-alt);
+    border-radius: var(--qd-wobbly-alt);
 }
 
 /* Attempt rows: flat closeness color (no hatching: the stripes fought with the letters),
@@ -260,26 +260,26 @@ button:disabled {
 .word-input.guess:focus {
     border-style: solid;
     transform: none;
-    box-shadow: var(--sk-retrace);
+    box-shadow: var(--qd-retrace);
     background: linear-gradient(transparent 62%, rgba(253, 224, 71, 0.55) 62%);
 }
 
 .word-input.guess.won,
 .word-input.guess.won:disabled {
-    background: var(--sk-hatch), var(--win-bg);
+    background: var(--qd-hatch), var(--win-bg);
 }
 
 /* Game codes stay in a typewriter font: they are random letters, handwriting would confuse them */
 .code-input {
     font-family: 'Courier New', ui-monospace, monospace;
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly-alt);
+    border-radius: var(--qd-wobbly-alt);
     background: transparent;
 }
 
 .code-input:focus,
 select:focus {
-    box-shadow: var(--sk-retrace);
+    box-shadow: var(--qd-retrace);
 }
 
 /* ---------- Revealed secret: a note taped onto the sheet ----------
@@ -291,10 +291,10 @@ select:focus {
     text-shadow: none;
     font-size: 22px;
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly-alt);
+    border-radius: var(--qd-wobbly-alt);
     /* A fresher sheet than the yellowed page: it was taped on later */
     background: #fffaea;
-    box-shadow: var(--sk-retrace), 2px 4px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--qd-retrace), 2px 4px 8px rgba(0, 0, 0, 0.08);
     transform: rotate(-0.5deg);
 }
 
@@ -382,7 +382,7 @@ select:focus {
 
 .import-dialog {
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly);
+    border-radius: var(--qd-wobbly);
 }
 
 .import-dialog::backdrop {
@@ -439,7 +439,7 @@ select:focus {
 @media (max-width: 640px) {
     /* The card's side padding shrinks to 22px: keep the margin line inside it */
     .page {
-        --sk-margin: 12px;
+        --qd-margin: 12px;
     }
     .word-input {
         font-size: 23px;
@@ -485,9 +485,9 @@ select:focus {
     width: 54px;
     height: 30px;
     border: 2px solid var(--ink);
-    border-radius: var(--sk-wobbly);
+    border-radius: var(--qd-wobbly);
     background: transparent;
-    box-shadow: var(--sk-retrace);
+    box-shadow: var(--qd-retrace);
 }
 
 /* Knob: an empty pencil circle marked with a cross when off, a tick when on: the state reads

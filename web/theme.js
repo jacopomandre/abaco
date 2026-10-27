@@ -11,14 +11,14 @@
     // Its keys are also the list of valid theme names.
     const THEME_COLOR = {
         classico: '#FDF8EB',
-        sketch:   '#E4DCC8',
+        quaderno: '#E4DCC8',
         arcade:   '#0A0626',
         lavagna:  '#D8CDB4',
         notte:    '#0C1020'
     };
 
     // Old theme names still saved on some devices -> the theme that replaced them
-    const RENAMED = { matrix: 'notte', hacker: 'notte', retro: 'arcade' };
+    const RENAMED = { matrix: 'notte', hacker: 'notte', retro: 'arcade', sketch: 'quaderno' };
 
     // Saved theme, or the default one when none (or an unknown one) is stored.
     // Storage can be unavailable (private mode, blocked site data): every access is guarded.
