@@ -104,7 +104,7 @@ body {
 }
 
 /* Logo as a sticker stuck on the sheet: white die-cut edge (drop-shadows with no blur, pushed
-   in eight directions, follow the drawing's shape), a soft shadow under it, a little crooked */
+   in eight directions, follow the drawing's shape), a soft shadow under it (upright, as in every theme) */
 .logo {
     filter:
         drop-shadow(3px 0 0 #fff) drop-shadow(-3px 0 0 #fff)
@@ -112,7 +112,6 @@ body {
         drop-shadow(2px 2px 0 #fff) drop-shadow(-2px -2px 0 #fff)
         drop-shadow(2px -2px 0 #fff) drop-shadow(-2px 2px 0 #fff)
         drop-shadow(1px 3px 3px rgba(0, 0, 0, 0.3));
-    transform: rotate(-3deg);
 }
 
 .tagline {
