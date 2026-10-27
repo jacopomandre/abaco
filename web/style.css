@@ -1577,7 +1577,7 @@ select:focus {
     display: none;
 }
 
-/* One menu for both screens: the game's choices while playing, theme and privacy on the home */
+/* One menu for both screens: the game's choices while playing, privacy on the home; the theme on both */
 body:not(.playing) .menu-game,
 body.playing .menu-home {
     display: none;

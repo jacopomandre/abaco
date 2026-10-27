@@ -1264,8 +1264,8 @@
     $hintsDialog.addEventListener('click', function (ev) {
         if (ev.target === $hintsDialog) $hintsDialog.close();
     });
-    // Phone menu, the same popup on both screens: the game's choices while playing, theme and privacy
-    // on the home (style.css shows the right ones). Each choice closes it first, then does what the
+    // Phone menu, the same popup on both screens: the game's choices while playing, privacy on the home,
+    // the theme on both (style.css shows the right ones). Each choice closes it first, then does what the
     // hidden bar button did.
     function openMenu(title) {
         $menuTitle.textContent = title;
@@ -1337,6 +1337,11 @@
     $menuTheme.addEventListener('change', function () {
         window.AbacoTheme.set($menuTheme.value);
         $theme.value = $menuTheme.value;
+        // Changed during a game: the rows take the new theme's sizes, fit the board again once its
+        // stylesheet and its font have arrived
+        onViewportChange();
+        setTimeout(onViewportChange, 300);
+        if (document.fonts) document.fonts.ready.then(onViewportChange);
     });
 
     // --- Page load: resume the saved game if there is one, else show the start screen ---
