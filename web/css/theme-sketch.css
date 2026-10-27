@@ -66,13 +66,13 @@ body {
     /* Ruled sheet: red margin line in the left padding (--sk-margin from the edge),
        over a faint blue line every 32px starting below the top edge */
     --sk-margin: 30px;
-    /* Coffee stains first, so they sit over the ruling: a mug ring cut by the top-right corner
-       and a few splashes in the empty bottom-right corner. Content rows are opaque and cover them. */
+    /* No coffee stains: on a phone there is no free corner, and they sat under the theme picker
+       and the footer text. The paper grain below gives the sheet its used look instead. */
     background:
-        url("../img/coffee-ring.svg") right -70px top -95px / 240px no-repeat,
-        url("../img/coffee-drops.svg") right 30px bottom 18px / 140px no-repeat,
         linear-gradient(90deg, transparent var(--sk-margin), rgba(220, 80, 80, 0.55) var(--sk-margin) calc(var(--sk-margin) + 2px), transparent calc(var(--sk-margin) + 2px)),
         repeating-linear-gradient(transparent 0 31px, rgba(120, 160, 210, 0.35) 31px 32px) 0 20px,
+        /* Paper grain: faint warm noise, so the sheet is not a flat screen color */
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 0.09 0'/></filter><rect width='180' height='180' filter='url(%23g)'/></svg>") 0 0 / 180px 180px,
         var(--surface);
     border: 2px solid var(--ink);
     border-radius: var(--sk-wobbly);
@@ -271,19 +271,64 @@ select:focus {
     box-shadow: var(--sk-retrace);
 }
 
-/* ---------- Revealed secret: a hatched note, graphite text ---------- */
+/* ---------- Revealed secret: a note taped onto the sheet ----------
+   Plain paper, no hatching (its stripes ran through the letters of the definition),
+   held by two strips of tape across the top corners. A win gets a pale green note. */
 .dict-entry {
+    position: relative;
     color: var(--ink);
-    text-shadow: var(--sk-halo);
+    text-shadow: none;
     font-size: 22px;
     border: 2px solid var(--ink);
     border-radius: var(--sk-wobbly-alt);
-    background: var(--sk-hatch), var(--reveal-surrendered);
-    box-shadow: var(--sk-retrace);
+    background: #fffdf5;
+    box-shadow: var(--sk-retrace), 2px 4px 8px rgba(0, 0, 0, 0.08);
+    transform: rotate(-0.5deg);
 }
 
 .dict-entry.won {
-    background: var(--sk-hatch), var(--reveal-won);
+    background: #e8f4e1;
+}
+
+/* Two strips of semi-transparent tape over the top corners */
+.dict-entry::before,
+.dict-entry::after {
+    content: "";
+    position: absolute;
+    top: -12px;
+    width: 76px;
+    height: 24px;
+    background: rgba(226, 214, 176, 0.75);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    pointer-events: none;
+}
+
+.dict-entry::before {
+    left: -14px;
+    transform: rotate(-32deg);
+}
+
+.dict-entry::after {
+    right: -14px;
+    transform: rotate(30deg);
+}
+
+/* A win: the found word circled in red pen, with a star scribbled beside it */
+.dict-entry.won .dict-word {
+    display: inline-block;
+    padding: 2px 22px 6px 14px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 60' preserveAspectRatio='none'><path d='M30 8 C80 -2 170 2 192 22 C206 40 160 56 100 56 C40 57 4 48 6 30 C8 14 40 6 88 6' fill='none' stroke='%23c0392b' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/></svg>") center / 100% 100% no-repeat;
+}
+
+.dict-entry.won .dict-head::after {
+    content: "";
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin-left: 8px;
+    vertical-align: top;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><path d='M20 3 L24.5 15 L37 15.5 L27 23.5 L30.5 36 L20 28.5 L9.5 36 L13 23.5 L3 15.5 L15.5 15 Z' fill='none' stroke='%23c0392b' stroke-width='2.2' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+    transform: rotate(12deg);
 }
 
 .dict-word {
@@ -433,14 +478,16 @@ select:focus {
     box-shadow: var(--sk-retrace);
 }
 
+/* Knob: an empty pencil circle marked with a cross when off, a tick when on: the state reads
+   from the mark itself, not only from the highlighter */
 .toggle::before {
-    top: 4px;
-    left: 4px;
-    width: 18px;
-    height: 18px;
-    background: repeating-linear-gradient(-45deg, var(--ink) 0 1.5px, transparent 1.5px 4px);
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
     border: 2px solid var(--ink);
     box-sizing: border-box;
+    background: var(--surface) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M6 6 L14 14 M14 6 L6 14' stroke='%232b2b2b' stroke-width='2.2' stroke-linecap='round'/></svg>") center / 12px 12px no-repeat;
 }
 
 .start-option .custom-field .toggle:checked {
@@ -450,7 +497,7 @@ select:focus {
 
 .toggle:checked::before {
     transform: translateX(24px);
-    background: var(--ink);
+    background: var(--surface) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M4 10.5 L8.5 15 L16 5' fill='none' stroke='%232b2b2b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / 13px 13px no-repeat;
 }
 
 /* Attempts stepper: hand-drawn - and + boxes, the count written big in between */
@@ -489,4 +536,34 @@ select:focus {
     background-repeat: no-repeat, no-repeat;
     background-position: right 12px center, 0 0;
     background-size: 30px 30px, 100% 100%;
+}
+
+/* ---------- Pencil marks in place of the shared shapes ---------- */
+/* Rows and headword: a small pencil arrow instead of the flat diamond of the other themes */
+.word-input.bound::before,
+.dict-word::before {
+    width: 18px;
+    height: 12px;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 12'><path d='M1 6.5 C6 5.5 11 6.5 16 6 M11 1.5 L16.5 6 L11 10.5' fill='none' stroke='%232b2b2b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+}
+
+.word-input.bound::before {
+    left: 10px;
+    transform: translateY(-50%);
+}
+
+.dict-word::before {
+    transform: none;
+}
+
+/* Pickers: a "v" drawn in pencil instead of the two neat triangles */
+select {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 10'><path d='M1.5 2 C4 4.5 5.5 6.5 7 8.5 C8.5 6 10.5 3.5 12.5 1.5' fill='none' stroke='%232b2b2b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-position: right 10px center;
+    background-size: 14px 10px;
+}
+
+/* Privacy link at the foot of the page: handwriting needs more than the 12px of style.css */
+.site-footer {
+    font-size: 17px;
 }
