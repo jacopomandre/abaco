@@ -19,9 +19,10 @@
     --ink-muted: #7a7a7a;
     --line: #2b2b2b;
     --line-soft: #2b2b2b;
-    --surface: #fbfaf6;
-    --surface-alt: #f6f3ea;
-    --surface-sunk: #ebe7dc;
+    /* Aged paper: ivory turning yellow, darker toward the edges (see .page) */
+    --surface: #f6eed9;
+    --surface-alt: #f1e7cf;
+    --surface-sunk: #ddd2b8;
     --win-bg: #e3f1dc;
     --win-line: #2f855a;
     /* Closeness scale in colored pencils, red (far) to green (close), in the same three bands as the
@@ -36,11 +37,11 @@
     /* Warnings in red pen */
     --alert: #c0392b;
     /* Paper-colored halo around graphite text: keeps it readable over the hatching */
-    --sk-halo: 1px 0 0 #fbfaf6, -1px 0 0 #fbfaf6, 0 1px 0 #fbfaf6, 0 -1px 0 #fbfaf6,
-               1px 1px 0 #fbfaf6, -1px -1px 0 #fbfaf6, 1px -1px 0 #fbfaf6, -1px 1px 0 #fbfaf6;
+    --sk-halo: 1px 0 0 #f6eed9, -1px 0 0 #f6eed9, 0 1px 0 #f6eed9, 0 -1px 0 #f6eed9,
+               1px 1px 0 #f6eed9, -1px -1px 0 #f6eed9, 1px -1px 0 #f6eed9, -1px 1px 0 #f6eed9;
     --reveal-surrendered: #c9c6bd;
     /* Pencil hatching laid over a fill (paper-colored stripes let the fill show as strokes) */
-    --sk-hatch: repeating-linear-gradient(-45deg, rgba(251, 250, 246, 0.55) 0 3px, transparent 3px 7px);
+    --sk-hatch: repeating-linear-gradient(-45deg, rgba(246, 238, 217, 0.55) 0 3px, transparent 3px 7px);
     /* Hand-drawn outline: uneven corners, then a second fainter trace slightly off the first */
     --sk-wobbly: 255px 15px 225px 15px / 15px 225px 15px 255px;
     --sk-wobbly-alt: 15px 225px 15px 255px / 225px 15px 255px 15px;
@@ -71,6 +72,17 @@ body {
     background:
         linear-gradient(90deg, transparent var(--sk-margin), rgba(220, 80, 80, 0.55) var(--sk-margin) calc(var(--sk-margin) + 2px), transparent calc(var(--sk-margin) + 2px)),
         repeating-linear-gradient(transparent 0 31px, rgba(120, 160, 210, 0.35) 31px 32px) 0 20px,
+        /* Ageing, uneven like real paper: a few brown foxing spots, a faint fold across the sheet,
+           one corner yellowed more than the other, edges darker than the middle */
+        radial-gradient(circle at 78% 31%, rgba(140, 95, 40, 0.22) 0 2px, transparent 5px),
+        radial-gradient(circle at 23% 58%, rgba(140, 95, 40, 0.16) 0 3px, transparent 7px),
+        radial-gradient(circle at 64% 82%, rgba(140, 95, 40, 0.18) 0 1.5px, transparent 4px),
+        radial-gradient(circle at 88% 67%, rgba(140, 95, 40, 0.12) 0 4px, transparent 9px),
+        radial-gradient(circle at 35% 12%, rgba(140, 95, 40, 0.14) 0 2px, transparent 5px),
+        linear-gradient(176deg, transparent 47.6%, rgba(255, 255, 255, 0.45) 47.9%, rgba(130, 95, 40, 0.12) 48.3%, transparent 48.8%),
+        radial-gradient(ellipse at 100% 0%, rgba(175, 125, 45, 0.26), transparent 55%),
+        radial-gradient(ellipse at 0% 100%, rgba(175, 125, 45, 0.16), transparent 50%),
+        radial-gradient(ellipse at 45% 45%, transparent 50%, rgba(160, 115, 45, 0.18) 100%),
         /* Paper grain: faint warm noise, so the sheet is not a flat screen color */
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 0.09 0'/></filter><rect width='180' height='180' filter='url(%23g)'/></svg>") 0 0 / 180px 180px,
         var(--surface);
@@ -237,7 +249,7 @@ button:disabled {
 /* Rows without the hint: a light pencil shade inside the graphite outline */
 .word-input.bound.no-closeness,
 .word-input.bound.imported {
-    --row-plain-bg: #efede7;
+    --row-plain-bg: #ece2c9;
 }
 
 /* Guess row: dashed outline, to be filled in; a highlighter mark while typing */
@@ -281,7 +293,8 @@ select:focus {
     font-size: 22px;
     border: 2px solid var(--ink);
     border-radius: var(--sk-wobbly-alt);
-    background: #fffdf5;
+    /* A fresher sheet than the yellowed page: it was taped on later */
+    background: #fffaea;
     box-shadow: var(--sk-retrace), 2px 4px 8px rgba(0, 0, 0, 0.08);
     transform: rotate(-0.5deg);
 }
@@ -418,10 +431,10 @@ select:focus {
 }
 
 /* Pen colors matching the closeness scale of the rows: red (far), orange (near), green (very near and found) */
-.closeness-badge.far   { --fill: #c0392b; --edge: #fbfaf6; }
-.closeness-badge.near  { --fill: #d9741a; --edge: #fbfaf6; }
+.closeness-badge.far   { --fill: #c0392b; --edge: #f6eed9; }
+.closeness-badge.near  { --fill: #d9741a; --edge: #f6eed9; }
 .closeness-badge.close,
-.closeness-badge.won   { --fill: #2f855a; --edge: #fbfaf6; }
+.closeness-badge.won   { --fill: #2f855a; --edge: #f6eed9; }
 
 /* ---------- Narrow screens ---------- */
 @media (max-width: 640px) {
