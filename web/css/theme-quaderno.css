@@ -220,13 +220,23 @@ button:disabled {
     border-radius: var(--qd-wobbly-alt);
 }
 
-/* Attempt rows: flat closeness color (no hatching: the stripes fought with the letters),
-   graphite text and marker (see .word-input.bound in style.css). */
+/* Attempt rows: a stroke of highlighter in the closeness color (no hatching: the stripes fought with
+   the letters), graphite text and marker (see .word-input.bound in style.css). No pencil outline:
+   uneven ends like a marker's, and the ink sinks into the paper (multiply), its grain showing through. */
 .word-input.bound {
     color: var(--ink);
     text-shadow: none;
-    border-color: var(--ink);
+    border: none;
+    box-shadow: none;
+    border-radius: 6px 16px 8px 18px / 14px 6px 16px 8px;
+    mix-blend-mode: multiply;
     padding-left: 36px;
+}
+
+/* Every other stroke drawn the other way round */
+.board-stack > :nth-child(even) .word-input.bound,
+.board-stack > .word-input.bound:nth-child(even) {
+    border-radius: 16px 6px 18px 8px / 6px 14px 8px 16px;
 }
 
 /* Graphite on a light fill keeps its contrast: the letters past the shared prefix can fade more */
@@ -234,10 +244,13 @@ button:disabled {
     --word-rest-opacity: 0.6;
 }
 
-/* Rows without the hint: a light pencil shade inside the graphite outline */
+/* Rows without the hint: a gray highlighter, dark enough to show on the paper without an outline */
 .word-input.bound.no-closeness,
 .word-input.bound.imported {
-    --row-plain-bg: #efe8d6;
+    --row-plain-bg: #dcd3bf;
+    /* No outline here either (style.css draws one around the plain rows of the other themes) */
+    border: none;
+    box-shadow: none;
 }
 
 /* Guess row: dashed outline, to be filled in; a highlighter mark while typing */
