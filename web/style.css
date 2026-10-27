@@ -1564,3 +1564,212 @@ select:focus {
         box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
     }
 }
+
+/* ---------- Phone home screen ---------- */
+/* Phone-only pieces of the home: hidden on a wide screen, where the page keeps its two cards,
+   the top bar and the footer */
+.round-btn,
+.difficulty-chips,
+.sheet-title,
+.sheet-play,
+.resume-line,
+.sheet-backdrop {
+    display: none;
+}
+
+/* One menu for both screens: the game's choices while playing, theme and privacy on the home */
+body:not(.playing) .menu-game,
+body.playing .menu-home {
+    display: none;
+}
+
+.menu-dialog .theme-label {
+    justify-content: space-between;
+    font-size: 13px;
+}
+
+.menu-link {
+    color: var(--ink-soft);
+    font-size: 14px;
+    text-align: center;
+}
+
+/* While the home is shown (app.js sets body.home), a phone gets it in one fixed screen:
+   - top right: "?" (the rules) and the menu (theme, privacy);
+   - the big logo and the tagline, centered in the free room;
+   - the new game card at the bottom: levels as buttons, "su misura" on its own line, GIOCA, and a
+     "Riprendi una partita" link that opens the import popup in place of the import card.
+   "Su misura" opens its rules as a sheet sliding up from the bottom, with its own GIOCA. */
+@media (max-width: 640px) {
+    html:has(body.home),
+    body.home {
+        height: var(--app-height, 100dvh);
+        overflow: hidden;
+    }
+
+    body.home .page {
+        display: flex;
+        flex-direction: column;
+        height: calc(100% - 16px);
+        margin: 8px;
+        padding: 12px 16px 16px;
+        overflow: hidden;
+    }
+
+    /* Top bar: only the two round buttons */
+    body.home .theme-bar {
+        margin: 0;
+        gap: 8px;
+    }
+
+    body.home #hints-open,
+    body.home .theme-bar .theme-label {
+        display: none;
+    }
+
+    body.home .round-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 17px;
+        font-size: 16px;
+    }
+
+    /* Logo and tagline fill the room above the card, centered; the logo shrinks on a short screen */
+    body.home .header {
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 12px;
+        text-align: center;
+    }
+
+    body.home .logo {
+        height: min(190px, 24vh);
+        margin: 0 auto;
+    }
+
+    body.home .tagline {
+        flex: none;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    body.home .rule,
+    body.home .site-footer,
+    body.home .start-option + .start-option,
+    body.home .difficulty-label {
+        display: none;
+    }
+
+    body.home .start-screen {
+        margin: 12px 0 0;
+    }
+
+    body.home .start-option {
+        padding: 16px;
+        gap: 10px;
+    }
+
+    /* Three levels on a row, "su misura" below, across the whole card */
+    body.home .difficulty-chips {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    body.home .chip {
+        padding: 7px 4px;
+        border-radius: 999px;
+        font-size: 13px;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    body.home .chip[aria-pressed="true"] {
+        background: var(--ink);
+        color: var(--surface);
+        border-color: var(--ink);
+    }
+
+    body.home .chip-custom {
+        grid-column: 1 / -1;
+        border-style: dashed;
+    }
+
+    body.home .resume-line {
+        display: block;
+        margin: 2px 0 0;
+        text-align: center;
+        font-size: 14px;
+        color: var(--ink-soft);
+    }
+
+    body.home .link-btn {
+        /* Not the card's full-width buttons (.start-option button): a link inside the sentence */
+        width: auto;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--ink);
+        font: inherit;
+        font-weight: 600;
+        text-transform: none;
+        letter-spacing: 0;
+        text-decoration: underline;
+        box-shadow: none;
+    }
+
+    /* "Su misura": the rules panel shows only as the sheet, while it is open (body.custom-open) */
+    body.home:not(.custom-open) .custom-rules {
+        display: none;
+    }
+
+    body.home.custom-open .sheet-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 3;
+        background: rgba(10, 20, 40, 0.45);
+    }
+
+    body.home.custom-open .custom-rules {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 4;
+        gap: 14px;
+        padding: 20px 20px 24px;
+        background: var(--surface);
+        border-radius: var(--r-lg) var(--r-lg) 0 0;
+        box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.25);
+        animation: sheetIn 240ms var(--ease) 1;
+    }
+
+    body.home .sheet-title {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--ink);
+    }
+
+    body.home .sheet-play {
+        display: block;
+        width: 100%;
+        margin-top: 4px;
+        background: var(--ink);
+        color: var(--surface);
+    }
+}
+
+@keyframes sheetIn {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}

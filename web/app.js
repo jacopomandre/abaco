@@ -68,6 +68,15 @@
     const $menuExport      = document.getElementById('menu-export');
     const $menuHints       = document.getElementById('menu-hints');
     const $menuHistory     = document.getElementById('menu-history');
+    const $menuTitle       = document.getElementById('menu-dialog-title');
+    const $menuTheme       = document.getElementById('menu-theme');
+    // Phone home (see "Phone home screen" in style.css)
+    const $homeHints       = document.getElementById('home-hints');
+    const $homeMenu        = document.getElementById('home-menu');
+    const $homeImport      = document.getElementById('home-import');
+    const $difficultyChips = document.querySelectorAll('.difficulty-chips .chip');
+    const $customPlay      = document.getElementById('custom-play');
+    const $sheetBackdrop   = document.getElementById('sheet-backdrop');
 
     // Same width as the "Phone game screen" media query of style.css: below it the game is one fixed screen
     const PHONE = window.matchMedia('(max-width: 640px)');
@@ -464,6 +473,8 @@
         game = null;
         saveGame();
         document.body.classList.remove('playing', 'ended');
+        // On a phone the home becomes one fixed screen (style.css, "Phone home screen")
+        document.body.classList.add('home');
         $startScreen.hidden    = false;
         $board.hidden          = true;
         $historySection.hidden = true;
@@ -477,6 +488,7 @@
         $board.hidden          = false;
         $historySection.hidden = false;
         // On a phone the game screen becomes one fixed screen (style.css, "Phone game screen")
+        document.body.classList.remove('home', 'custom-open');
         document.body.classList.add('playing');
     }
 
@@ -1174,6 +1186,15 @@
             button.disabled = step < 0 ? customAttempts <= CUSTOM_ATTEMPTS_MIN : customAttempts >= CUSTOM_ATTEMPTS_MAX;
         });
         $difficultyNote.textContent = rules ? rulesSummary(rules) : '';
+        // Phone home: the level buttons show the choice of the select they stand for
+        $difficultyChips.forEach(function (chip) {
+            chip.setAttribute('aria-pressed', String(chip.dataset.difficulty === $difficulty.value));
+        });
+    }
+
+    // Phone home: open or close the "su misura" rules as a sheet from the bottom
+    function setCustomSheet(open) {
+        document.body.classList.toggle('custom-open', open);
     }
 
     // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
@@ -1243,8 +1264,28 @@
     $hintsDialog.addEventListener('click', function (ev) {
         if (ev.target === $hintsDialog) $hintsDialog.close();
     });
-    // Phone game menu: each choice closes it first, then does what the hidden bar button did
-    $menuOpen.addEventListener('click', function () { $menuDialog.showModal(); });
+    // Phone menu, the same popup on both screens: the game's choices while playing, theme and privacy
+    // on the home (style.css shows the right ones). Each choice closes it first, then does what the
+    // hidden bar button did.
+    function openMenu(title) {
+        $menuTitle.textContent = title;
+        $menuDialog.showModal();
+    }
+    $menuOpen.addEventListener('click', function () { openMenu('Partita'); });
+    $homeMenu.addEventListener('click', function () { openMenu('Menu'); });
+    $homeHints.addEventListener('click', function () { $hintsDialog.showModal(); });
+    $homeImport.addEventListener('click', openImportDialog);
+
+    // Phone home: a level button sets the difficulty select; "su misura" also opens its sheet
+    $difficultyChips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+            $difficulty.value = chip.dataset.difficulty;
+            updateDifficultyNote();
+            setCustomSheet(chip.dataset.difficulty === CUSTOM);
+        });
+    });
+    $sheetBackdrop.addEventListener('click', function () { setCustomSheet(false); });
+    $customPlay.addEventListener('click', newGame);
     $menuDialog.addEventListener('click', function (ev) {
         if (ev.target === $menuDialog) $menuDialog.close();
     });
@@ -1288,6 +1329,14 @@
     $theme.value = window.AbacoTheme.current();
     $theme.addEventListener('change', function () {
         window.AbacoTheme.set($theme.value);
+        $menuTheme.value = $theme.value;
+    });
+    // The phone menu's picker: same options, same choice
+    $menuTheme.append(...Array.from($theme.options, function (o) { return new Option(o.text, o.value); }));
+    $menuTheme.value = $theme.value;
+    $menuTheme.addEventListener('change', function () {
+        window.AbacoTheme.set($menuTheme.value);
+        $theme.value = $menuTheme.value;
     });
 
     // --- Page load: resume the saved game if there is one, else show the start screen ---
