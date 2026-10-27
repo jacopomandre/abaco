@@ -429,11 +429,12 @@ select:focus {
     text-shadow: none;
 }
 
-/* Pen colors matching the closeness scale of the rows: red (far), orange (near), green (very near and found) */
-.closeness-badge.far   { --fill: #c0392b; --edge: #faf5e8; }
-.closeness-badge.near  { --fill: #d9741a; --edge: #faf5e8; }
+/* Dark ink pen colors matching the closeness scale of the rows: bordeaux (far), burnt orange (near),
+   forest green (very near and found) */
+.closeness-badge.far   { --fill: #7f1717; --edge: #faf5e8; }
+.closeness-badge.near  { --fill: #8c3f04; --edge: #faf5e8; }
 .closeness-badge.close,
-.closeness-badge.won   { --fill: #2f855a; --edge: #faf5e8; }
+.closeness-badge.won   { --fill: #154f33; --edge: #faf5e8; }
 
 /* ---------- Narrow screens ---------- */
 @media (max-width: 640px) {
