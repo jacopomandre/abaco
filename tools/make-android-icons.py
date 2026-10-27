@@ -1,4 +1,7 @@
-# Abaco Zuzzurellone - builds every Android launcher icon and splash image from the logo.
+# Abaco Zuzzurellone - builds the Android splash images from the logo.
+# The launcher icons (mipmap-*/ic_launcher*.png) are no longer built here: they have the store look
+# (cream, abacus beads, adaptive background layer) and are committed as drawn. Running this script
+# must not overwrite them, so main() below only writes the splash screens.
 # Needs Pillow:   python tools/make-android-icons.py     (run from the project root)
 # Source: resources/icon-source.png, a square logo on a plain cream background, with some
 # empty margin around the drawing.
@@ -46,23 +49,12 @@ def masked(image, size, radius_share):
 def main():
     logo = Image.open(ROOT / 'resources' / 'icon-source.png').convert('RGBA')
 
-    for name, scale in DENSITIES.items():
-        folder = RES / f'mipmap-{name}'
-        # Adaptive icon foreground (Android 8+): the launcher masks it and adds the cream background
-        adaptive = round(108 * scale)
-        centered((adaptive, adaptive), logo, ADAPTIVE_LOGO_SHARE, (0, 0, 0, 0)).save(folder / 'ic_launcher_foreground.png')
-        # Legacy icons (Android 7 and older): a rounded square and a round variant
-        legacy = round(48 * scale)
-        masked(logo, legacy, LEGACY_CORNER_SHARE).save(folder / 'ic_launcher.png')
-        round_source = centered(logo.size, logo, ROUND_LOGO_SHARE, CREAM)
-        masked(round_source, legacy, 0.5).save(folder / 'ic_launcher_round.png')
-
     # Splash screens: keep each existing file's size, cream background, logo in the middle
     for splash in RES.glob('drawable*/splash.png'):
         size = Image.open(splash).size
         centered(size, logo, SPLASH_LOGO_SHARE, CREAM).convert('RGB').save(splash)
 
-    print('icons and splash screens written under', RES)
+    print('splash screens written under', RES)
 
 
 if __name__ == '__main__':
