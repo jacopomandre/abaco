@@ -304,17 +304,20 @@
          room for. Reuses the import popup's look (import-dialog) so every theme styles it the same way. -->
     <dialog id="menu-dialog" class="import-dialog menu-dialog" aria-labelledby="menu-dialog-title">
         <form method="dialog" class="dialog-form">
-            <h2 id="menu-dialog-title" class="dialog-title">Partita</h2>
+            <!-- Title on the left, the theme picker of the wide page's top bar on the right -->
+            <div class="menu-head">
+                <h2 id="menu-dialog-title" class="dialog-title">Partita</h2>
+                <label class="theme-label">
+                    TEMA:
+                    <select id="menu-theme"></select>
+                </label>
+            </div>
             <div class="menu-actions">
                 <button id="menu-import" type="button" class="menu-game">IMPORTA</button>
                 <button id="menu-export" type="button" class="menu-game">ESPORTA</button>
                 <button id="menu-hints" type="button">COME SI GIOCA</button>
             </div>
-            <!-- The theme picker of the wide page's top bar, on both screens; privacy (its footer) on the home -->
-            <label class="theme-label">
-                TEMA:
-                <select id="menu-theme"></select>
-            </label>
+            <!-- Privacy (the wide page's footer), on the home -->
             <a class="menu-home menu-link" href="privacy.html">Privacy</a>
             <!-- Closed until tapped: the words tried, numbered in the order they were played, laid out
                  in two columns -->

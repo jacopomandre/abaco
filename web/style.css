@@ -1608,9 +1608,15 @@ body.playing .menu-home {
     display: none;
 }
 
-.menu-dialog .theme-label {
+.menu-head {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    font-size: 13px;
+    gap: 12px;
+}
+
+.menu-head .theme-label {
+    font-size: 12px;
 }
 
 .menu-link {
