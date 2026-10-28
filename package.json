@@ -8,7 +8,9 @@
     "android:sync": "npm run check && cap sync android",
     "android:apk": "npm run android:sync && cd android && .\\gradlew.bat assembleDebug",
     "android:release": "npm run android:sync && cd android && .\\gradlew.bat assembleRelease",
-    "android:bundle": "npm run android:sync && cd android && .\\gradlew.bat bundleRelease assembleRelease"
+    "android:bundle": "npm run android:sync && cd android && .\\gradlew.bat bundleRelease assembleRelease",
+    "postandroid:release": "node tools/release-reminder.js",
+    "postandroid:bundle": "node tools/release-reminder.js"
   },
   "devDependencies": {
     "@capacitor/android": "^7.6.9",
