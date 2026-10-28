@@ -67,7 +67,8 @@
     const $menuImport      = document.getElementById('menu-import');
     const $menuExport      = document.getElementById('menu-export');
     const $menuHints       = document.getElementById('menu-hints');
-    const $menuHistory     = document.getElementById('menu-history');
+    const $menuHistoryLower = document.getElementById('menu-history-lower');
+    const $menuHistoryUpper = document.getElementById('menu-history-upper');
     const $menuTitle       = document.getElementById('menu-dialog-title');
     const $menuTheme       = document.getElementById('menu-theme');
     // Phone home (see "Phone home screen" in style.css)
@@ -513,13 +514,21 @@
     // Render attempts history list: the words tried, in the order played (this session only: imported
     // attempts are just a count). Where each one fell is on the board already, so no "avanti" / "indietro".
     // The same list goes in the phone game menu, where the fixed screen keeps the history
+    // The phone menu splits them in two columns, as on the board: "Avanti" for the words before the
+    // secret, "Indietro" for those after it (the winning word is on the board, revealed)
     function renderHistory() {
-        for (const list of [$history, $menuHistory]) {
-            list.innerHTML = '';
-            for (const a of game.attempts) {
-                const li = document.createElement('li');
-                li.textContent = a.word;
-                list.appendChild(li);
+        $history.innerHTML = '';
+        $menuHistoryLower.innerHTML = '';
+        $menuHistoryUpper.innerHTML = '';
+        for (const a of game.attempts) {
+            const li = document.createElement('li');
+            li.textContent = a.word;
+            $history.appendChild(li);
+            const column = a.outcome === 'LOWER' ? $menuHistoryLower : a.outcome === 'UPPER' ? $menuHistoryUpper : null;
+            if (column) {
+                const item = document.createElement('li');
+                item.textContent = a.word;
+                column.appendChild(item);
             }
         }
     }

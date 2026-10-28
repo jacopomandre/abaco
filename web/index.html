@@ -316,10 +316,20 @@
                 <select id="menu-theme"></select>
             </label>
             <a class="menu-home menu-link" href="privacy.html">Privacy</a>
-            <!-- Closed until tapped: the words tried, in the order they were played -->
+            <!-- Closed until tapped: the words tried, in the order they were played, in two columns like the
+                 board: the words before the secret (go forward) and the ones after it (go back) -->
             <details class="history-details menu-history menu-game">
                 <summary class="history-title">STORIA TENTATIVI</summary>
-                <ul id="menu-history" class="history-list"></ul>
+                <div class="history-columns">
+                    <section>
+                        <h3 class="history-column-title">Avanti</h3>
+                        <ul id="menu-history-lower" class="history-column"></ul>
+                    </section>
+                    <section>
+                        <h3 class="history-column-title">Indietro</h3>
+                        <ul id="menu-history-upper" class="history-column"></ul>
+                    </section>
+                </div>
             </details>
             <div class="dialog-actions">
                 <button id="menu-close" type="submit">CHIUDI</button>
