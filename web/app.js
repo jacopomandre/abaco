@@ -492,20 +492,6 @@
         document.body.classList.add('playing');
     }
 
-    // --- Outcome / history helpers ---
-
-    // Map outcome to the italian label shown in history
-    // LOWER => guess is before the secret => player must move forward (avanti)
-    // UPPER => guess is after  the secret => player must move backward (indietro)
-    function outcomeLabel(outcome) {
-        switch (outcome) {
-            case 'LOWER': return 'avanti';
-            case 'UPPER': return 'indietro';
-            case 'WON':   return 'vinto!';
-            default:      return outcome;
-        }
-    }
-
     // --- Banner helpers ---
 
     // Show a message in the bottom banner (error or info)
@@ -524,14 +510,15 @@
 
     // --- Board rendering ---
 
-    // Render attempts history list (this session only: imported attempts are just a count)
+    // Render attempts history list: the words tried, in the order played (this session only: imported
+    // attempts are just a count). Where each one fell is on the board already, so no "avanti" / "indietro".
     // The same list goes in the phone game menu, where the fixed screen keeps the history
     function renderHistory() {
         for (const list of [$history, $menuHistory]) {
             list.innerHTML = '';
             for (const a of game.attempts) {
                 const li = document.createElement('li');
-                li.textContent = `${a.word} (${outcomeLabel(a.outcome)})`;
+                li.textContent = a.word;
                 list.appendChild(li);
             }
         }

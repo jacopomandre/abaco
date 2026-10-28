@@ -1388,13 +1388,21 @@ select:focus {
     gap: 10px;
 }
 
-.menu-history .history-title {
-    margin: 0 0 8px;
-    cursor: default;
+/* The words tried as small tags that wrap, not one full-width line each; a long game scrolls inside */
+.menu-history .history-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 30vh;
+    overflow-y: auto;
 }
 
-/* Always open here: no disclosure arrow */
-.menu-history .history-title::before {
+.menu-history .history-list li {
+    padding: 3px 10px;
+    border-radius: 999px;
+}
+
+.menu-history .history-list li::before {
     display: none;
 }
 
