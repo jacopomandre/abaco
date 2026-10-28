@@ -1388,11 +1388,14 @@ select:focus {
     gap: 10px;
 }
 
-/* The words tried in two columns, numbered in the order played (1 2 on the first line, 3 4 below...):
-   plain words in the page's face; a long game scrolls inside, the menu stays put */
+/* The words tried in two columns, numbered in the order played and read down: the first half in the
+   left column, the rest in the right one (app.js sets --history-rows, half the count rounded up).
+   Plain words in the page's face; a long game scrolls inside, the menu stays put. */
 .history-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(var(--history-rows, 1), auto);
+    grid-auto-flow: column;
     gap: 0 16px;
     margin: 12px 0 0;
     padding: 0;

@@ -522,6 +522,8 @@
                 list.appendChild(li);
             }
         }
+        // Two columns read down in the menu: as many rows as half the words
+        $menuHistory.style.setProperty('--history-rows', String(Math.max(1, Math.ceil(game.attempts.length / 2))));
     }
 
     // Attempts counter of the phone game screen's top bar: "13 / 20 tentativi" while playing,
