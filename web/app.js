@@ -572,8 +572,9 @@
 
     // Fit the board into the phone game screen without scrolling: keep the rows closest to the guess
     // (or to the revealed word) and fold the farther ones of each side into a counter, one row at a time,
-    // until the board fits. At least the closest row of each side always stays: the two bounds are what
-    // the player plays against. Wide screens scroll the page instead: every row stays.
+    // until the board fits. While playing, at least the closest row of each side always stays: the two
+    // bounds are what the player plays against (a finished game may fold them too, see minKept).
+    // Wide screens scroll the page instead: every row stays.
     function fitBoard() {
         $boardStack.querySelectorAll('.more-words').forEach(function (b) { b.remove(); });
         const items  = Array.from($boardStack.children);
@@ -597,16 +598,26 @@
         const counters = { lower: [], upper: [] };
         const overflows = function () { return $boardStack.scrollHeight > $boardStack.clientHeight + 1; };
 
+        // Rows each side keeps at least. Once the game is over there is no guess to play against the
+        // bounds, and the revealed word (with its definition) matters more: those may fold too.
+        let minKept = 1;
+        const ended = items[center] && items[center].classList.contains('dict-entry');
         while (overflows()) {
             // Fold on the side keeping more rows, so the guess stays near the middle
             const canFold = function (side) {
-                return !openedSides[side] && sides[side].length - folded[side] > 1;
+                return !openedSides[side] && sides[side].length - folded[side] > minKept;
             };
             const keptLower = sides.lower.length - folded.lower;
             const keptUpper = sides.upper.length - folded.upper;
             let side = keptLower >= keptUpper ? 'lower' : 'upper';
             if (!canFold(side)) side = side === 'lower' ? 'upper' : 'lower';
-            if (!canFold(side)) break;
+            if (!canFold(side)) {
+                if (ended && minKept > 0) {
+                    minKept = 0;
+                    continue;
+                }
+                break;
+            }
 
             folded[side]++;
             const hidden = sides[side].slice(0, folded[side]);
