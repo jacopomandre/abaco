@@ -1388,37 +1388,22 @@ select:focus {
     gap: 10px;
 }
 
-/* Two columns, before and after the secret: plain words in the page's face, one per line;
-   a long game scrolls inside, the menu stays put */
+/* The words tried in two columns, numbered in the order played (1 2 on the first line, 3 4 below...):
+   plain words in the page's face; a long game scrolls inside, the menu stays put */
 .history-columns {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 12px;
+    gap: 0 16px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: attempt;
     max-height: 34vh;
     overflow-y: auto;
 }
 
-/* The column titles stay in sight while the lists scroll */
-.history-column-title {
-    position: sticky;
-    top: 0;
-    background: var(--surface);
-    margin: 0 0 4px;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-}
-
-.history-column {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.history-column li {
+.history-columns li {
+    counter-increment: attempt;
     padding: 4px 0;
     border-bottom: 1px solid var(--line-soft);
     font-size: 15px;
@@ -1426,10 +1411,20 @@ select:focus {
     overflow-wrap: anywhere;
 }
 
-/* No attempts on one side yet */
-.history-column:empty::before {
-    content: "—";
+.history-columns li::before {
+    content: counter(attempt) ".";
+    display: inline-block;
+    min-width: 24px;
+    font-size: 12px;
     color: var(--ink-muted);
+}
+
+/* No attempts yet: say so instead of showing an empty list */
+.history-columns:empty::before {
+    content: "Nessun tentativo ancora.";
+    grid-column: 1 / -1;
+    color: var(--ink-muted);
+    font-size: 14px;
 }
 
 /* Collapsed far rows of the phone game screen (app.js, fitBoard): "+ 4 parole prima  balena ... gatto".
