@@ -17,9 +17,9 @@ paths:
 - A change is NOT done while the script exits with an error.
 
 ## Entry format
-- One entry per line, file sorted by `chiave`, no duplicated `chiave`.
+- One entry per line, file sorted by `parola` lowercased with accents stripped; no two words equal once accents are stripped.
 - `parola`: single lowercase word, dictionary lemma (noun singular, adjective masculine singular, verb infinitive), with accents.
-- `chiave`: `parola` lowercased with accents stripped.
+- No `chiave` field: the checker computes the accent-free form itself (the game never used it).
 - `categoria`: `sostantivo` | `aggettivo` | `verbo`.
 - `descrizione`: Italian, 1-2 sentences, must not contain the defined word.
 - `difficolta`: non-empty array of `facile` | `media` | `difficile`.

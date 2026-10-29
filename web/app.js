@@ -1,11 +1,23 @@
 // Abaco Zuzzurellone - vanilla SPA client
 // The whole game runs here, with no server: the secret word is drawn from the
-// dictionary shipped with the page (dizionario.js, loaded before this file).
+// dictionary shipped with the page (dizionario.js, loaded in parallel with this file, see dictionaryReady).
 (function () {
     'use strict';
 
-    // Dictionary entries: { parola, chiave, categoria, descrizione, difficolta: [...] }
-    const DICTIONARY = window.ABACO_DIZIONARIO || [];
+    // Dictionary entries: { parola, categoria, descrizione, difficolta: [...] }.
+    // dizionario.js loads in parallel (async in index.html): it may arrive after this file runs, so the
+    // dictionary is read when a secret is drawn, after dictionaryReady. Resuming a saved game needs none.
+    const dictionary = function () { return window.ABACO_DIZIONARIO || []; };
+    const dictionaryReady = new Promise(function (resolve) {
+        if (window.ABACO_DIZIONARIO) {
+            resolve();
+            return;
+        }
+        // Loaded or failed: either way stop waiting (a failed load shows as "dizionario non disponibile")
+        const script = document.getElementById('dictionary-script');
+        script.addEventListener('load', resolve);
+        script.addEventListener('error', resolve);
+    });
     // Word pools a game can draw from -> labels of the "difficolta" field of the dictionary
     const WORD_POOLS = {
         EASY:   ['facile'],
@@ -123,7 +135,7 @@
     const RULE_CODE_KEYS = { words: 'w', attempts: 'a', colors: 'h', bold: 'b' };
 
     // Italian alphabetical order, ignoring case and accents: typing "citta" matches "città"
-    // (same idea as the accent-free "chiave" field of the dictionary)
+    // (the same accent-free order the dictionary file is sorted in)
     const ITALIAN = new Intl.Collator('it', { sensitivity: 'base' });
 
     // Current game. Mirrored to localStorage on every change, so a reload resumes it.
@@ -189,7 +201,7 @@
     function pickSecret(words, lower, upper) {
         const labels     = WORD_POOLS[words];
         const bounded    = lower !== undefined;
-        const candidates = DICTIONARY.filter(function (entry) {
+        const candidates = dictionary().filter(function (entry) {
             return entry.difficolta.some(function (label) { return labels.includes(label); })
                 && (!bounded
                     || (ITALIAN.compare(lower, entry.parola) < 0 && ITALIAN.compare(entry.parola, upper) < 0));
@@ -892,9 +904,19 @@
 
     // --- Game actions ---
 
-    // Start a new game with the selected difficulty (or the custom panel's rules)
-    function newGame() {
+    // Wait for the dictionary, before drawing a secret: right away once it is there; on a slow connection
+    // just after the page opened, a message says why GIOCA takes a moment
+    async function whenDictionaryReady() {
+        if (window.ABACO_DIZIONARIO) return;
+        showBanner('Carico il dizionario…', false);
+        await dictionaryReady;
         clearBanner();
+    }
+
+    // Start a new game with the selected difficulty (or the custom panel's rules)
+    async function newGame() {
+        clearBanner();
+        await whenDictionaryReady();
         try {
             const difficulty = $difficulty.value;
             const custom     = difficulty === CUSTOM;
@@ -1056,10 +1078,11 @@
     // --- Import ---
 
     // Start screen: resume a game from the code pasted in the card's field
-    function importFromStartScreen() {
+    async function importFromStartScreen() {
         const code = ($importCode.value || '').trim();
         if (!code) return;
         clearBanner();
+        await whenDictionaryReady();
         try {
             game = parseGameCode(code);
             render();
@@ -1080,10 +1103,11 @@
 
     // Popup confirmed (button or Enter): replace the current game with the pasted one.
     // An invalid code keeps the popup open and the current game untouched.
-    function importFromDialog(ev) {
+    async function importFromDialog(ev) {
         ev.preventDefault();
         const code = ($importCodeGame.value || '').trim();
         if (!code) return;
+        await whenDictionaryReady();
         try {
             game = parseGameCode(code);
             $importDialog.close();

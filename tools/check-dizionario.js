@@ -21,7 +21,7 @@ const dictionary = global.window.ABACO_DIZIONARIO;
 
 const errors = [];
 
-// Accent-free lowercase form: what the "chiave" field must contain
+// Accent-free lowercase form of a word: the file is sorted by it, and it must be unique
 function toKey(word) {
     return word.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
@@ -38,18 +38,20 @@ if (!Array.isArray(dictionary) || dictionary.length === 0) {
             errors.push(`${name}: "parola" must be a single lowercase word`);
             continue;
         }
-        if (entry.chiave !== toKey(entry.parola)) {
-            errors.push(`${name}: "chiave" must be "${toKey(entry.parola)}"`);
+        // No stored key: the game never needed one, and computing it here keeps the file lighter
+        const key = toKey(entry.parola);
+        if (seen.has(key)) {
+            errors.push(`${name}: duplicated word (same letters as another, accents aside)`);
         }
-        if (seen.has(entry.chiave)) {
-            errors.push(`${name}: duplicated "chiave"`);
-        }
-        seen.add(entry.chiave);
+        seen.add(key);
         // The game relies on nothing but the app's own sort, yet a sorted file keeps diffs readable
-        if (entry.chiave < previousKey) {
-            errors.push(`${name}: file not sorted by "chiave" (comes after "${previousKey}")`);
+        if (key < previousKey) {
+            errors.push(`${name}: file not sorted by the accent-free word (comes after "${previousKey}")`);
         }
-        previousKey = entry.chiave;
+        previousKey = key;
+        if (Object.prototype.hasOwnProperty.call(entry, 'chiave')) {
+            errors.push(`${name}: the "chiave" field is no longer used, remove it`);
+        }
         if (!CATEGORIES.includes(entry.categoria)) {
             errors.push(`${name}: unknown "categoria" ${JSON.stringify(entry.categoria)}`);
         }
@@ -71,7 +73,7 @@ if (!Array.isArray(dictionary) || dictionary.length === 0) {
         }
         const perPrefix = new Map();
         for (const entry of words) {
-            const prefix = String(entry.chiave).slice(0, 2);
+            const prefix = toKey(String(entry.parola)).slice(0, 2);
             perPrefix.set(prefix, (perPrefix.get(prefix) || 0) + 1);
         }
         const ranked = [...perPrefix.entries()].sort((a, b) => b[1] - a[1]);

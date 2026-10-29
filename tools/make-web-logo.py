@@ -38,6 +38,9 @@ def main():
     width = round(logo.width * OUTPUT_HEIGHT / logo.height)
     logo = logo.resize((width, OUTPUT_HEIGHT), Image.LANCZOS)
     target = ROOT / 'web' / 'img' / 'logo.png'
+    # 256-color palette (alpha kept, dithered): a flat drawing shows no difference, and the file drops
+    # from about 165 KB to about 30 KB, the first picture the home loads
+    logo = logo.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG)
     logo.save(target, optimize=True)
     print(f'{target} written: {width}x{OUTPUT_HEIGHT}')
 

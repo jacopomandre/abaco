@@ -419,8 +419,9 @@
         </form>
     </dialog>
 
-    <!-- The dictionary must load first: app.js reads window.ABACO_DIZIONARIO -->
-    <script src="dizionario.js"></script>
+    <!-- The dictionary (about 2 MB) loads in parallel (async): the game starts without waiting for it,
+         and app.js waits for it only to draw a secret (GIOCA, import). It sets window.ABACO_DIZIONARIO. -->
+    <script id="dictionary-script" src="dizionario.js" async></script>
     <script src="app.js"></script>
 </body>
 </html>
