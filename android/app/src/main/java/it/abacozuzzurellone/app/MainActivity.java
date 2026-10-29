@@ -1,17 +1,24 @@
 package it.abacozuzzurellone.app;
 
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.WindowManager;
+import android.webkit.WebView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.WebViewListener;
 
 public class MainActivity extends BridgeActivity {
+
+    // Height of the camera cutout at the top, in CSS pixels: the page leaves that much room itself
+    private int cutoutTopCss = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -24,25 +31,54 @@ public class MainActivity extends BridgeActivity {
         // Behind the bars: black, like the classic system bars the app had before (white icons, see styles.xml)
         findViewById(android.R.id.content).setBackgroundColor(Color.BLACK);
 
-        View webView = getBridge().getWebView();
+        // With the bars hidden, Android's default keeps the window out of the camera cutout's strip: a black
+        // band across the top. Draw there too; the page leaves the room for the camera itself (--inset-top).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            getWindow().getAttributes().layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            getWindow().getAttributes().layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        }
+
+        WebView webView = getBridge().getWebView();
         ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
             // The keyboard (ime) counts too: edge-to-edge, the window no longer shrinks for it by itself,
-            // and it would cover the guess field. Each side takes the largest of the three.
-            Insets insets = windowInsets.getInsets(
-                WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.displayCutout()
-                    | WindowInsetsCompat.Type.ime()
+            // and it would cover the guess field. Each side takes the largest of bars, keyboard and cutout,
+            // except the top: the cutout there is left to the page, so its own background fills the strip
+            // around the camera instead of a black margin.
+            Insets bars = windowInsets.getInsets(
+                WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime()
             );
+            Insets cutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
             MarginLayoutParams mlp = (MarginLayoutParams) v.getLayoutParams();
-            mlp.leftMargin = insets.left;
-            mlp.topMargin = insets.top;
-            mlp.rightMargin = insets.right;
-            mlp.bottomMargin = insets.bottom;
+            mlp.leftMargin = Math.max(bars.left, cutout.left);
+            mlp.topMargin = bars.top;
+            mlp.rightMargin = Math.max(bars.right, cutout.right);
+            mlp.bottomMargin = Math.max(bars.bottom, cutout.bottom);
             v.setLayoutParams(mlp);
+
+            float density = getResources().getDisplayMetrics().density;
+            cutoutTopCss = Math.round(Math.max(0, cutout.top - bars.top) / density);
+            sendInsetTop();
             return WindowInsetsCompat.CONSUMED;
         });
 
+        // The insets may arrive before the page: send them again once it is loaded
+        getBridge().addWebViewListener(new WebViewListener() {
+            @Override
+            public void onPageLoaded(WebView view) {
+                sendInsetTop();
+            }
+        });
+
         hideSystemBars();
+    }
+
+    // Tell the page how much room to leave at the top for the camera (style.css, --inset-top)
+    private void sendInsetTop() {
+        getBridge().getWebView().evaluateJavascript(
+            "document.documentElement.style.setProperty('--inset-top', '" + cutoutTopCss + "px')", null);
     }
 
     // Immersive mode: the game takes the whole screen, status and navigation bars hidden.

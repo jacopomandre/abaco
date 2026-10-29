@@ -66,6 +66,12 @@ html, body {
     text-rendering: optimizeLegibility;
 }
 
+/* Android app in immersive mode: the page also covers the camera cutout's strip at the top, and leaves
+   that room itself (MainActivity sets --inset-top), in the theme's own background color. 0 elsewhere. */
+body {
+    padding-top: var(--inset-top, 0px);
+}
+
 /* Page container — a centered card with soft elevation */
 .page {
     max-width: 760px;
