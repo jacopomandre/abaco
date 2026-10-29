@@ -66,9 +66,11 @@ html, body {
     text-rendering: optimizeLegibility;
 }
 
-/* Android app in immersive mode: the page also covers the camera cutout's strip at the top, and leaves
-   that room itself (MainActivity sets --inset-top), in the theme's own background color. 0 elsewhere. */
-body {
+/* Android app in immersive mode: the page also covers the camera cutout's strip at the top
+   (MainActivity sets --inset-top; 0 elsewhere). A scrolling page leaves that room above itself; the
+   fixed phone screens instead take the card up to the edge, around the camera (see "Card under the
+   camera" at the end). */
+body:not(.home):not(.playing) {
     padding-top: var(--inset-top, 0px);
 }
 
@@ -1809,4 +1811,20 @@ body.playing .menu-home {
 @keyframes sheetIn {
     from { transform: translateY(100%); }
     to   { transform: translateY(0); }
+}
+
+/* ---------- Card under the camera (Android app, phone screens) ---------- */
+/* With a camera cutout at the top (--inset-top, from MainActivity) the card of the fixed phone screens
+   goes up to the screen's edge, so the camera sits inside the card rather than on a strip of background,
+   and its top padding grows by the cutout's height: the content still starts below the camera.
+   Without a cutout (--inset-top 0) the card keeps its 8px margin. */
+@media (max-width: 640px) {
+    body.home .page,
+    body.playing .page {
+        /* 8px without a cutout, 0 with one (any inset of at least 1px) */
+        --card-top: clamp(0px, calc(8px - var(--inset-top, 0px) * 8), 8px);
+        margin-top: var(--card-top);
+        height: calc(100% - 8px - var(--card-top));
+        padding-top: calc(12px + var(--inset-top, 0px));
+    }
 }
