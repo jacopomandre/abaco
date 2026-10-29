@@ -1815,16 +1815,19 @@ body.playing .menu-home {
 
 /* ---------- Card under the camera (Android app, phone screens) ---------- */
 /* With a camera cutout at the top (--inset-top, from MainActivity) the card of the fixed phone screens
-   goes up to the screen's edge, so the camera sits inside the card rather than on a strip of background,
-   and its top padding grows by the cutout's height: the content still starts below the camera.
-   Without a cutout (--inset-top 0) the card keeps its 8px margin. */
+   moves up so its top edge runs between the screen's edge and the camera: a thin margin above
+   (15% of the cutout, at most 6px; a punch-hole camera sits a few pixels below the edge), the camera
+   inside the card. Its top padding grows by the rest of the cutout: the content still starts below
+   the camera. Without a cutout (--inset-top 0) the card keeps its 8px margin. */
 @media (max-width: 640px) {
     body.home .page,
     body.playing .page {
         /* 8px without a cutout, 0 with one (any inset of at least 1px) */
-        --card-top: clamp(0px, calc(8px - var(--inset-top, 0px) * 8), 8px);
+        --no-cutout: clamp(0px, calc(8px - var(--inset-top, 0px) * 8), 8px);
+        --cutout-gap: min(6px, calc(var(--inset-top, 0px) * 0.15));
+        --card-top: calc(var(--no-cutout) + var(--cutout-gap));
         margin-top: var(--card-top);
         height: calc(100% - 8px - var(--card-top));
-        padding-top: calc(12px + var(--inset-top, 0px));
+        padding-top: calc(12px + var(--inset-top, 0px) - var(--cutout-gap));
     }
 }
