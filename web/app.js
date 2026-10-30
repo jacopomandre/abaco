@@ -40,6 +40,8 @@
     const $importError     = document.getElementById('import-dialog-error');
     const $importCancel    = document.getElementById('import-cancel');
     const $boardStack      = document.getElementById('board-stack');
+    // Small arrow beside the board: shows / hides the alphabet rail (body.rail-open)
+    const $railToggle      = document.getElementById('rail-toggle');
     const $submit          = document.getElementById('submit-guess');
     const $surrender       = document.getElementById('surrender');
     const $restart         = document.getElementById('restart-game');
@@ -125,6 +127,8 @@
     const SAVE_KEY = 'abaco.partita';
     // localStorage key holding the last custom rules, so the panel opens on them
     const CUSTOM_SAVE_KEY = 'abaco.su-misura';
+    // localStorage key remembering whether the game screen's alphabet rail was left open
+    const RAIL_SAVE_KEY = 'abaco.alfabeto';
 
     // Game code format version, bumped if the exported payload ever changes shape
     // (3: carries the difficulty, which sets both the attempts and the color hint;
@@ -476,6 +480,29 @@
         try {
             localStorage.setItem(CUSTOM_SAVE_KEY, JSON.stringify(rules));
         } catch (_) { /* the panel will just open on the defaults */ }
+    }
+
+    // Alphabet rail of the game screen: open or closed, remembered for the next games and visits
+    function setAlphabetRail(open) {
+        const label = open ? 'Nascondi l\'alfabeto' : 'Mostra l\'alfabeto';
+        document.body.classList.toggle('rail-open', open);
+        $railToggle.setAttribute('aria-expanded', String(open));
+        $railToggle.setAttribute('aria-label', label);
+        $railToggle.title = label;
+    }
+
+    function loadAlphabetRail() {
+        try {
+            return localStorage.getItem(RAIL_SAVE_KEY) === 'aperto';
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function saveAlphabetRail(open) {
+        try {
+            localStorage.setItem(RAIL_SAVE_KEY, open ? 'aperto' : 'chiuso');
+        } catch (_) { /* the rail will just start closed next time */ }
     }
 
     // --- Screen helpers ---
@@ -1328,6 +1355,16 @@
     });
     $submit.addEventListener('pointerdown', function (ev) {
         if (PHONE.matches && $guess) ev.preventDefault();
+    });
+    // The alphabet arrow, likewise, leaves the keyboard open
+    setAlphabetRail(loadAlphabetRail());
+    $railToggle.addEventListener('pointerdown', function (ev) {
+        if (PHONE.matches && $guess) ev.preventDefault();
+    });
+    $railToggle.addEventListener('click', function () {
+        const open = !document.body.classList.contains('rail-open');
+        setAlphabetRail(open);
+        saveAlphabetRail(open);
     });
     // A message floating over the phone game screen closes with a tap
     $banner.addEventListener('click', function () {

@@ -1889,6 +1889,62 @@ body.playing .alpha-rail {
     transform: rotate(var(--lean, -3deg));
 }
 
+/* Closed by default: the small arrow at the rail's top (.rail-toggle) slides it in, and back out.
+   app.js sets body.rail-open and remembers the choice. */
+body:not(.rail-open) .alpha-rail {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px);
+}
+
+.alpha-rail {
+    transition:
+        opacity var(--t-med) var(--ease),
+        transform var(--t-med) var(--ease),
+        visibility var(--t-med);
+}
+
+/* A bare chevron, none of the theme's button look: pointing left (the letters come in from the
+   right) while closed, right once open. It sits above the rail, which starts below it while open. */
+.rail-toggle {
+    display: none;
+}
+
+body.playing .rail-toggle,
+body.playing .rail-toggle:hover:not(:disabled),
+body.playing .rail-toggle:active:not(:disabled) {
+    position: absolute;
+    top: 36px;
+    right: 14px;
+    width: 12px;
+    height: 22px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    transform: none;
+    color: var(--ink-soft);
+}
+
+body.playing .rail-toggle {
+    display: flex;
+}
+
+.rail-toggle .btn-icon {
+    transition: transform var(--t-med) var(--ease);
+}
+
+body.rail-open .rail-toggle .btn-icon {
+    transform: rotate(180deg);
+}
+
+body.rail-open .alpha-rail {
+    top: 60px;
+}
+
 /* A stroke down the rail's whole length, left of the tiles: the board labels' one (.dict-edge) upright,
    in their ink, and every theme restyles it along with theirs */
 .alpha-rail::before {
@@ -1907,8 +1963,8 @@ body.playing .alpha-rail {
 
 /* Phone game screen: the rail stands beside the rows only, between the top bar and the buttons, so
    those keep the card's even padding and stay centered. .board-middle takes the free height the board
-   stack had; the rail sits 5px off the card's inner edge and the stack's right padding grows from 14px
-   to 34px to keep the rows clear of it and of its stroke. */
+   stack had; the rail sits 5px off the card's inner edge and, while it is open, the stack's right
+   padding grows from 14px to 34px to keep the rows clear of it and of its stroke. */
 @media (max-width: 640px) {
     body.playing .board-middle {
         position: relative;
@@ -1918,8 +1974,25 @@ body.playing .alpha-rail {
         flex-direction: column;
     }
 
-    body.playing .board-stack {
+    /* Only while the rail is open: closed, the rows take the whole width again */
+    body.playing.rail-open .board-stack {
         padding-right: 34px;
+    }
+
+    body.playing .board-stack {
+        transition: padding-right var(--t-med) var(--ease);
+    }
+
+    /* The arrow in the card's right padding, at the top of the rows' area */
+    body.playing .rail-toggle,
+    body.playing .rail-toggle:hover:not(:disabled),
+    body.playing .rail-toggle:active:not(:disabled) {
+        top: 0;
+        right: -13px;
+    }
+
+    body.rail-open .alpha-rail {
+        top: 24px;
     }
 
     .alpha-rail {
