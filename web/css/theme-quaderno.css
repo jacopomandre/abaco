@@ -414,12 +414,6 @@ select:focus {
     .page {
         --qd-margin: 12px;
     }
-
-    /* Game screen: the padding grows to 26px for the alphabet rail (style.css, "Alphabet rails"): the
-       margin line moves to its right, so the letters sit in the margin like notes */
-    body.playing .page {
-        --qd-margin: 22px;
-    }
 }
 
 /* ---------- Board frame (abaco / zuzzurellone): wavy pencil line like the page rule ---------- */

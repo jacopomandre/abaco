@@ -1833,7 +1833,7 @@ body.playing .menu-home {
 }
 
 /* ---------- Alphabet rails (game screen) ---------- */
-/* While a game is shown, both side paddings of the card hold the alphabet A-Z, from the card's top to
+/* While a game is shown, the card's right padding holds the alphabet A-Z, from the card's top to
    its bottom: a frame for the board and a reminder of the letters' order for the "prima / dopo" hints.
    Drawn like the board labels ABACO / ZUZZURELLONE (.dict-edge) turned upright: the same font and ink,
    a faint stroke running between the letters, and every theme restyles that stroke along with
@@ -1904,22 +1904,31 @@ body.playing .alpha-rail {
     transform: rotate(calc(-1 * var(--lean, -8deg)));
 }
 
-/* In the card's 44px side padding, 16px off the content (left of the notebook theme's margin line) */
-.alpha-rail-left {
-    left: 8px;
-}
-
+/* In the card's 44px right padding, 16px off the content */
 .alpha-rail-right {
     right: 8px;
 }
 
-/* Phone game screen: the card's side padding grows from 14px to 26px to make room for a 16px column,
-   from below the camera cutout (same top padding as the card) to the bottom. The letters shrink with
-   the height (keyboard open, --app-height). */
+/* Divider between the board and the letters: a semi-transparent bar as tall as the column, halfway
+   in the gap, in the letters' ink so every theme tints it */
+.alpha-rail::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -9px;
+    width: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    opacity: 0.2;
+}
+
+/* Phone game screen: the card's right padding grows from 14px to 28px to make room for a 16px column
+   and its divider, from below the camera cutout (same top padding as the card) to the bottom. The
+   letters shrink with the height (keyboard open, --app-height). */
 @media (max-width: 640px) {
     body.playing .page {
-        padding-left: 26px;
-        padding-right: 26px;
+        padding-right: 28px;
     }
 
     .alpha-rail {
@@ -1934,8 +1943,8 @@ body.playing .alpha-rail {
         gap: 2px;
     }
 
-    .alpha-rail-left {
-        left: 5px;
+    .alpha-rail::after {
+        left: -4px;
     }
 
     .alpha-rail-right {
