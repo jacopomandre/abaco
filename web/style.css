@@ -1832,13 +1832,15 @@ body.playing .menu-home {
     }
 }
 
-/* ---------- Alphabet rails (game screen) ---------- */
-/* While a game is shown, the card's right padding holds the alphabet A-Z, from the card's top to
-   its bottom: a frame for the board and a reminder of the letters' order for the "prima / dopo" hints.
-   Drawn like the board labels ABACO / ZUZZURELLONE (.dict-edge) turned upright: the same font and ink,
-   a faint stroke running between the letters, and every theme restyles that stroke along with
-   the labels' one. Each letter leans a few degrees, alternating, so the column reads as decoration
-   rather than a ruler. Decorative: aria-hidden in the HTML. */
+/* ---------- Alphabet rail (game screen) ---------- */
+/* While a game is shown, the card's right padding holds the alphabet A-Z on wooden letter tiles, like a
+   board game's: a frame for the board and a reminder of the letters' order for the "prima / dopo" hints.
+   The tiles keep a fixed gap and the column sits in the middle of the card's height, with as much room
+   above as below. They look the same in every theme (an object on the card), each with a slight lean.
+   Decorative: aria-hidden in the HTML.
+   The rail is a size container: the tiles take the size that fits 26 of them and their gaps in its
+   height (100cqh), so a short card (phone with the keyboard open) gets smaller tiles instead of
+   overflowing. */
 body.playing .page {
     position: relative;
 }
@@ -1848,106 +1850,62 @@ body.playing .page {
     position: absolute;
     top: 36px;
     bottom: 36px;
-    width: 20px;
+    right: 8px;
+    width: 24px;
+    container-type: size;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1;
-    text-transform: uppercase;
-    color: var(--ink-soft);
+    justify-content: center;
+    --gap: 4px;
+    gap: var(--gap);
     pointer-events: none;
     user-select: none;
+    --tile: min(24px, calc((100cqh - 25 * var(--gap)) / 26));
 }
 
 body.playing .alpha-rail {
     display: flex;
 }
 
-/* Each letter, then the stroke down to the next one (after Z, down to the rail's end); a short stroke
-   above A, like the label's leading one */
+/* Light wood with a bevel, dark letter */
 .alpha-rail span {
-    flex: 1;
-    min-height: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 3px;
-    /* Turned around the letter's center, so the letter leans in place */
-    transform-origin: 50% 0.5em;
-    transform: rotate(var(--lean, -8deg));
+    justify-content: center;
+    flex: none;
+    width: var(--tile);
+    height: var(--tile);
+    background: linear-gradient(160deg, #f6e4bd, #e7c98f);
+    border-radius: 3px;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        inset 0 -2px 0 rgba(120, 80, 30, 0.35),
+        0 1px 2px rgba(0, 0, 0, 0.25);
+    color: #3b2a14;
+    font-family: var(--font-ui);
+    font-size: calc(var(--tile) * 0.58);
+    font-weight: 700;
+    line-height: 1;
+    transform: rotate(var(--lean, -3deg));
 }
 
-.alpha-rail span:nth-child(2n) { --lean: 7deg; }
-.alpha-rail span:nth-child(3n) { --lean: -4deg; }
-.alpha-rail span:nth-child(5n) { --lean: 10deg; }
+.alpha-rail span:nth-child(2n) { --lean: 2deg; }
+.alpha-rail span:nth-child(3n) { --lean: -1deg; }
+.alpha-rail span:nth-child(5n) { --lean: 4deg; }
 
-.alpha-rail::before,
-.alpha-rail span::after {
-    content: "";
-    flex: 1;
-    min-height: 0;
-    border-left: 1px solid currentColor;
-    opacity: 0.35;
-}
-
-.alpha-rail::before {
-    flex: 0 0 6px;
-}
-
-/* The stroke stays upright: it takes back its letter's lean, turning around its top end (which the
-   letter's lean shifts sideways by a pixel or two at most) */
-.alpha-rail span::after {
-    transform-origin: 50% 0;
-    transform: rotate(calc(-1 * var(--lean, -8deg)));
-}
-
-/* In the card's 44px right padding, 16px off the content */
-.alpha-rail-right {
-    right: 8px;
-}
-
-/* Divider between the board and the letters: a semi-transparent bar as tall as the column, halfway
-   in the gap, in the letters' ink so every theme tints it */
-.alpha-rail::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: -9px;
-    width: 2px;
-    border-radius: 1px;
-    background: currentColor;
-    opacity: 0.2;
-}
-
-/* Phone game screen: the card's right padding grows from 14px to 28px to make room for a 16px column
-   and its divider, from below the camera cutout (same top padding as the card) to the bottom. The
-   letters shrink with the height (keyboard open, --app-height). */
+/* Phone game screen: the card's right padding grows from 14px to 30px to make room for a 20px column,
+   from below the camera cutout (same top padding as the card) to the bottom */
 @media (max-width: 640px) {
     body.playing .page {
-        padding-right: 28px;
+        padding-right: 30px;
     }
 
     .alpha-rail {
         top: calc(10px + var(--inset-top, 0px) - var(--cutout-gap, 0px));
         bottom: 10px;
-        width: 16px;
-        gap: 2px;
-        font-size: clamp(8px, calc(var(--app-height, 100dvh) / 64), 12px);
-    }
-
-    .alpha-rail span {
-        gap: 2px;
-    }
-
-    .alpha-rail::after {
-        left: -4px;
-    }
-
-    .alpha-rail-right {
         right: 5px;
+        width: 20px;
+        --gap: 3px;
+        --tile: min(20px, calc((100cqh - 25 * var(--gap)) / 26));
     }
 }
