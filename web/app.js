@@ -40,7 +40,7 @@
     const $importError     = document.getElementById('import-dialog-error');
     const $importCancel    = document.getElementById('import-cancel');
     const $boardStack      = document.getElementById('board-stack');
-    // Small arrow beside the board: shows / hides the alphabet rail (body.rail-open)
+    // A-Z button of the game screen's top bar: shows / hides the alphabet rail (body.rail-open)
     const $railToggle      = document.getElementById('rail-toggle');
     const $submit          = document.getElementById('submit-guess');
     const $surrender       = document.getElementById('surrender');
@@ -1356,7 +1356,7 @@
     $submit.addEventListener('pointerdown', function (ev) {
         if (PHONE.matches && $guess) ev.preventDefault();
     });
-    // The alphabet arrow, likewise, leaves the keyboard open
+    // The A-Z button, likewise, leaves the keyboard open
     setAlphabetRail(loadAlphabetRail());
     $railToggle.addEventListener('pointerdown', function (ev) {
         if (PHONE.matches && $guess) ev.preventDefault();

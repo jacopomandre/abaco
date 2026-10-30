@@ -1469,7 +1469,7 @@ select:focus {
 
 /* ---------- Phone game screen: the whole game in one fixed screen ---------- */
 /* While a game is shown (app.js sets body.playing), a phone gets no page scroll at all:
-   - top: back arrow, attempts left, "..." menu;
+   - top: back arrow, attempts left, A-Z (alphabet rail) and "..." menu;
    - middle: the board, filling what is left; far rows collapse into .more-words to fit (app.js, fitBoard);
    - bottom: the action buttons, right above the keyboard (which shrinks the page, see the viewport meta).
    Logo, tagline, theme bar, history and footer stay on the start screen; the menu holds the rest.
@@ -1889,7 +1889,7 @@ body.playing .alpha-rail {
     transform: rotate(var(--lean, -3deg));
 }
 
-/* Closed by default: the small arrow at the rail's top (.rail-toggle) slides it in, and back out.
+/* Closed by default: the A-Z button of the top bar (.rail-btn) slides it in, and back out.
    app.js sets body.rail-open and remembers the choice. */
 body:not(.rail-open) .alpha-rail {
     opacity: 0;
@@ -1904,45 +1904,20 @@ body:not(.rail-open) .alpha-rail {
         visibility var(--t-med);
 }
 
-/* A bare chevron, none of the theme's button look: pointing left (the letters come in from the
-   right) while closed, right once open. It sits above the rail, which starts below it while open. */
-.rail-toggle {
+/* A-Z button of the top bar, a quiet button like the others there: while the tiles show, its outline
+   darkens (not under the pointer, where the theme's hover look stays whole) */
+.rail-btn {
     display: none;
 }
 
-body.playing .rail-toggle,
-body.playing .rail-toggle:hover:not(:disabled),
-body.playing .rail-toggle:active:not(:disabled) {
-    position: absolute;
-    top: 36px;
-    right: 14px;
-    width: 12px;
-    height: 22px;
-    padding: 0;
+body.playing .rail-btn {
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-    transform: none;
-    color: var(--ink-soft);
 }
 
-body.playing .rail-toggle {
-    display: flex;
-}
-
-.rail-toggle .btn-icon {
-    transition: transform var(--t-med) var(--ease);
-}
-
-body.rail-open .rail-toggle .btn-icon {
-    transform: rotate(180deg);
-}
-
-body.rail-open .alpha-rail {
-    top: 60px;
+body.rail-open .rail-btn:not(:hover) {
+    border-color: var(--ink);
+    color: var(--ink);
 }
 
 /* A stroke down the rail's whole length, left of the tiles: the board labels' one (.dict-edge) upright,
@@ -1983,16 +1958,28 @@ body.rail-open .alpha-rail {
         transition: padding-right var(--t-med) var(--ease);
     }
 
-    /* The arrow in the card's right padding, at the top of the rows' area */
-    body.playing .rail-toggle,
-    body.playing .rail-toggle:hover:not(:disabled),
-    body.playing .rail-toggle:active:not(:disabled) {
-        top: 0;
-        right: -13px;
+    /* The top bar gets the A-Z button beside the "..." one: the attempts left stay centered on the
+       bar (not between the arrow and the buttons), the arrow takes back its auto margin */
+    body.playing .code-actions {
+        position: relative;
     }
 
-    body.rail-open .alpha-rail {
-        top: 24px;
+    body.playing .back-btn {
+        margin-right: auto;
+    }
+
+    body.playing .attempts-count {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        white-space: nowrap;
+    }
+
+    /* As tall as the "..." button beside it */
+    body.playing .rail-btn {
+        align-self: stretch;
+        padding: 5px 10px;
     }
 
     .alpha-rail {
