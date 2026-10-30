@@ -78,7 +78,9 @@ body {
 
 .rule,
 .dict-edge::before,
-.dict-edge::after {
+.dict-edge::after,
+.alpha-rail::before,
+.alpha-rail span::after {
     border-color: var(--line-soft);
 }
 

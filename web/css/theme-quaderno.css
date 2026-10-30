@@ -414,6 +414,12 @@ select:focus {
     .page {
         --qd-margin: 12px;
     }
+
+    /* Game screen: the padding grows to 26px for the alphabet rail (style.css, "Alphabet rails"): the
+       margin line moves to its right, so the letters sit in the margin like notes */
+    body.playing .page {
+        --qd-margin: 22px;
+    }
 }
 
 /* ---------- Board frame (abaco / zuzzurellone): wavy pencil line like the page rule ---------- */
@@ -428,6 +434,14 @@ select:focus {
     height: 8px;
     border: none;
     background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='8'><path d='M0 4 Q15 1 30 4 T60 4 T90 5 T120 4' fill='none' stroke='%232b2b2b' stroke-width='1.6' stroke-linecap='round' opacity='0.75'/></svg>") repeat-x center;
+}
+
+/* Alphabet rails (style.css): the same wavy pencil stroke, upright */
+.alpha-rail::before,
+.alpha-rail span::after {
+    width: 8px;
+    border: none;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='120'><path d='M4 0 Q1 15 4 30 T4 60 T5 90 T4 120' fill='none' stroke='%232b2b2b' stroke-width='1.6' stroke-linecap='round' opacity='0.75'/></svg>") repeat-y center;
 }
 
 /* Narrow screens: rows' padding drops to 32px (+ 2px border). After the rule above, so it wins */
