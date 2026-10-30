@@ -1469,7 +1469,7 @@ select:focus {
 
 /* ---------- Phone game screen: the whole game in one fixed screen ---------- */
 /* While a game is shown (app.js sets body.playing), a phone gets no page scroll at all:
-   - top: back arrow, attempts left, A-Z (alphabet rail) and "..." menu;
+   - top: back arrow, attempts left, "..." menu (the A-Z button of the alphabet rail right below it);
    - middle: the board, filling what is left; far rows collapse into .more-words to fit (app.js, fitBoard);
    - bottom: the action buttons, right above the keyboard (which shrinks the page, see the viewport meta).
    Logo, tagline, theme bar, history and footer stay on the start screen; the menu holds the rest.
@@ -1958,28 +1958,29 @@ body.rail-open .rail-btn:not(:hover) {
         transition: padding-right var(--t-med) var(--ease);
     }
 
-    /* The top bar gets the A-Z button beside the "..." one: the attempts left stay centered on the
-       bar (not between the arrow and the buttons), the arrow takes back its auto margin */
+    /* The A-Z button right below the "..." one, as wide and as tall, at the head of the rail: out of
+       the top bar (which keeps the arrow, the attempts left and the menu), over the rows' area, which
+       leaves it a strip at its top (the bar's 10px gap below it, the same again above the rows) */
     body.playing .code-actions {
         position: relative;
     }
 
-    body.playing .back-btn {
-        margin-right: auto;
-    }
-
-    body.playing .attempts-count {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        white-space: nowrap;
-    }
-
-    /* As tall as the "..." button beside it */
     body.playing .rail-btn {
-        align-self: stretch;
-        padding: 5px 10px;
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        min-width: 40px;
+        height: 30px;
+        justify-content: center;
+        padding: 0 8px;
+    }
+
+    body.playing .board-middle {
+        padding-top: 40px;
+    }
+
+    body.playing .alpha-rail {
+        top: 40px;
     }
 
     .alpha-rail {
