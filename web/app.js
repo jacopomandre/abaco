@@ -42,6 +42,13 @@
     const $boardStack      = document.getElementById('board-stack');
     // A-Z button of the game screen's top bar: shows / hides the alphabet rail (body.rail-open)
     const $railToggle      = document.getElementById('rail-toggle');
+    const $railTiles       = document.querySelectorAll('.alpha-rail span');
+    // AIUTI button of the top bar, its drop-down menu and the answers above the rows (see "Help on demand")
+    const $helpOpen        = document.getElementById('help-open');
+    const $helpMenu        = document.getElementById('help-menu');
+    const $helpLast3       = document.getElementById('help-last3');
+    const $helpCategory    = document.getElementById('help-category');
+    const $helpNotes       = document.getElementById('help-notes');
     const $submit          = document.getElementById('submit-guess');
     const $surrender       = document.getElementById('surrender');
     const $restart         = document.getElementById('restart-game');
@@ -150,6 +157,8 @@
     //   rules:                custom games only: the rules chosen by the player (see DIFFICULTY)
     //   baseAttempts:         attempts already spent before this session (0, or the imported count)
     //   attempts: [{word, outcome}]  guesses made in this session
+    //   help:     help asked for, each at most once: 'LAST3' | 'CATEGORY' (see "Help on demand");
+    //             missing in games saved before it existed
     //   status:   'IN_PROGRESS' | 'WON' | 'SURRENDERED' | 'LOST' (attempts ran out)
     // }
     // outcome: 'LOWER' | 'UPPER' | 'WON'
@@ -226,9 +235,15 @@
 
     // --- Derived game values ---
 
-    // Total attempts spent on this game, including those made before an import
+    // Help asked for in this game (none in games saved before the help existed)
+    function helpUsed() {
+        return game.help || [];
+    }
+
+    // Total attempts spent on this game, including those made before an import and the ones
+    // each help costs
     function attemptCount() {
-        return game.baseAttempts + game.attempts.length;
+        return game.baseAttempts + game.attempts.length + helpUsed().length;
     }
 
     // Attempts still available: the countdown shown to the player
@@ -427,6 +442,7 @@
             difficulty:   payload.g,
             baseAttempts: gameRules.attempts - left,
             attempts:     [],
+            help:         [],
             status:       'IN_PROGRESS'
         };
         if (custom) imported.rules = rules;
@@ -459,6 +475,7 @@
                     : typeof saved.difficulty === 'string' && hasOwn(DIFFICULTY, saved.difficulty))
                 && Number.isInteger(saved.baseAttempts)
                 && Array.isArray(saved.attempts)
+                && (saved.help === undefined || Array.isArray(saved.help))
                 && ['IN_PROGRESS', 'WON', 'SURRENDERED', 'LOST'].includes(saved.status);
             return usable ? saved : null;
         } catch (_) {
@@ -503,6 +520,80 @@
         try {
             localStorage.setItem(RAIL_SAVE_KEY, open ? 'aperto' : 'chiuso');
         } catch (_) { /* the rail will just start closed next time */ }
+    }
+
+    // --- Help on demand ---
+    // The AIUTI button's menu: each help answers one question about the secret, costs one attempt and
+    // works once per game. None may spend the last attempt, which would end the game without a guess.
+
+    // How the dictionary's categories are shown: on the tiles, and read out
+    const CATEGORY_NAMES = {
+        sostantivo: { tiles: 'NOME',      text: 'un nome' },
+        verbo:      { tiles: 'VERBO',     text: 'un verbo' },
+        aggettivo:  { tiles: 'AGGETTIVO', text: 'un aggettivo' }
+    };
+
+    // Last three letters of the secret, without accents, each letter once (the help does not tell
+    // whether one repeats)
+    function lastLetters() {
+        const letters = game.secret.word.toUpperCase()
+            .normalize('NFD').replace(/[̀-ͯ]/g, '')
+            .replace(/[^A-Z]/g, '')
+            .slice(-3);
+        return [...new Set(letters)];
+    }
+
+    function setHelpMenu(open) {
+        $helpMenu.hidden = !open;
+        $helpOpen.setAttribute('aria-expanded', String(open));
+    }
+
+    // Menu items, lit rail tiles and answers above the rows, from the help the game used
+    function renderHelp() {
+        const used     = helpUsed();
+        const playing  = game.status === 'IN_PROGRESS';
+        // One attempt must be left for a guess after the help
+        const canPay   = attemptsLeft() > 1;
+        const category = CATEGORY_NAMES[game.secret.category];
+        $helpLast3.disabled    = !playing || !canPay || used.includes('LAST3');
+        $helpCategory.disabled = !playing || !canPay || used.includes('CATEGORY') || !category;
+
+        const lit = used.includes('LAST3') ? lastLetters() : [];
+        $railTiles.forEach(function (tile) { tile.classList.toggle('lit', lit.includes(tile.textContent)); });
+
+        $helpNotes.replaceChildren();
+        if (used.includes('CATEGORY') && category) {
+            const tiles = document.createElement('span');
+            tiles.className = 'help-tiles';
+            tiles.setAttribute('role', 'img');
+            tiles.setAttribute('aria-label', `È ${category.text}`);
+            [...category.tiles].forEach(function (letter) {
+                const tile = document.createElement('span');
+                tile.textContent = letter;
+                tiles.appendChild(tile);
+            });
+            $helpNotes.appendChild(tiles);
+        }
+        if (lit.length > 0) {
+            // The rail is decorative (aria-hidden): screen readers get the letters here
+            const note = document.createElement('span');
+            note.className = 'visually-hidden';
+            note.textContent = `Ultime lettere: ${lit.join(', ')}`;
+            $helpNotes.appendChild(note);
+        }
+        $helpNotes.hidden = $helpNotes.childElementCount === 0;
+    }
+
+    function useHelp(kind) {
+        setHelpMenu(false);
+        if (!game || game.status !== 'IN_PROGRESS' || helpUsed().includes(kind) || attemptsLeft() <= 1) return;
+        game.help = [...helpUsed(), kind];
+        // The lit letters are on the rail: open it if it was closed
+        if (kind === 'LAST3') {
+            setAlphabetRail(true);
+            saveAlphabetRail(true);
+        }
+        render();
     }
 
     // --- Screen helpers ---
@@ -898,6 +989,8 @@
         renderBoard(freshWord);
         renderHistory();
         renderAttemptsCount();
+        renderHelp();
+        setHelpMenu(false);
         showGameScreen();
 
         // A finished game cannot be played, surrendered or exported
@@ -958,6 +1051,7 @@
                 difficulty:   difficulty,
                 baseAttempts: 0,
                 attempts:     [],
+                help:         [],
                 status:       'IN_PROGRESS'
             };
             if (custom) {
@@ -1360,6 +1454,25 @@
     setAlphabetRail(loadAlphabetRail());
     $railToggle.addEventListener('pointerdown', function (ev) {
         if (PHONE.matches && $guess) ev.preventDefault();
+    });
+    // AIUTI: the menu drops down and folds up again; a tap anywhere else or Esc folds it too.
+    // Like the A-Z button, it leaves the phone keyboard open.
+    [$helpOpen, $helpLast3, $helpCategory].forEach(function (button) {
+        button.addEventListener('pointerdown', function (ev) {
+            if (PHONE.matches && $guess) ev.preventDefault();
+        });
+    });
+    $helpOpen.addEventListener('click', function () { setHelpMenu($helpMenu.hidden); });
+    $helpLast3.addEventListener('click', function () { useHelp('LAST3'); });
+    $helpCategory.addEventListener('click', function () { useHelp('CATEGORY'); });
+    document.addEventListener('pointerdown', function (ev) {
+        if (!$helpMenu.hidden && !ev.target.closest('.help-wrap')) setHelpMenu(false);
+    });
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && !$helpMenu.hidden) {
+            setHelpMenu(false);
+            $helpOpen.focus();
+        }
     });
     $railToggle.addEventListener('click', function () {
         const open = !document.body.classList.contains('rail-open');

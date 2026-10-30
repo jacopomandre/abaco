@@ -220,6 +220,35 @@
                      the choice (body.rail-open) -->
                 <button id="rail-toggle" type="button" class="quiet-btn rail-btn" aria-expanded="false"
                         title="Mostra l'alfabeto" aria-label="Mostra l'alfabeto">A–Z</button>
+                <!-- Game screen only: help on demand, each one once per game and for one attempt; the button
+                     drops a menu down under itself (app.js, "Help on demand"; style.css, "Help menu") -->
+                <div class="help-wrap">
+                    <button id="help-open" type="button" class="quiet-btn help-btn"
+                            aria-haspopup="menu" aria-expanded="false" aria-controls="help-menu">
+                        <svg class="btn-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 18h6"></path>
+                            <path d="M10 22h4"></path>
+                            <path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"></path>
+                        </svg>
+                        AIUTI
+                        <svg class="btn-icon help-caret" viewBox="0 0 24 24" width="10" height="10" aria-hidden="true"
+                             fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"></path>
+                        </svg>
+                    </button>
+                    <!-- Each item: an icon of lit letter tiles and what the help does, no title -->
+                    <div id="help-menu" class="help-menu" role="menu" hidden>
+                        <button id="help-last3" type="button" class="help-item" role="menuitem">
+                            <span class="help-icon" aria-hidden="true"><span>T</span><span>R</span><span>E</span></span>
+                            <span class="help-text">Illumina le ultime tre lettere</span>
+                        </button>
+                        <button id="help-category" type="button" class="help-item" role="menuitem">
+                            <span class="help-icon" aria-hidden="true"><span>T</span><span>I</span><span>P</span><span>O</span></span>
+                            <span class="help-text">Dice se è nome, verbo o aggettivo</span>
+                        </button>
+                    </div>
+                </div>
                 <!-- Phone game screen only: IMPORTA, ESPORTA, the rules and the history move into this menu -->
                 <button id="menu-open" type="button" class="quiet-btn menu-btn" aria-haspopup="dialog"
                         title="Altre azioni" aria-label="Altre azioni">
@@ -235,6 +264,9 @@
                  The guess placeholder shows the attempts countdown (20 / 15 / 15 by difficulty).
                  Once the game is over, the guess row is replaced in place by the secret's dictionary entry. -->
             <div class="board-middle">
+                <!-- Answers of the help used in this game (app.js fills it): the kind of word on lit tiles, and
+                     for screen readers the last three letters, which the tiles of the alphabet rail light up -->
+                <div id="help-notes" class="help-notes" aria-live="polite" hidden></div>
                 <div id="board-stack" class="board-stack" aria-live="polite"></div>
                 <!-- Game screen only: the alphabet on wooden tiles, a reminder of the letters' order for the
                      "prima / dopo" hints, in the card's right padding (on a phone, beside the rows only).
@@ -400,6 +432,27 @@
                         <span class="hint-word" aria-hidden="true"><span class="common-prefix">c</span><span class="word-rest">oda</span></span>
                         <span>con <em>casa</em>: solo la <em>c</em>; la <em>a</em> finale non conta,
                             perché la <em>o</em> ha già interrotto la serie</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="hints-section">
+                <h3 class="hints-heading">Aiuti a richiesta</h3>
+                <p class="hints-text">
+                    Durante la partita il tasto <strong>AIUTI</strong> apre un menu di aiuti, a ogni livello.
+                    Ognuno si usa una volta sola per partita e costa <strong>un tentativo</strong>;
+                    con un solo tentativo rimasto non si possono più chiedere.
+                </p>
+                <!-- Icons as in the help menu (.help-icon: lit letter tiles) -->
+                <ul class="hints-levels">
+                    <li class="hints-level">
+                        <span class="help-icon" aria-hidden="true"><span>T</span><span>R</span><span>E</span></span>
+                        <span>illumina sull'alfabeto le ultime tre lettere della segreta (una lettera
+                            ripetuta si accende una volta sola)</span>
+                    </li>
+                    <li class="hints-level">
+                        <span class="help-icon" aria-hidden="true"><span>T</span><span>I</span><span>P</span><span>O</span></span>
+                        <span>scrive sopra le parole se la segreta è un nome, un verbo o un aggettivo</span>
                     </li>
                 </ul>
             </section>
