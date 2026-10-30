@@ -8,6 +8,7 @@
 # Needs Pillow:   python tools/make-android-icons.py     (run from the project root)
 # Source: resources/icon-source.png, a square logo on a plain cream background, with some
 # empty margin around the drawing.
+import math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFilter
 
@@ -24,15 +25,18 @@ ADAPTIVE_ABACUS_SHARE = 0.46
 # Beads of the launcher background: (color, center x, center y, radius) in dp on the 108dp canvas.
 # Launchers show the central 72dp (18 to 90), so the beads near the edge are partly cut off.
 LAUNCHER_BEADS = (
-    ((237, 107, 101), 22.5, 26.5, 8.9),   # red, top left
-    ((248, 196, 52), 84, 25, 8),          # yellow, top right
+    ((237, 107, 101), 28.4, 25.4, 8.9),   # red, top left
+    ((248, 196, 52), 86.9, 34.4, 8),      # yellow, top right
     ((61, 171, 105), 17.9, 55.9, 5),      # green, left
     ((37, 176, 172), 89.9, 53.9, 5),      # teal, right
-    ((119, 77, 161), 21.9, 85.9, 8),      # purple, bottom left
-    ((69, 127, 205), 86.9, 86.9, 8.9),    # blue, bottom right
+    ((119, 77, 161), 32.9, 85.9, 8),      # purple, bottom left
+    ((69, 127, 205), 80.4, 81.9, 8.9),    # blue, bottom right
 )
 # Smallest room between a bead and the abacus, in dp
 MIN_BEAD_GAP_DP = 3
+# Smallest share of each bead that must show inside the round mask (the 72dp circle in the
+# middle of the canvas, the tightest launcher shape), so every bead appears in every version
+MIN_BEAD_VISIBLE_SHARE = 0.3
 # Share of the adaptive canvas that a legacy icon shows (the central 72dp of 108dp)
 LEGACY_VIEW_SHARE = 72 / 108
 # Width of the abacus as a share of the 512px Play Store icon (Play rounds its corners itself)
@@ -111,6 +115,40 @@ def bead_background(size):
     return big.resize((size, size), Image.LANCZOS)
 
 
+def check_beads_visible():
+    """Stop if a bead shows less than MIN_BEAD_VISIBLE_SHARE of its area inside the round mask:
+    the area shared by the bead and the 36dp-radius circle in the middle, over the bead's area."""
+    mask_radius, middle = 36, 54
+    for color, x, y, radius in LAUNCHER_BEADS:
+        d = math.hypot(x - middle, y - middle)
+        if d >= mask_radius + radius:
+            shown = 0
+        elif d <= mask_radius - radius:
+            shown = 1
+        else:
+            lens = (radius ** 2 * math.acos((d * d + radius ** 2 - mask_radius ** 2) / (2 * d * radius))
+                    + mask_radius ** 2 * math.acos((d * d + mask_radius ** 2 - radius ** 2) / (2 * d * mask_radius))
+                    - 0.5 * math.sqrt((-d + radius + mask_radius) * (d + radius - mask_radius)
+                                      * (d - radius + mask_radius) * (d + radius + mask_radius)))
+            shown = lens / (math.pi * radius ** 2)
+        if shown < MIN_BEAD_VISIBLE_SHARE:
+            raise SystemExit(f'bead {color} at ({x}, {y}) shows only {shown:.0%} in the round mask, move it in')
+
+
+def check_launcher_bead_gap(abacus):
+    """Stop if a launcher bead comes closer than MIN_BEAD_GAP_DP to the abacus: exact distance from
+    each bead's center to the abacus pixels, measured on a 432px (4px per dp) canvas."""
+    size = 432
+    unit = size / 108
+    drawing = place(Image.new('RGBA', (size, size)), abacus, ADAPTIVE_ABACUS_SHARE).getchannel('A')
+    points = [(index % size / unit, index // size / unit)
+              for index, alpha in enumerate(drawing.getdata()) if alpha > 20]
+    for color, x, y, radius in LAUNCHER_BEADS:
+        gap = min(math.hypot(x - px, y - py) for px, py in points) - radius
+        if gap < MIN_BEAD_GAP_DP:
+            raise SystemExit(f'bead {color} at ({x}, {y}) is {gap:.1f}dp from the abacus, move it')
+
+
 def check_bead_gap(background, foreground, min_gap_px, name):
     """Stop if a bead (anything not cream in background) comes closer than min_gap_px to the
     drawing in foreground: the abacus grown by min_gap_px must not overlap any bead."""
@@ -142,6 +180,8 @@ def beads_only(icon):
 
 def main():
     abacus = abacus_drawing()
+    check_beads_visible()
+    check_launcher_bead_gap(abacus)
 
     # Launcher icons: adaptive foreground (abacus on transparent), and the legacy square and round
     # icons for old Android, which show the central part of background + foreground
@@ -150,7 +190,6 @@ def main():
         canvas = round(108 * scale)
         foreground = place(Image.new('RGBA', (canvas, canvas)), abacus, ADAPTIVE_ABACUS_SHARE)
         background = bead_background(canvas)
-        check_bead_gap(background, foreground, MIN_BEAD_GAP_DP * scale, f'mipmap-{density}')
         foreground.save(folder / 'ic_launcher_foreground.png', optimize=True)
         background.convert('RGB').save(folder / 'ic_launcher_background.png', optimize=True)
         full = background.copy()
