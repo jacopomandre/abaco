@@ -4,7 +4,7 @@
 # The source has a cream background: here it is made transparent (so the logo sits on any
 # page color), the empty margin is cropped away and the result is scaled down for the web.
 from pathlib import Path
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 # Background color of the source, removed from the picture
@@ -29,25 +29,10 @@ def color_to_alpha(pixel):
     return color + (round(alpha * 255),)
 
 
-def abacus_only(logo):
-    """Keep only the abacus drawing: the "abaco zuzzurellone" lettering was too small to read in
-    the header. The abacus is the shape holding the topmost drawn pixel; everything not touching
-    it (lettering, sparks) is made transparent."""
-    mask = logo.getchannel('A').point(lambda alpha: 255 if alpha else 0)
-    width = mask.width
-    top = next(index for index, alpha in enumerate(mask.getdata()) if alpha)
-    ImageDraw.floodfill(mask, (top % width, top // width), 128)
-    keep = mask.point(lambda value: 255 if value == 128 else 0)
-    abacus = Image.new('RGBA', logo.size)
-    abacus.paste(logo, mask=keep)
-    return abacus
-
-
 def main():
     source = Image.open(ROOT / 'resources' / 'icon-source.png').convert('RGB')
     logo = Image.new('RGBA', source.size)
     logo.putdata([color_to_alpha(pixel) for pixel in source.getdata()])
-    logo = abacus_only(logo)
     # Crop to the drawing, then scale down
     logo = logo.crop(logo.getbbox())
     width = round(logo.width * OUTPUT_HEIGHT / logo.height)
