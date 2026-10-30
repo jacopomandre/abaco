@@ -1831,3 +1831,83 @@ body.playing .menu-home {
         padding-top: calc(12px + var(--inset-top, 0px) - var(--cutout-gap));
     }
 }
+
+/* ---------- Alphabet rails (game screen) ---------- */
+/* While a game is shown, the alphabet A-Z runs down both sides of the card, outside it: a reminder of
+   the letters' order for the "prima / dopo" hints. Each rail is a small card of its own (surface, soft
+   border), so its letters read on every theme's page background. Decorative: aria-hidden in the HTML.
+   Wide screen: fixed beside the card, vertically centered; where the screen has no room beside the
+   760px card, the page makes some. Phone: thin columns in the card's side margins (see below). */
+.alpha-rail {
+    display: none;
+    position: fixed;
+    top: 50%;
+    z-index: 0;
+    --rail-width: 24px;
+    --rail-gap: 14px;
+    width: var(--rail-width);
+    height: min(640px, 100vh - 64px);
+    transform: translateY(-50%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--r-md);
+    color: var(--ink-muted);
+    font-family: var(--font-mono);
+    font-size: clamp(9px, calc((100vh - 64px) / 40), 13px);
+    font-weight: 600;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}
+
+body.playing .alpha-rail {
+    display: flex;
+}
+
+/* Beside the card (760px wide, centered), never closer than 10px to the screen's edge */
+.alpha-rail-left {
+    left: max(10px, calc(50% - 380px - var(--rail-gap) - var(--rail-width)));
+}
+
+.alpha-rail-right {
+    right: max(10px, calc(50% - 380px - var(--rail-gap) - var(--rail-width)));
+}
+
+/* Between the phone layout and a screen wide enough for card + rails: the card narrows instead */
+@media (min-width: 641px) and (max-width: 855px) {
+    body.playing {
+        padding-inline: 48px;
+    }
+}
+
+/* Phone game screen: the card's side margins grow from 8px to 22px and each rail, 16px wide, fills one
+   from the card's top (below the camera cutout) to its bottom, following --app-height like the card,
+   so the keyboard shrinks the rails too. The letters shrink with the height (keyboard open). */
+@media (max-width: 640px) {
+    body.playing .page {
+        margin-left: 22px;
+        margin-right: 22px;
+    }
+
+    .alpha-rail {
+        --rail-width: 16px;
+        top: max(8px, var(--inset-top, 0px));
+        height: calc(var(--app-height, 100dvh) - 8px - max(8px, var(--inset-top, 0px)));
+        transform: none;
+        padding: 6px 0;
+        border-radius: var(--r-sm);
+        font-size: clamp(7px, calc(var(--app-height, 100dvh) / 46), 11px);
+    }
+
+    .alpha-rail-left {
+        left: 3px;
+    }
+
+    .alpha-rail-right {
+        right: 3px;
+    }
+}

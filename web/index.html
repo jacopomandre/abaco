@@ -52,6 +52,10 @@
 </head>
 <!-- az-* classes come from the theme and are inert when its links are removed -->
 <body class="az-page">
+    <!-- Game screen only: the alphabet down both sides of the card, a reminder of the letters' order
+         for the "prima / dopo" hints. Decorative, so screen readers skip it (style.css, "Alphabet rails"). -->
+    <div class="alpha-rail alpha-rail-left" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span></div>
+    <div class="alpha-rail alpha-rail-right" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span><span>K</span><span>L</span><span>M</span><span>N</span><span>O</span><span>P</span><span>Q</span><span>R</span><span>S</span><span>T</span><span>U</span><span>V</span><span>W</span><span>X</span><span>Y</span><span>Z</span></div>
     <main class="page az-card">
         <!-- Top right, on every screen (start and game): the rules popup and the theme picker.
              The theme choice is remembered for the next visit (theme.js) -->
