@@ -50,6 +50,8 @@
     --r-sm: 6px;
     --r-md: 8px;
     --r-lg: 6px;
+    /* Alphabet rail's line (style.css, "Alphabet rail"): white on this dark card */
+    --rail-line: rgba(255, 255, 255, 0.35);
 }
 
 /* Classroom wall */
@@ -94,8 +96,7 @@ body {
 
 .rule,
 .dict-edge::before,
-.dict-edge::after,
-.alpha-rail::before {
+.dict-edge::after {
     border-color: rgba(243, 241, 231, 0.35);
 }
 

@@ -27,6 +27,9 @@
     --reveal-surrendered: #7b8089;
     /* Warnings (few attempts left, import errors): red, apart from the closeness scale */
     --alert: #c95560;
+    /* Line beside the alphabet rail of the game screen (see "Alphabet rail"): black, a little see-through,
+       on the light cards; the dark themes make it white */
+    --rail-line: rgba(0, 0, 0, 0.3);
 
     /* Typography */
     --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -1920,16 +1923,15 @@ body.rail-open .rail-btn:not(:hover) {
     color: var(--ink);
 }
 
-/* A stroke down the rail's whole length, left of the tiles: the board labels' one (.dict-edge) upright,
-   in their ink, and every theme restyles it along with theirs */
+/* A thin line left of the tiles, as long as the column of tiles (26 tiles and 25 gaps, centered like
+   them), in --rail-line: black on the light themes, white on the dark ones */
 .alpha-rail::before {
     content: "";
     position: absolute;
-    top: 0;
-    bottom: 0;
+    top: calc(50% - (26 * var(--tile) + 25 * var(--gap)) / 2);
+    height: calc(26 * var(--tile) + 25 * var(--gap));
     left: -5px;
-    border-left: 1px solid var(--ink-soft);
-    opacity: 0.35;
+    border-left: 1px solid var(--rail-line);
 }
 
 .alpha-rail span:nth-child(2n) { --lean: 2deg; }

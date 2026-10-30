@@ -44,6 +44,8 @@
     --r-sm: 4px;
     --r-md: 6px;
     --r-lg: 10px;
+    /* Alphabet rail's line (style.css, "Alphabet rail"): white on this dark card */
+    --rail-line: rgba(255, 255, 255, 0.35);
 }
 
 html,
@@ -100,8 +102,7 @@ body::before {
 
 .rule,
 .dict-edge::before,
-.dict-edge::after,
-.alpha-rail::before {
+.dict-edge::after {
     border-color: var(--line-soft);
 }
 

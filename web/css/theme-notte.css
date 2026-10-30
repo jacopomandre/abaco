@@ -39,6 +39,8 @@
     --r-sm: 8px;
     --r-md: 12px;
     --r-lg: 22px;
+    /* Alphabet rail's line (style.css, "Alphabet rail"): white on this dark card */
+    --rail-line: rgba(255, 255, 255, 0.35);
 }
 
 /* ---------- Sky: night gradient and a few faint stars ---------- */
@@ -78,8 +80,7 @@ body {
 
 .rule,
 .dict-edge::before,
-.dict-edge::after,
-.alpha-rail::before {
+.dict-edge::after {
     border-color: var(--line-soft);
 }
 

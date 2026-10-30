@@ -430,15 +430,6 @@ select:focus {
     background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='8'><path d='M0 4 Q15 1 30 4 T60 4 T90 5 T120 4' fill='none' stroke='%232b2b2b' stroke-width='1.6' stroke-linecap='round' opacity='0.75'/></svg>") repeat-x center;
 }
 
-/* Alphabet rail (style.css): its stroke is a margin line, the same red as the sheet's (see .page) */
-.alpha-rail::before {
-    width: 2px;
-    margin-left: -1px;
-    border: none;
-    background: rgba(220, 80, 80, 0.55);
-    opacity: 1;
-}
-
 /* Narrow screens: rows' padding drops to 32px (+ 2px border). After the rule above, so it wins */
 @media (max-width: 640px) {
     .dict-edge {
