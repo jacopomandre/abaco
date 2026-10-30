@@ -2,8 +2,9 @@
 # images from the logo.
 # Launcher and store icons show only the abacus drawing: the "abaco zuzzurellone" lettering is
 # too small to read at icon size. They keep the store look: cream with abacus beads around the
-# edge. The beads are the adaptive background layer (mipmap-*/ic_launcher_background.png),
-# committed as drawn and only read here; the abacus is the foreground layer.
+# edge. The beads are the adaptive background layer (mipmap-*/ic_launcher_background.png, drawn
+# from LAUNCHER_BEADS), the abacus is the foreground layer. A bead must never touch the abacus:
+# the script stops if one comes closer than MIN_BEAD_GAP_DP.
 # Needs Pillow:   python tools/make-android-icons.py     (run from the project root)
 # Source: resources/icon-source.png, a square logo on a plain cream background, with some
 # empty margin around the drawing.
@@ -20,6 +21,18 @@ DENSITIES = {'mdpi': 1, 'hdpi': 1.5, 'xhdpi': 2, 'xxhdpi': 3, 'xxxhdpi': 4}
 # Width of the abacus as a share of the 108dp adaptive canvas. Launchers show only the central
 # 72dp and may mask it to a 66dp circle: the abacus corners must stay inside that circle.
 ADAPTIVE_ABACUS_SHARE = 0.46
+# Beads of the launcher background: (color, center x, center y, radius) in dp on the 108dp canvas.
+# Launchers show the central 72dp (18 to 90), so the beads near the edge are partly cut off.
+LAUNCHER_BEADS = (
+    ((237, 107, 101), 22.5, 26.5, 8.9),   # red, top left
+    ((248, 196, 52), 84, 25, 8),          # yellow, top right
+    ((61, 171, 105), 17.9, 55.9, 5),      # green, left
+    ((37, 176, 172), 89.9, 53.9, 5),      # teal, right
+    ((119, 77, 161), 21.9, 85.9, 8),      # purple, bottom left
+    ((69, 127, 205), 86.9, 86.9, 8.9),    # blue, bottom right
+)
+# Smallest room between a bead and the abacus, in dp
+MIN_BEAD_GAP_DP = 3
 # Share of the adaptive canvas that a legacy icon shows (the central 72dp of 108dp)
 LEGACY_VIEW_SHARE = 72 / 108
 # Width of the abacus as a share of the 512px Play Store icon (Play rounds its corners itself)
@@ -88,6 +101,28 @@ def masked(image, size, radius_share):
     return big.resize((size, size), Image.LANCZOS)
 
 
+def bead_background(size):
+    """Cream square of size x size px with LAUNCHER_BEADS drawn on it (108dp = size px)."""
+    big = Image.new('RGBA', (size * SMOOTH, size * SMOOTH), CREAM)
+    draw = ImageDraw.Draw(big)
+    unit = size * SMOOTH / 108
+    for color, x, y, radius in LAUNCHER_BEADS:
+        draw.ellipse(((x - radius) * unit, (y - radius) * unit, (x + radius) * unit, (y + radius) * unit), fill=color)
+    return big.resize((size, size), Image.LANCZOS)
+
+
+def check_bead_gap(background, foreground, min_gap_px, name):
+    """Stop if a bead (anything not cream in background) comes closer than min_gap_px to the
+    drawing in foreground: the abacus grown by min_gap_px must not overlap any bead."""
+    beads = Image.new('L', background.size)
+    beads.putdata([255 if max(abs(v - c) for v, c in zip(pixel[:3], CREAM)) > NOISE else 0
+                   for pixel in background.convert('RGB').getdata()])
+    grown = foreground.getchannel('A').point(lambda alpha: 255 if alpha > 20 else 0)
+    grown = grown.filter(ImageFilter.MaxFilter(2 * round(min_gap_px) + 1))
+    if Image.composite(grown, Image.new('L', grown.size), beads).getbbox():
+        raise SystemExit(f'{name}: a bead is closer than {min_gap_px}px to the abacus, move it')
+
+
 def beads_only(icon):
     """The store icon with its old logo painted over in cream, keeping the beads around the edge:
     the beads are the drawn shapes touching the border, everything else is the logo."""
@@ -114,8 +149,11 @@ def main():
         folder = RES / f'mipmap-{density}'
         canvas = round(108 * scale)
         foreground = place(Image.new('RGBA', (canvas, canvas)), abacus, ADAPTIVE_ABACUS_SHARE)
+        background = bead_background(canvas)
+        check_bead_gap(background, foreground, MIN_BEAD_GAP_DP * scale, f'mipmap-{density}')
         foreground.save(folder / 'ic_launcher_foreground.png', optimize=True)
-        full = Image.open(folder / 'ic_launcher_background.png').convert('RGBA')
+        background.convert('RGB').save(folder / 'ic_launcher_background.png', optimize=True)
+        full = background.copy()
         full.alpha_composite(foreground)
         margin = round(canvas * (1 - LEGACY_VIEW_SHARE) / 2)
         view = full.crop((margin, margin, canvas - margin, canvas - margin))
@@ -129,7 +167,11 @@ def main():
     store_icons = [ROOT / 'release' / 'store' / 'play-icon-512.png', ROOT / 'release' / 'play-icon-512.png']
     existing = [path for path in store_icons if path.exists()]
     if existing:
-        store = place(beads_only(Image.open(existing[0])), abacus, STORE_ABACUS_SHARE).convert('RGB')
+        beads = beads_only(Image.open(existing[0]))
+        store = place(beads.copy(), abacus, STORE_ABACUS_SHARE)
+        check_bead_gap(beads, place(Image.new('RGBA', beads.size), abacus, STORE_ABACUS_SHARE),
+                       MIN_BEAD_GAP_DP * 512 / 108, 'play-icon-512')
+        store = store.convert('RGB')
         for path in existing:
             store.save(path, optimize=True)
             print(f'{path} written')
