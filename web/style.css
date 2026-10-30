@@ -1889,6 +1889,18 @@ body.playing .alpha-rail {
     transform: rotate(var(--lean, -3deg));
 }
 
+/* A stroke down the rail's whole length, left of the tiles: the board labels' one (.dict-edge) upright,
+   in their ink, and every theme restyles it along with theirs */
+.alpha-rail::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -5px;
+    border-left: 1px solid var(--ink-soft);
+    opacity: 0.35;
+}
+
 .alpha-rail span:nth-child(2n) { --lean: 2deg; }
 .alpha-rail span:nth-child(3n) { --lean: -1deg; }
 .alpha-rail span:nth-child(5n) { --lean: 4deg; }
@@ -1896,7 +1908,7 @@ body.playing .alpha-rail {
 /* Phone game screen: the rail stands beside the rows only, between the top bar and the buttons, so
    those keep the card's even padding and stay centered. .board-middle takes the free height the board
    stack had; the rail sits 5px off the card's inner edge and the stack's right padding grows from 14px
-   to 30px to keep the rows clear of it. */
+   to 34px to keep the rows clear of it and of its stroke. */
 @media (max-width: 640px) {
     body.playing .board-middle {
         position: relative;
@@ -1907,7 +1919,7 @@ body.playing .alpha-rail {
     }
 
     body.playing .board-stack {
-        padding-right: 30px;
+        padding-right: 34px;
     }
 
     .alpha-rail {
@@ -1917,5 +1929,9 @@ body.playing .alpha-rail {
         width: 20px;
         --gap: 3px;
         --tile: min(20px, calc((100cqh - 25 * var(--gap)) / 26));
+    }
+
+    .alpha-rail::before {
+        left: -4px;
     }
 }

@@ -100,7 +100,8 @@ body::before {
 
 .rule,
 .dict-edge::before,
-.dict-edge::after {
+.dict-edge::after,
+.alpha-rail::before {
     border-color: var(--line-soft);
 }
 

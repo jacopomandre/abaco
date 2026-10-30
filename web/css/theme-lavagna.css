@@ -94,7 +94,8 @@ body {
 
 .rule,
 .dict-edge::before,
-.dict-edge::after {
+.dict-edge::after,
+.alpha-rail::before {
     border-color: rgba(243, 241, 231, 0.35);
 }
 
