@@ -1893,17 +1893,27 @@ body.playing .alpha-rail {
 .alpha-rail span:nth-child(3n) { --lean: -1deg; }
 .alpha-rail span:nth-child(5n) { --lean: 4deg; }
 
-/* Phone game screen: the card's right padding grows from 14px to 30px to make room for a 20px column,
-   from below the camera cutout (same top padding as the card) to the bottom */
+/* Phone game screen: the rail stands beside the rows only, between the top bar and the buttons, so
+   those keep the card's even padding and stay centered. .board-middle takes the free height the board
+   stack had; the rail sits 5px off the card's inner edge and the stack's right padding grows from 14px
+   to 30px to keep the rows clear of it. */
 @media (max-width: 640px) {
-    body.playing .page {
+    body.playing .board-middle {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    body.playing .board-stack {
         padding-right: 30px;
     }
 
     .alpha-rail {
-        top: calc(10px + var(--inset-top, 0px) - var(--cutout-gap, 0px));
-        bottom: 10px;
-        right: 5px;
+        top: 0;
+        bottom: 0;
+        right: -9px;
         width: 20px;
         --gap: 3px;
         --tile: min(20px, calc((100cqh - 25 * var(--gap)) / 26));
