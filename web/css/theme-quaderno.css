@@ -74,13 +74,10 @@ body {
 /* ---------- Card: a sheet of paper outlined in pencil, traced twice ---------- */
 .page {
     position: relative;
-    /* Ruled sheet: red margin line in the left padding (--qd-margin from the edge),
-       over a faint blue line every 32px starting below the top edge */
-    --qd-margin: 30px;
+    /* Ruled sheet: a faint blue line every 32px starting below the top edge, no red margin line */
     /* No coffee stains: on a phone there is no free corner, and they sat under the theme picker
        and the footer text. The paper grain below gives the sheet its used look instead. */
     background:
-        linear-gradient(90deg, transparent var(--qd-margin), rgba(220, 80, 80, 0.55) var(--qd-margin) calc(var(--qd-margin) + 2px), transparent calc(var(--qd-margin) + 2px)),
         repeating-linear-gradient(transparent 0 31px, rgba(120, 160, 210, 0.35) 31px 32px) 0 20px,
         /* Ageing, uneven like real paper: a few brown foxing spots, a faint fold across the sheet,
            one corner yellowed more than the other, edges darker than the middle */
@@ -407,14 +404,6 @@ select:focus {
 .closeness-badge.near  { --fill: #8c3f04; --edge: #faf5e8; }
 .closeness-badge.close,
 .closeness-badge.won   { --fill: #154f33; --edge: #faf5e8; }
-
-/* ---------- Narrow screens ---------- */
-@media (max-width: 640px) {
-    /* The card's side padding shrinks to 22px: keep the margin line inside it */
-    .page {
-        --qd-margin: 12px;
-    }
-}
 
 /* ---------- Board frame (abaco / zuzzurellone): wavy pencil line like the page rule ---------- */
 .dict-edge {
