@@ -246,6 +246,13 @@ button:disabled {
 
 /* Rows without the hint: a gray highlighter, dark enough to show on the paper without an outline */
 .word-input.bound.no-closeness,
+/* The METÀ help's word (style.css): graphite letters like the other strokes, the light gold ones
+   would vanish on the highlighter */
+.word-input.bound.help-word {
+    color: var(--ink);
+    text-shadow: none;
+}
+
 .word-input.bound.imported {
     --row-plain-bg: #dcd3bf;
     /* No outline here either (style.css draws one around the plain rows of the other themes) */
