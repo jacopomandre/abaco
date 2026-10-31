@@ -2197,12 +2197,10 @@ body.playing:not(.ended) .help-wrap {
 }
 
 /* The word the "metà" help played (app.js marks it .help-word): a gold border with an amber glow around
-   its row (amber, not light yellow, which would vanish on the cream cards), the rows' flat diamond lit
-   white, and a streak of light sweeping across the row every few seconds. The streak runs under the
-   letters (isolation: the row is its own stacking context, so z-index -1 stays above its fill), so a
-   long word stays readable while it passes. In the history list, a small gold gem in place of the dot. */
+   its row (amber, not light yellow, which would vanish on the cream cards) and the rows' flat diamond
+   lit white. Nothing moves: an endless animation slows a phone down. In the history list, a small gold
+   gem in place of the dot. */
 .word-input.bound.help-word {
-    isolation: isolate;
     box-shadow:
         0 0 0 2px #f0a500,
         0 0 14px 4px rgba(230, 140, 0, 0.75);
@@ -2213,30 +2211,6 @@ body.playing:not(.ended) .help-wrap {
     box-shadow:
         0 0 3px 1px #fff,
         0 0 6px 2px rgb(255, 200, 40);
-}
-
-.word-input.bound.help-word::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(105deg, transparent 38%, rgba(255, 240, 170, 0.7) 50%, transparent 62%);
-    background-size: 250% 100%;
-    background-position: 130% 0;
-    pointer-events: none;
-    animation: help-word-shine 2.6s ease-in-out infinite;
-}
-
-/* The streak crosses in the first 60% of the cycle, then the row rests until the next one */
-@keyframes help-word-shine {
-    0%       { background-position: 130% 0; }
-    60%, 100% { background-position: -30% 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .word-input.bound.help-word::after {
-        animation: none;
-    }
 }
 
 .history-list li.help-word::before {
