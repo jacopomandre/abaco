@@ -2196,11 +2196,13 @@ body.playing:not(.ended) .help-wrap {
         max-width: 100%;
     }
 
-    /* In the strip at the top of the rows' area, left of the A-Z button */
+    /* In the strip at the top of the rows' area, centered on the card like the top bar's counter
+       (the longest word, AGGETTIVO, stays clear of the A-Z button) */
     body.playing .help-notes {
         position: absolute;
         top: 0;
         left: 0;
+        right: 0;
         height: 30px;
         align-items: center;
         margin: 0;
