@@ -2155,8 +2155,8 @@ body.playing:not(.ended) .help-wrap {
     transform: scale(1.18);
 }
 
-/* Kind of word asked for: a tag on the guess box's top border, at its right, in the colors of the
-   menu's header. The box is wrapped (.guess-wrap) to hold it, like a fresh row with its badge. */
+/* Kind of word asked for: a tag on the guess box's top border, at its right, in the gold of the help
+   (lit tiles, METÀ's word), the same in every theme. The box is wrapped (.guess-wrap) to hold it, like a fresh row with its badge. */
 .guess-wrap {
     position: relative;
 }
@@ -2169,8 +2169,11 @@ body.playing:not(.ended) .help-wrap {
     transform: translateY(-50%);
     padding: 2px 8px;
     border-radius: 999px;
-    background: var(--help-head);
-    color: var(--help-head-ink);
+    background: linear-gradient(160deg, #fff3b0, #ffc83d);
+    box-shadow:
+        0 0 0 1.5px #e8a400,
+        0 0 6px 1px rgba(230, 140, 0, 0.45);
+    color: #3b2a14;
     font-family: var(--font-ui);
     font-size: 10px;
     font-weight: 700;
