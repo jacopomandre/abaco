@@ -528,9 +528,9 @@
 
     // How the dictionary's categories are shown: on the tiles, and read out
     const CATEGORY_NAMES = {
-        sostantivo: { tiles: 'NOME',      text: 'un nome' },
-        verbo:      { tiles: 'VERBO',     text: 'un verbo' },
-        aggettivo:  { tiles: 'AGGETTIVO', text: 'un aggettivo' }
+        sostantivo: { tag: 'NOME',      text: 'un nome' },
+        verbo:      { tag: 'VERBO',     text: 'un verbo' },
+        aggettivo:  { tag: 'AGGETTIVO', text: 'un aggettivo' }
     };
 
     // Last three letters of the secret, without accents, each letter once (the help does not tell
@@ -561,27 +561,9 @@
         const lit = used.includes('LAST3') ? lastLetters() : [];
         $railTiles.forEach(function (tile) { tile.classList.toggle('lit', lit.includes(tile.textContent)); });
 
-        $helpNotes.replaceChildren();
-        if (used.includes('CATEGORY') && category) {
-            const tiles = document.createElement('span');
-            tiles.className = 'help-tiles';
-            tiles.setAttribute('role', 'img');
-            tiles.setAttribute('aria-label', `È ${category.text}`);
-            [...category.tiles].forEach(function (letter) {
-                const tile = document.createElement('span');
-                tile.textContent = letter;
-                tiles.appendChild(tile);
-            });
-            $helpNotes.appendChild(tiles);
-        }
-        if (lit.length > 0) {
-            // The rail is decorative (aria-hidden): screen readers get the letters here
-            const note = document.createElement('span');
-            note.className = 'visually-hidden';
-            note.textContent = `Ultime lettere: ${lit.join(', ')}`;
-            $helpNotes.appendChild(note);
-        }
-        $helpNotes.hidden = $helpNotes.childElementCount === 0;
+        // The rail is decorative (aria-hidden): screen readers get the letters here.
+        // The kind of word is a tag on the guess box instead (appendGuessRow).
+        $helpNotes.textContent = lit.length > 0 ? `Ultime lettere: ${lit.join(', ')}` : '';
     }
 
     function useHelp(kind) {
@@ -712,7 +694,8 @@
         if (!PHONE.matches || !game) return;
 
         const center = items.findIndex(function (el) {
-            return el === $guess || el.classList.contains('dict-entry');
+            // The guess box, or the wrap holding it with the kind-of-word tag (.guess-wrap)
+            return ($guess !== null && el.contains($guess)) || el.classList.contains('dict-entry');
         });
         // The guess just played (wrapped with its badge, .bound-wrap) never folds, even when it lands
         // outside the bounds: the player must see where it went and its badge
@@ -904,7 +887,23 @@
                 submitGuess();
             }
         });
-        $boardStack.appendChild(input);
+        // Kind of word asked for (help on demand): a tag on the box's top border, where it never
+        // covers the countdown or the word being typed. The box is wrapped to hold it.
+        const category = helpUsed().includes('CATEGORY') && CATEGORY_NAMES[game.secret.category];
+        if (category) {
+            const wrap = document.createElement('div');
+            wrap.className = 'guess-wrap';
+            const tag = document.createElement('span');
+            tag.id          = 'word-type-tag';
+            tag.className   = 'word-type-tag';
+            tag.textContent = category.tag;
+            tag.setAttribute('aria-label', `È ${category.text}`);
+            input.setAttribute('aria-describedby', tag.id);
+            wrap.append(input, tag);
+            $boardStack.appendChild(wrap);
+        } else {
+            $boardStack.appendChild(input);
+        }
         $guess = input;
     }
 

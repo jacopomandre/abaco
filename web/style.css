@@ -2007,8 +2007,8 @@ body.rail-open .rail-btn:not(:hover) {
 /* ---------- Help menu (game screen) ---------- */
 /* AIUTI button of the top bar: a quiet button like the others there, dropping a menu down under itself.
    Each help (app.js, "Help on demand") costs one attempt and works once per game; an item whose help
-   was used, or that would spend the last attempt, is disabled. The icons and the answers are letter
-   tiles lit like the ones the help lights on the alphabet rail. */
+   was used, or that would spend the last attempt, is disabled. The icons are letter tiles lit like
+   the ones the help lights on the alphabet rail. */
 .help-wrap {
     display: none;
     position: relative;
@@ -2115,9 +2115,8 @@ body.playing:not(.ended) .help-wrap {
     width: 70px;
 }
 
-/* Lit letter tiles: the help menu's icons, the answers above the board and the rail's tiles a help lit */
+/* Lit letter tiles: the help menu's icons and the rail's tiles a help lit */
 .help-icon span,
-.help-tiles span,
 .alpha-rail span.lit {
     background: linear-gradient(160deg, #fff3b0, #ffc83d);
     box-shadow:
@@ -2127,8 +2126,7 @@ body.playing:not(.ended) .help-wrap {
     color: #3b2a14;
 }
 
-.help-icon span,
-.help-tiles span {
+.help-icon span {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -2152,28 +2150,29 @@ body.playing:not(.ended) .help-wrap {
     transform: scale(1.18);
 }
 
-/* The kind of word, on lit tiles above the rows (each with the rail's slight lean) */
-.help-notes {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 12px;
+/* Kind of word asked for: a tag on the guess box's top border, at its right, in the colors of the
+   menu's header. The box is wrapped (.guess-wrap) to hold it, like a fresh row with its badge. */
+.guess-wrap {
+    position: relative;
 }
 
-.help-tiles {
-    display: inline-flex;
-    gap: 3px;
+.word-type-tag {
+    position: absolute;
+    top: 0;
+    right: 12px;
+    z-index: 1;
+    transform: translateY(-50%);
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--help-head);
+    color: var(--help-head-ink);
+    font-family: var(--font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    pointer-events: none;
 }
-
-.help-tiles span {
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    transform: rotate(var(--lean, -3deg));
-}
-
-.help-tiles span:nth-child(2n) { --lean: 2deg; }
-.help-tiles span:nth-child(3n) { --lean: -1deg; }
-.help-tiles span:nth-child(5n) { --lean: 4deg; }
 
 @media (max-width: 640px) {
     /* Between the attempts left and the "..." menu; the counter stays on one line */
@@ -2194,17 +2193,5 @@ body.playing:not(.ended) .help-wrap {
 
     body.playing .help-menu {
         max-width: 100%;
-    }
-
-    /* In the strip at the top of the rows' area, centered on the card like the top bar's counter
-       (the longest word, AGGETTIVO, stays clear of the A-Z button) */
-    body.playing .help-notes {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 30px;
-        align-items: center;
-        margin: 0;
     }
 }

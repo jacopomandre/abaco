@@ -266,9 +266,8 @@
                  The guess placeholder shows the attempts countdown (20 / 15 / 15 by difficulty).
                  Once the game is over, the guess row is replaced in place by the secret's dictionary entry. -->
             <div class="board-middle">
-                <!-- Answers of the help used in this game (app.js fills it): the kind of word on lit tiles, and
-                     for screen readers the last three letters, which the tiles of the alphabet rail light up -->
-                <div id="help-notes" class="help-notes" aria-live="polite" hidden></div>
+                <!-- For screen readers: the last three letters a help lit on the alphabet rail (app.js fills it) -->
+                <div id="help-notes" class="visually-hidden" aria-live="polite"></div>
                 <div id="board-stack" class="board-stack" aria-live="polite"></div>
                 <!-- Game screen only: the alphabet on wooden tiles, a reminder of the letters' order for the
                      "prima / dopo" hints, in the card's right padding (on a phone, beside the rows only).
@@ -454,7 +453,8 @@
                     </li>
                     <li class="hints-level">
                         <span class="help-icon" aria-hidden="true"><span>T</span><span>I</span><span>P</span><span>O</span></span>
-                        <span>scrive sopra le parole se la segreta è un nome, un verbo o un aggettivo</span>
+                        <span>dice, su un'etichetta sopra la casella del tentativo, se la segreta è un nome,
+                            un verbo o un aggettivo</span>
                     </li>
                 </ul>
             </section>
