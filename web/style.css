@@ -30,6 +30,9 @@
     /* Line beside the alphabet rail of the game screen (see "Alphabet rail"): black, a little see-through,
        on the light cards; the dark themes make it white */
     --rail-line: rgba(0, 0, 0, 0.3);
+    /* Header of the AIUTI menu (see "Help menu"): the colors of the theme's main button */
+    --help-head: var(--ink);
+    --help-head-ink: var(--surface);
 
     /* Typography */
     --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -2048,6 +2051,22 @@ body.playing:not(.ended) .help-wrap {
     border: 1px solid var(--line);
     border-radius: var(--r-md);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Header band across the top of the menu, in the theme's colors: what every help costs */
+.help-head {
+    margin: -6px -6px 4px;
+    padding: 6px 12px;
+    /* The menu's corners, inside its 1px border */
+    border-radius: calc(var(--r-md) - 1px) calc(var(--r-md) - 1px) 0 0;
+    background: var(--help-head);
+    color: var(--help-head-ink);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 
 /* The items are plain rows, not buttons of the theme (no border, fill or shadow of its own) */

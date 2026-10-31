@@ -41,6 +41,9 @@
     --r-lg: 22px;
     /* Alphabet rail's line (style.css, "Alphabet rail"): white on this dark card */
     --rail-line: rgba(255, 255, 255, 0.35);
+    /* AIUTI menu's header: moon gold like TENTA */
+    --help-head: var(--nt-gold);
+    --help-head-ink: var(--surface);
 }
 
 /* ---------- Sky: night gradient and a few faint stars ---------- */

@@ -238,7 +238,9 @@
                         </svg>
                     </button>
                     <!-- Each item: an icon of lit letter tiles and what the help does, no title -->
-                    <div id="help-menu" class="help-menu" role="menu" hidden>
+                    <div id="help-menu" class="help-menu" role="menu" aria-label="Aiuti, al costo di 1 tentativo" hidden>
+                        <!-- Header in the theme's colors (--help-head): what every help costs -->
+                        <p class="help-head" aria-hidden="true">Al costo di 1 tentativo</p>
                         <button id="help-last3" type="button" class="help-item" role="menuitem">
                             <span class="help-icon" aria-hidden="true"><span>T</span><span>R</span><span>E</span></span>
                             <span class="help-text">Illumina le ultime tre lettere</span>

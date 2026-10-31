@@ -10,6 +10,9 @@
 :root {
     /* Palette: style.css tokens remapped to the theme colors */
     --ink: var(--az-navy);
+    /* AIUTI menu's header: orange like TENTA */
+    --help-head: var(--az-orange);
+    --help-head-ink: #fff;
     --ink-soft: #4a6187;
     --ink-muted: #6e7f96;
     --line: var(--az-navy);
