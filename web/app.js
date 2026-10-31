@@ -1261,7 +1261,7 @@
         const names = hintNames(rules);
         let hints;
         if (names.length === 0) {
-            hints = 'senza aiuti';
+            hints = 'senza colori di vicinanza';
         } else if (names.length === 1) {
             hints = `con ${names[0]}`;
         } else {
