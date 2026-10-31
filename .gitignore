@@ -58,3 +58,7 @@ android/signing/
 ### Local notes ###
 # Personal to-do list: kept on disk, never committed (the repository is public)
 TODO.md
+
+### Contrast check ###
+# Report of the last tools/check-contrast.js run (the /contrasto skill): screenshots and full list
+contrast-report/

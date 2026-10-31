@@ -5,6 +5,7 @@
   "description": "Abaco Zuzzurellone - static web game (web/) wrapped as an Android app with Capacitor",
   "scripts": {
     "check": "node tools/check-dizionario.js",
+    "check:contrast": "node tools/check-contrast.js",
     "android:sync": "npm run check && cap sync android",
     "android:apk": "npm run android:sync && cd android && .\\gradlew.bat assembleDebug",
     "android:release": "npm run android:sync && cd android && .\\gradlew.bat assembleRelease",
@@ -15,6 +16,7 @@
   "devDependencies": {
     "@capacitor/android": "^7.6.9",
     "@capacitor/cli": "^7.6.9",
-    "@capacitor/core": "^7.6.9"
+    "@capacitor/core": "^7.6.9",
+    "playwright-core": "^1.64.1"
   }
 }
