@@ -2068,9 +2068,18 @@ body.playing:not(.ended) .help-wrap {
     cursor: pointer;
 }
 
+/* The themes' button:hover / :active looks (ink fill with light text, lift, offset shadow) stay off
+   the rows: under the pointer a row only gets a tint of the theme's ink (--surface-alt is next to white
+   on the light cards; the plain --surface-alt only for a WebView without color-mix()) */
 .help-menu .help-item:hover:not(:disabled),
+.help-menu .help-item:active:not(:disabled),
 .help-menu .help-item:focus-visible {
     background: var(--surface-alt);
+    background: color-mix(in srgb, var(--ink) 10%, transparent);
+    color: var(--ink);
+    border: none;
+    box-shadow: none;
+    transform: none;
 }
 
 .help-menu .help-item:disabled {
