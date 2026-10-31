@@ -2101,9 +2101,19 @@ body.playing:not(.ended) .help-wrap {
     transform: none;
 }
 
+/* A help already used (or not affordable): the tiles fade and lose their color, the text only turns
+   to the theme's soft ink (--ink-muted would read too faintly on the light cards) */
 .help-menu .help-item:disabled {
-    opacity: 0.45;
     cursor: default;
+}
+
+.help-menu .help-item:disabled .help-icon {
+    opacity: 0.45;
+    filter: grayscale(0.7);
+}
+
+.help-menu .help-item:disabled .help-text {
+    color: var(--ink-soft);
 }
 
 /* The icons' column is as wide as the longest one (ME TÀ: 4 tiles and a space), so the texts line up */
