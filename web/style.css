@@ -2207,12 +2207,22 @@ body.playing:not(.ended) .help-wrap {
    and the rows' flat diamond in gold. Nothing moves: an endless animation slows a phone down. In the
    history list, a small gold gem in place of the dot. */
 .word-input.bound.help-word {
-    color: #ffeeb8;
-    text-shadow: 0 0 4px rgba(255, 200, 60, 0.5);
-    box-shadow:
+    --help-word-light:
         inset 0 0 0 2px #e8b830,
         inset 0 0 10px 2px rgba(255, 210, 80, 0.4),
         0 0 8px 1px rgba(230, 140, 0, 0.4);
+    color: #ffeeb8;
+    text-shadow: 0 0 4px rgba(255, 200, 60, 0.5);
+    box-shadow: var(--help-word-light);
+}
+
+/* Without the closeness colors (hard level, custom games without them) the row keeps its plain fill,
+   light in some themes: the letters keep the theme's ink there. The gold rim and glow stay, also where
+   a theme takes the outline off its plain rows (quaderno). */
+.word-input.bound.help-word.no-closeness {
+    color: var(--ink);
+    text-shadow: none;
+    box-shadow: var(--help-word-light);
 }
 
 .word-input.bound.help-word::before {
