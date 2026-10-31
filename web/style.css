@@ -2106,13 +2106,18 @@ body.playing:not(.ended) .help-wrap {
     cursor: default;
 }
 
-/* The icons' column is as wide as the longest one (4 tiles), so the texts line up */
+/* The icons' column is as wide as the longest one (ME TÀ: 4 tiles and a space), so the texts line up */
 .help-icon {
     display: inline-flex;
     justify-content: center;
     gap: 2px;
     flex: none;
-    width: 70px;
+    width: 76px;
+}
+
+/* A space between two words on the tiles (ME TÀ) */
+.help-icon .word-break {
+    margin-left: 6px;
 }
 
 /* Lit letter tiles: the help menu's icons and the rail's tiles a help lit */
