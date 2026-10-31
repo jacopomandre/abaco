@@ -48,6 +48,7 @@
     const $helpMenu        = document.getElementById('help-menu');
     const $helpLast3       = document.getElementById('help-last3');
     const $helpCategory    = document.getElementById('help-category');
+    const $helpHalf        = document.getElementById('help-half');
     const $helpNotes       = document.getElementById('help-notes');
     const $submit          = document.getElementById('submit-guess');
     const $surrender       = document.getElementById('surrender');
@@ -156,8 +157,9 @@
     //   difficulty:           'EASY' | 'MEDIUM' | 'HARD' (key of DIFFICULTY) | 'CUSTOM'
     //   rules:                custom games only: the rules chosen by the player (see DIFFICULTY)
     //   baseAttempts:         attempts already spent before this session (0, or the imported count)
-    //   attempts: [{word, outcome}]  guesses made in this session
-    //   help:     help asked for, each at most once: 'LAST3' | 'CATEGORY' (see "Help on demand");
+    //   attempts: [{word, outcome, help}]  guesses made in this session; help: true on the word the
+    //             "metà" help played (it costs the help's attempt, not one of its own)
+    //   help:     help asked for, each at most once: 'LAST3' | 'CATEGORY' | 'HALF' (see "Help on demand");
     //             missing in games saved before it existed
     //   status:   'IN_PROGRESS' | 'WON' | 'SURRENDERED' | 'LOST' (attempts ran out)
     // }
@@ -243,7 +245,8 @@
     // Total attempts spent on this game, including those made before an import and the ones
     // each help costs
     function attemptCount() {
-        return game.baseAttempts + game.attempts.length + helpUsed().length;
+        const guesses = game.attempts.filter(function (a) { return !a.help; }).length;
+        return game.baseAttempts + guesses + helpUsed().length;
     }
 
     // Attempts still available: the countdown shown to the player
@@ -543,6 +546,27 @@
         return [...new Set(letters)];
     }
 
+    // The "metà" help's word: one drawn at random from the middle fifth of the words still possible
+    // (those of the game's level strictly between the two closest bounds, the secret left out, so it
+    // never wins the game), between 40% and 60% of them. Drawn and not the exact middle: the exact one
+    // would always be the same word for the same bounds (every game starts from abaco - zuzzurellone),
+    // and a frequent player could learn it by heart. Null when no word is left between the bounds.
+    function halfwayWord() {
+        const labels = WORD_POOLS[rulesOf(game).words];
+        const lowers = lowerWords();
+        const lower  = lowers[lowers.length - 1];
+        const upper  = upperWords()[0];
+        const words  = dictionary().filter(function (entry) {
+            return entry.difficolta.some(function (label) { return labels.includes(label); })
+                && ITALIAN.compare(lower, entry.parola) < 0 && ITALIAN.compare(entry.parola, upper) < 0
+                && ITALIAN.compare(entry.parola, game.secret.word) !== 0;
+        }).map(function (entry) { return entry.parola; }).sort(ITALIAN.compare);
+        if (words.length === 0) return null;
+        const from = Math.floor(words.length * 0.4);
+        const to   = Math.max(from + 1, Math.ceil(words.length * 0.6));
+        return words[from + Math.floor(Math.random() * (to - from))];
+    }
+
     function setHelpMenu(open) {
         $helpMenu.hidden = !open;
         $helpOpen.setAttribute('aria-expanded', String(open));
@@ -557,6 +581,7 @@
         const category = CATEGORY_NAMES[game.secret.category];
         $helpLast3.disabled    = !playing || !canPay || used.includes('LAST3');
         $helpCategory.disabled = !playing || !canPay || used.includes('CATEGORY') || !category;
+        $helpHalf.disabled     = !playing || !canPay || used.includes('HALF');
 
         const lit = used.includes('LAST3') ? lastLetters() : [];
         $railTiles.forEach(function (tile) { tile.classList.toggle('lit', lit.includes(tile.textContent)); });
@@ -566,16 +591,29 @@
         $helpNotes.textContent = lit.length > 0 ? `Ultime lettere: ${lit.join(', ')}` : '';
     }
 
-    function useHelp(kind) {
+    async function useHelp(kind) {
         setHelpMenu(false);
         if (!game || game.status !== 'IN_PROGRESS' || helpUsed().includes(kind) || attemptsLeft() <= 1) return;
+        let played;
+        if (kind === 'HALF') {
+            // A resumed game may not have the dictionary yet
+            await whenDictionaryReady();
+            played = halfwayWord();
+            if (!played) {
+                showBanner('Non ci sono altre parole da tagliare a metà.', false);
+                return;
+            }
+            // Played like a guess, so it narrows the bounds and plays the closeness badge
+            const outcome = ITALIAN.compare(played, game.secret.word) < 0 ? 'LOWER' : 'UPPER';
+            game.attempts.push({ word: played, outcome: outcome, help: true });
+        }
         game.help = [...helpUsed(), kind];
         // The lit letters are on the rail: open it if it was closed
         if (kind === 'LAST3') {
             setAlphabetRail(true);
             saveAlphabetRail(true);
         }
-        render();
+        render(played);
     }
 
     // --- Screen helpers ---
@@ -631,6 +669,7 @@
             for (const a of game.attempts) {
                 const li = document.createElement('li');
                 li.textContent = a.word;
+                if (a.help) li.classList.add('help-word');
                 list.appendChild(li);
             }
         }
@@ -817,6 +856,11 @@
         // A plain element rather than a readonly <input>: only part of its text has to be bold
         const row = document.createElement('div');
         row.className = 'word-input bound';
+        // The word the "metà" help played: golden glow and a shining gem for marker
+        if (game.attempts.some(function (a) { return a.help && a.word === word; })) {
+            row.classList.add('help-word');
+            row.title = 'Parola dell\'aiuto METÀ';
+        }
         const rules    = rulesOf(game);
         const imported = word === game.baseLower || word === game.baseUpper;
         const colored  = rules.colors && !imported;
@@ -1456,7 +1500,7 @@
     });
     // AIUTI: the menu drops down and folds up again; a tap anywhere else or Esc folds it too.
     // Like the A-Z button, it leaves the phone keyboard open.
-    [$helpOpen, $helpLast3, $helpCategory].forEach(function (button) {
+    [$helpOpen, $helpLast3, $helpCategory, $helpHalf].forEach(function (button) {
         button.addEventListener('pointerdown', function (ev) {
             if (PHONE.matches && $guess) ev.preventDefault();
         });
@@ -1464,6 +1508,7 @@
     $helpOpen.addEventListener('click', function () { setHelpMenu($helpMenu.hidden); });
     $helpLast3.addEventListener('click', function () { useHelp('LAST3'); });
     $helpCategory.addEventListener('click', function () { useHelp('CATEGORY'); });
+    $helpHalf.addEventListener('click', function () { useHelp('HALF'); });
     document.addEventListener('pointerdown', function (ev) {
         if (!$helpMenu.hidden && !ev.target.closest('.help-wrap')) setHelpMenu(false);
     });
