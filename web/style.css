@@ -2210,6 +2210,12 @@ body.playing:not(.ended) .help-wrap {
     body.playing .help-menu {
         max-width: 100%;
     }
+
+    /* Capped at the bar's width, a long text goes on two lines instead of sticking out of the menu
+       (on a 360px phone) */
+    body.playing .help-menu .help-item {
+        white-space: normal;
+    }
 }
 
 /* The word the "metà" help played (app.js marks it .help-word): lit from inside, a gold rim and a warm
