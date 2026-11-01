@@ -531,9 +531,9 @@
 
     // How the dictionary's categories are shown: on the tiles, and read out
     const CATEGORY_NAMES = {
-        sostantivo: { tag: 'NOME',      text: 'un nome' },
-        verbo:      { tag: 'VERBO',     text: 'un verbo' },
-        aggettivo:  { tag: 'AGGETTIVO', text: 'un aggettivo' }
+        sostantivo: { tag: 'SOSTANTIVO', text: 'un sostantivo' },
+        verbo:      { tag: 'VERBO',      text: 'un verbo' },
+        aggettivo:  { tag: 'AGGETTIVO',  text: 'un aggettivo' }
     };
 
     // Last three letters of the secret, without accents, each letter once (the help does not tell
