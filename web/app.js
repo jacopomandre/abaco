@@ -706,6 +706,7 @@
         const button = document.createElement('button');
         button.type      = 'button';
         button.className = 'more-words';
+        button.dataset.side = side;
         // A fresh row is wrapped with its badge (.bound-wrap): read the row only, not the badge's letters
         const words = rows.map(function (r) { return (r.querySelector('.word-input') || r).textContent; });
         const label = document.createElement('span');
@@ -727,6 +728,8 @@
     // bounds are what the player plays against (a finished game may fold them too, see minKept).
     // Wide screens scroll the page instead: every row stays.
     function fitBoard() {
+        // Moving rows would falsify the measures below
+        settleBoardMotion();
         $boardStack.querySelectorAll('.more-words').forEach(function (b) { b.remove(); });
         const items  = Array.from($boardStack.children);
         items.forEach(function (el) { el.hidden = false; });
@@ -1023,10 +1026,163 @@
         appendDictEdge(DICT_LAST);
     }
 
+    // --- Board motion: after a guess the rows glide to their new places ---
+
+    // renderBoard rebuilds every row, so on its own the whole board would jump in one frame. Instead
+    // (FLIP): note where everything was, rebuild, then play each element from its old place to the new
+    // one. Only visuals: the game state and the layout are already final when the motion starts.
+    // Animates "translate", not "transform": rows and entries have transforms of their own in the themes
+    // (and the focused box its lift), and both are played by the compositor, so a phone can keep up.
+    const BOARD_MOTION_MS   = 300;
+    // Slow start and slow end: a curve that starts at full speed still reads as a jump in the first frame
+    const BOARD_MOTION_EASE = 'cubic-bezier(0.3, 0, 0.2, 1)';
+    // A guess landing far from the box flies a bit longer, or it would cross the board in a blink
+    const FRESH_ROW_MS_PER_PX = 0.4;
+    const FRESH_ROW_MAX_MS    = 500;
+    const REDUCED_MOTION    = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // What sits below the board on wide screens: pushed down by each new row, it has to glide too
+    const BOARD_FOLLOWERS   = '.actions, .rule, .history-section, .site-footer';
+
+    // The motion being played: { animations, lifted, ghosts }, null when the board is still
+    let boardMotion = null;
+
+    // Word of a board row: a fresh row is wrapped with its badge (.bound-wrap), whose letters do not count
+    function boardRowWord(el) {
+        return (el.querySelector('.word-input') || el).textContent;
+    }
+
+    // The same element across two rebuilds has the same key. The guess box and the revealed word share
+    // one, as the latter takes the former's place. The index tells apart a word played twice.
+    function boardKeys() {
+        const seen = new Map();
+        return Array.from($boardStack.children).map(function (el) {
+            let key;
+            if (el.matches('.dict-edge')) {
+                key = `edge:${el.textContent}`;
+            } else if (el.matches('.more-words')) {
+                key = `more:${el.dataset.side}`;
+            } else if (el.matches('.guess, .guess-wrap, .dict-entry')) {
+                key = 'guess';
+            } else {
+                key = `row:${boardRowWord(el)}`;
+            }
+            const index = seen.get(key) || 0;
+            seen.set(key, index + 1);
+            return { el: el, key: `${key}#${index}` };
+        });
+    }
+
+    // Where everything visible is now, with the running motion's offsets included: a guess played
+    // mid-motion carries on from there. Folding rows are on their way out and no longer count.
+    function captureBoard() {
+        const tops = new Map();
+        boardKeys().forEach(function (item) {
+            if (!item.el.hidden && !item.el.classList.contains('board-ghost')) {
+                tops.set(item.key, item.el.getBoundingClientRect());
+            }
+        });
+        document.querySelectorAll(BOARD_FOLLOWERS).forEach(function (el) {
+            if (el.getClientRects().length > 0) tops.set(el, el.getBoundingClientRect());
+        });
+        return tops;
+    }
+
+    // Jump to the end of the running motion, if any
+    function settleBoardMotion() {
+        if (!boardMotion) return;
+        boardMotion.animations.forEach(function (a) { a.cancel(); });
+        boardMotion.lifted.forEach(function (el) { el.style.zIndex = ''; });
+        boardMotion.ghosts.forEach(function (el) {
+            el.hidden = true;
+            el.classList.remove('board-ghost');
+            el.removeAttribute('aria-hidden');
+            el.style.left = el.style.top = el.style.width = '';
+        });
+        boardMotion = null;
+        $boardStack.classList.remove('board-moving');
+    }
+
+    // A row just folded: show it once more, out of the flow, flying into its counter while it fades.
+    // The real row rather than a copy: it keeps its theme's look, which depends on its place in the stack.
+    function foldRowAway(el, from, motion) {
+        let counter = el.previousElementSibling;
+        while (counter && !counter.matches('.more-words')) counter = counter.previousElementSibling;
+        if (!counter) return;
+        const box = $boardStack.getBoundingClientRect();
+        const to  = counter.getBoundingClientRect();
+        el.hidden = false;
+        el.classList.add('board-ghost');
+        el.setAttribute('aria-hidden', 'true');
+        el.style.left  = `${from.left - box.left - $boardStack.clientLeft}px`;
+        el.style.top   = `${to.top - box.top - $boardStack.clientTop + $boardStack.scrollTop}px`;
+        el.style.width = `${from.width}px`;
+        motion.ghosts.push(el);
+        motion.animations.push(el.animate(
+            [{ translate: `0 ${from.top - to.top}px`, opacity: 1 }, { translate: '0 0', opacity: 0 }],
+            { duration: BOARD_MOTION_MS, easing: BOARD_MOTION_EASE }));
+    }
+
+    // Play the motion from the places noted by captureBoard to the current ones.
+    // freshWord's row is new: it leaves from the guess box, where the player has just typed it.
+    function playBoardMotion(before, freshWord) {
+        const motion  = { animations: [], lifted: [], ghosts: [] };
+        const options = { duration: BOARD_MOTION_MS, easing: BOARD_MOTION_EASE };
+        const slide   = function (el, from) {
+            const dy = from.top - el.getBoundingClientRect().top;
+            if (Math.abs(dy) >= 0.5) {
+                motion.animations.push(el.animate([{ translate: `0 ${dy}px` }, { translate: '0 0' }], options));
+            }
+        };
+
+        boardKeys().forEach(function (item) {
+            const el    = item.el;
+            const isNew = !before.has(item.key);
+            const fresh = isNew && !el.matches('.more-words') && boardRowWord(el) === freshWord;
+            const from  = fresh ? before.get('guess#0') : before.get(item.key);
+            if (el.hidden) {
+                if (from) foldRowAway(el, from, motion);
+            } else if (fresh && from) {
+                // Over the rows it may cross, and showing at once over the box it comes out of
+                el.style.zIndex = '2';
+                motion.lifted.push(el);
+                const dy = from.top - el.getBoundingClientRect().top;
+                motion.animations.push(el.animate([
+                    { translate: `0 ${dy}px`, opacity: 0 },
+                    { opacity: 1, offset: 0.3 },
+                    { translate: '0 0', opacity: 1 }
+                ], {
+                    duration: Math.min(FRESH_ROW_MAX_MS, BOARD_MOTION_MS + Math.abs(dy) * FRESH_ROW_MS_PER_PX),
+                    easing: BOARD_MOTION_EASE
+                }));
+            } else if (from) {
+                slide(el, from);
+            } else {
+                // A counter just born, or a row back out of a counter
+                motion.animations.push(el.animate([{ opacity: 0 }, { opacity: 1 }], options));
+            }
+        });
+        document.querySelectorAll(BOARD_FOLLOWERS).forEach(function (el) {
+            if (before.has(el) && el.getClientRects().length > 0) slide(el, before.get(el));
+        });
+
+        boardMotion = motion;
+        if (motion.animations.length === 0) {
+            settleBoardMotion();
+        } else {
+            Promise.allSettled(motion.animations.map(function (a) { return a.finished; })).then(function () {
+                if (boardMotion === motion) settleBoardMotion();
+            });
+        }
+    }
+
     // Redraw board, history, buttons and banner from the current game.
     // freshWord is passed only right after a guess, so the closeness badge never replays on a
-    // reload, an import or a surrender.
+    // reload, an import or a surrender, and only then the rows glide to their new places.
     function render(freshWord) {
+        const before = freshWord && !REDUCED_MOTION.matches ? captureBoard() : null;
+        settleBoardMotion();
+        // The new guess box takes the focus: no ring fading in again while it glides
+        $boardStack.classList.toggle('board-moving', before !== null);
         // Every change of the game goes through here: keep the saved copy in step
         saveGame();
         renderBoard(freshWord);
@@ -1063,6 +1219,8 @@
             // (and the winning celebration) however long the board has grown
             $boardStack.querySelector('.dict-entry').scrollIntoView({ block: 'center', behavior: 'smooth' });
         }
+        // Last: the scrolls above aim at the rows' final places, which an offset would falsify
+        if (before) playBoardMotion(before, freshWord);
     }
 
     // --- Game actions ---

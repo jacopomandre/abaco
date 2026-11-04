@@ -208,9 +208,24 @@ body:not(.home):not(.playing) {
 }
 
 .board-stack {
+    /* Containing block of the rows folding away (.board-ghost) */
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+/* While the rows glide after a guess (app.js, playBoardMotion) the new guess box keeps its focus look
+   from the first frame */
+.board-moving .word-input {
+    transition: none;
+}
+
+/* A row just folded into its counter, out of the flow for the moment it takes to fly there */
+.word-input.bound.board-ghost {
+    position: absolute;
+    margin: 0;
+    pointer-events: none;
 }
 
 /* Shared input geometry */
