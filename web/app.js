@@ -456,9 +456,10 @@
 
     // Storage can be unavailable or full (private mode, blocked site data): the game then
     // simply plays without saving, so every access is guarded.
+    // Only a game still being played is kept: a finished one must not come back.
     function saveGame() {
         try {
-            if (game) {
+            if (game && game.status === 'IN_PROGRESS') {
                 localStorage.setItem(SAVE_KEY, JSON.stringify(game));
             } else {
                 localStorage.removeItem(SAVE_KEY);
@@ -1720,11 +1721,12 @@
         if (document.fonts) document.fonts.ready.then(onViewportChange);
     });
 
-    // --- Page load: resume the saved game if there is one, else show the start screen ---
+    // --- Page load: resume the saved game if it is still being played, else show the start screen
+    // (which also drops a finished one saved by an older version) ---
     game = loadSavedGame();
-    if (game) {
+    if (game && game.status === 'IN_PROGRESS') {
         // A game saved when its level granted more attempts may already be past today's limit
-        if (game.status === 'IN_PROGRESS' && attemptsLeft() <= 0) {
+        if (attemptsLeft() <= 0) {
             game.status = 'LOST';
         }
         render();

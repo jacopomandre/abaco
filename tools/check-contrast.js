@@ -61,7 +61,6 @@ function savedGame(rules, help, status, imported) {
         status: status
     };
     if (used) game.attempts.push({ word: 'lanterna', outcome: 'UPPER', help: true });
-    if (status === 'WON') game.attempts.push({ word: 'lampada', outcome: 'WON' });
     if (rules.rules) game.rules = rules.rules;
     return game;
 }
@@ -76,10 +75,14 @@ function scenarios(viewport) {
         list.push({ name: `${rulesName}, aiuti da usare`, game: savedGame(rules, 'free', 'IN_PROGRESS'), open: 'help' });
         list.push({ name: `${rulesName}, aiuti usati, partita importata`, game: savedGame(rules, 'used', 'IN_PROGRESS', true), open: 'help' });
     }
-    // End of game: the revealed word is drawn the same at every level, only the rows' colors change
+    // End of game: the revealed word is drawn the same at every level, only the rows' colors change.
+    // Played to its end after loading, as the app never resumes a game already over.
     for (const rulesName of ['medio', 'difficile']) {
         for (const status of ['WON', 'SURRENDERED', 'LOST']) {
-            list.push({ name: `${rulesName}, fine partita ${status}`, game: savedGame(RULES[rulesName], 'used', status) });
+            const game = savedGame(RULES[rulesName], 'used', 'IN_PROGRESS');
+            // Loading a game with no attempts left is what makes it lost
+            if (status === 'LOST') game.baseAttempts = 99;
+            list.push({ name: `${rulesName}, fine partita ${status}`, game: game, finish: status });
         }
     }
     // The "..." menu exists on the phone game screen only
@@ -287,6 +290,23 @@ function groupKey(f) {
     return f.where + ' | ' + f.min;
 }
 
+// Bring a loaded game to its end, then leave the page as still as the other scenarios
+async function finishGame(page, status, secret) {
+    if (status === 'WON') {
+        await page.fill('#guess-input', secret);
+        await page.click('#submit-guess');
+    } else if (status === 'SURRENDERED') {
+        await page.click('#surrender');
+        await page.click('#confirm-ok');
+    }
+    await page.waitForSelector('.dict-entry');
+    await page.evaluate(function () {
+        document.getAnimations().forEach(function (a) { a.finish(); });
+        document.querySelectorAll('.closeness-badge').forEach(function (b) { b.remove(); });
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+}
+
 // One page: load the scenario, then measure it in every theme (and with the AIUTI menu closed / open).
 // shots: the worst failure seen so far per group, with the screenshot taken of it
 async function runScenario(browser, base, viewportName, size, scenario, shots) {
@@ -303,6 +323,7 @@ async function runScenario(browser, base, viewportName, size, scenario, shots) {
     await page.goto(base);
     await page.addStyleTag({ content: STILL_CSS });
     await page.evaluate(function () { return document.fonts.ready; });
+    if (scenario.finish) await finishGame(page, scenario.finish, scenario.game.secret.word);
     if (scenario.open === 'hints') {
         await page.evaluate(function () { document.getElementById('hints-dialog').showModal(); });
     } else if (scenario.open === 'menu') {
