@@ -1853,6 +1853,28 @@ body.playing .menu-home {
     }
 }
 
+/* ---------- Card along the screen's rounded corners (Android app, phone screens) ---------- */
+/* On a screen with corners rounder than the card, the corners would cut off the card's own and break its
+   outline. MainActivity sends the screen's radius (--screen-corner) and .rounded-screen, where Android
+   tells them: the card's corners then run parallel to the screen's, with the card's 8px margin all along.
+   This replaces each theme's radius, the hand-drawn one too: only a plain curve can stay parallel. */
+@media (max-width: 640px) {
+    .rounded-screen body.home .page,
+    .rounded-screen body.playing .page {
+        --card-corner: calc(var(--screen-corner) - 8px);
+        border-radius: var(--card-corner);
+        /* Room for the square buttons of some themes at the top and bottom corners, inside the curve */
+        padding-top: max(calc(12px + var(--inset-top, 0px) - var(--cutout-gap)), calc(var(--card-corner) * 0.34));
+        padding-bottom: max(16px, calc(var(--card-corner) * 0.34));
+    }
+
+    /* Quaderno's second pencil trace, 4px inside the outline */
+    .rounded-screen body.home .page::before,
+    .rounded-screen body.playing .page::before {
+        border-radius: calc(var(--card-corner) - 4px);
+    }
+}
+
 /* ---------- Alphabet rail (game screen) ---------- */
 /* While a game is shown, the card's right padding holds the alphabet A-Z on wooden letter tiles, like a
    board game's: a frame for the board and a reminder of the letters' order for the "prima / dopo" hints.

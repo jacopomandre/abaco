@@ -3,8 +3,10 @@ package it.abacozuzzurellone.app;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.RoundedCorner;
 import android.view.View;
 import android.view.ViewGroup.MarginLayoutParams;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import androidx.core.graphics.Insets;
@@ -19,6 +21,10 @@ public class MainActivity extends BridgeActivity {
 
     // Height of the camera cutout at the top, in CSS pixels: the page leaves that much room itself
     private int cutoutTopCss = 0;
+    // Radius of the screen's corners, in CSS pixels: the page's card follows it (style.css, --screen-corner)
+    private int screenCornerCss = 0;
+    // Up to here the themes' cards (8px from the edge, radius 6 to 22px) already sit clear of the corners
+    private static final int ROUNDED_SCREEN_MIN_CSS = 24;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +66,8 @@ public class MainActivity extends BridgeActivity {
 
             float density = getResources().getDisplayMetrics().density;
             cutoutTopCss = Math.round(Math.max(0, cutout.top - bars.top) / density);
-            sendInsetTop();
+            screenCornerCss = Math.round(largestScreenCorner(windowInsets) / density);
+            sendInsets();
             return WindowInsetsCompat.CONSUMED;
         });
 
@@ -68,17 +75,42 @@ public class MainActivity extends BridgeActivity {
         getBridge().addWebViewListener(new WebViewListener() {
             @Override
             public void onPageLoaded(WebView view) {
-                sendInsetTop();
+                sendInsets();
             }
         });
 
         hideSystemBars();
     }
 
-    // Tell the page how much room to leave at the top for the camera (style.css, --inset-top)
-    private void sendInsetTop() {
+    // Largest radius of the screen's corners, in physical pixels. 0 where unknown: Android tells it from
+    // version 12 on, and only for a screen with rounded corners.
+    private int largestScreenCorner(WindowInsetsCompat windowInsets) {
+        int largest = 0;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            WindowInsets insets = windowInsets.toWindowInsets();
+            if (insets != null) {
+                int[] positions = {
+                    RoundedCorner.POSITION_TOP_LEFT, RoundedCorner.POSITION_TOP_RIGHT,
+                    RoundedCorner.POSITION_BOTTOM_RIGHT, RoundedCorner.POSITION_BOTTOM_LEFT
+                };
+                for (int position : positions) {
+                    RoundedCorner corner = insets.getRoundedCorner(position);
+                    if (corner != null) largest = Math.max(largest, corner.getRadius());
+                }
+            }
+        }
+        return largest;
+    }
+
+    // Tell the page how much room to leave at the top for the camera (style.css, --inset-top) and how
+    // round the screen's corners are (--screen-corner): only when rounder than the themes' own cards
+    private void sendInsets() {
         getBridge().getWebView().evaluateJavascript(
-            "document.documentElement.style.setProperty('--inset-top', '" + cutoutTopCss + "px')", null);
+            "(function (root) {"
+                + "root.style.setProperty('--inset-top', '" + cutoutTopCss + "px');"
+                + "root.style.setProperty('--screen-corner', '" + screenCornerCss + "px');"
+                + "root.classList.toggle('rounded-screen', " + (screenCornerCss > ROUNDED_SCREEN_MIN_CSS) + ");"
+                + "})(document.documentElement)", null);
     }
 
     // Immersive mode: the game takes the whole screen, status and navigation bars hidden.
