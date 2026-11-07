@@ -614,15 +614,30 @@
             setAlphabetRail(true);
             saveAlphabetRail(true);
         }
-        render(played);
+        render(played, true);
     }
 
     // --- Screen helpers ---
+
+    // False until the page has drawn its first screen, which appears without any motion
+    let screensReady = false;
+
+    // A screen coming in: it fades in, rising a little. Only opacity and translate: cheap on a phone.
+    function playScreenIn(...elements) {
+        if (screensReady && !REDUCED_MOTION.matches) {
+            elements.forEach(function (el) {
+                el.animate(
+                    [{ opacity: 0, translate: '0 10px' }, { opacity: 1, translate: '0 0' }],
+                    { duration: BOARD_MOTION_MS, easing: BOARD_MOTION_EASE });
+            });
+        }
+    }
 
     // Show start screen and drop the current game
     function showStartScreen() {
         game = null;
         saveGame();
+        const entering = $startScreen.hidden;
         document.body.classList.remove('playing', 'ended');
         // On a phone the home becomes one fixed screen (style.css, "Phone home screen")
         document.body.classList.add('home');
@@ -631,16 +646,19 @@
         $historySection.hidden = true;
         $importCode.value      = '';
         clearBanner();
+        if (entering) playScreenIn($startScreen);
     }
 
     // Show game screen (board + history) and hide start screen
     function showGameScreen() {
+        const entering = $board.hidden;
         $startScreen.hidden    = true;
         $board.hidden          = false;
         $historySection.hidden = false;
         // On a phone the game screen becomes one fixed screen (style.css, "Phone game screen")
         document.body.classList.remove('home', 'custom-open');
         document.body.classList.add('playing');
+        if (entering) playScreenIn($board, $historySection);
     }
 
     // --- Banner helpers ---
@@ -721,8 +739,10 @@
         range.textContent = words.length === 1 ? words[0] : `${words[0]} … ${words[words.length - 1]}`;
         button.append(label, range);
         button.addEventListener('click', function () {
+            const before = REDUCED_MOTION.matches ? null : captureBoard();
             openedSides[side] = true;
             fitBoard();
+            if (before) playBoardMotion(before);
         });
         return button;
     }
@@ -1182,9 +1202,10 @@
 
     // Redraw board, history, buttons and banner from the current game.
     // freshWord is passed only right after a guess, so the closeness badge never replays on a
-    // reload, an import or a surrender, and only then the rows glide to their new places.
-    function render(freshWord) {
-        const before = freshWord && !REDUCED_MOTION.matches ? captureBoard() : null;
+    // reload, an import or a surrender. glide = the board is the one on screen, changed by the player
+    // (a guess, a help, a surrender): the rows move to their new places instead of jumping.
+    function render(freshWord, glide) {
+        const before = (freshWord || glide) && !REDUCED_MOTION.matches ? captureBoard() : null;
         settleBoardMotion();
         // The new guess box takes the focus: no ring fading in again while it glides
         $boardStack.classList.toggle('board-moving', before !== null);
@@ -1291,7 +1312,7 @@
         if (game.status === 'IN_PROGRESS' && attemptsLeft() === 0) {
             game.status = 'LOST';
         }
-        render(word);
+        render(word, true);
     }
 
     // Ask a question in the confirmation popup, the themed stand-in for window.confirm().
@@ -1324,7 +1345,7 @@
             'MI ARRENDO', 'CONTINUO');
         if (answer !== 'ok') return;
         game.status = 'SURRENDERED';
-        render();
+        render(undefined, true);
     }
 
     // Back to the start screen (back arrow, logo, "nuova partita"). Going back drops the saved game,
@@ -1520,6 +1541,8 @@
 
     // One line under the picker: what the chosen difficulty (or the custom panel) gives.
     // The custom panel shows only while "su misura" is chosen.
+    let panelOpen = false;
+
     function updateDifficultyNote() {
         // Without the colors the right letters cannot be on: switch them off and lock them
         if (!$customColors.checked) $customBold.checked = false;
@@ -1527,6 +1550,7 @@
         $customBold.closest('.toggle-field').classList.toggle('locked', $customBold.disabled);
         const custom = $difficulty.value === CUSTOM;
         const rules  = custom ? readCustomRules() : DIFFICULTY[$difficulty.value];
+        panelOpen = custom;
         $customRules.hidden = !custom;
         // The preset notes never change under the player's hand: no room to keep for them
         $noteSizer.hidden   = !custom;
@@ -1543,9 +1567,78 @@
         });
     }
 
-    // Phone home: open or close the "su misura" rules as a sheet from the bottom
+    // The same update for a choice of the player: the note fades to its new text and what sits below
+    // it moves to its new place, along with the "su misura" panel opening or folding on wide screens.
+    // These two animate the height, not a transform, as the card around them has to follow:
+    // a few elements of the start screen, for a moment, on a tap.
+    let panelMotion = null;
+
+    function changeDifficulty() {
+        const noteBox    = $difficultyNote.parentElement;
+        const noteHeight = noteBox.offsetHeight;
+        const oldNote    = $difficultyNote.textContent;
+        if (panelMotion) panelMotion.cancel();
+        const wasOpen = panelOpen;
+        updateDifficultyNote();
+        if (REDUCED_MOTION.matches) return;
+
+        const options = { duration: BOARD_MOTION_MS, easing: BOARD_MOTION_EASE };
+        if ($difficultyNote.textContent !== oldNote) {
+            $difficultyNote.animate([{ opacity: 0 }, { opacity: 1 }], options);
+        }
+        if (noteBox.offsetHeight !== noteHeight) {
+            noteBox.animate([{ height: `${noteHeight}px` }, { height: `${noteBox.offsetHeight}px` }], options);
+        }
+        // On a phone the panel is the sheet, see setCustomSheet
+        if (panelOpen !== wasOpen && !PHONE.matches) foldCustomPanel(panelOpen, options);
+    }
+
+    function foldCustomPanel(open, options) {
+        $customRules.hidden = false;
+        const gap    = parseFloat(getComputedStyle($customRules.parentElement).rowGap) || 0;
+        const folded = { height: '0px', marginBottom: `${-gap}px`, opacity: 0 };
+        const full   = { height: `${$customRules.offsetHeight}px`, marginBottom: '0px', opacity: 1 };
+        $customRules.style.overflow = 'hidden';
+        const motion = $customRules.animate(open ? [folded, full] : [full, folded], options);
+        const finish = function () {
+            $customRules.style.overflow = '';
+            if (panelMotion === motion) panelMotion = null;
+        };
+        motion.oncancel = finish;
+        motion.onfinish = function () {
+            finish();
+            $customRules.hidden = !panelOpen;
+        };
+        panelMotion = motion;
+    }
+
+    // Phone home: open or close the "su misura" rules as a sheet from the bottom.
+    // It comes in by CSS (sheetIn, sheetFade); going out, it has to stay on the page until it is gone.
+    let sheetClosing = null;
+
     function setCustomSheet(open) {
-        document.body.classList.toggle('custom-open', open);
+        // A second tap on the backdrop while it is going: let it go
+        if (!open && sheetClosing) return;
+        if (sheetClosing) sheetClosing.forEach(function (a) { a.cancel(); });
+        sheetClosing = null;
+        const body = document.body;
+        if (open || REDUCED_MOTION.matches || !body.classList.contains('custom-open')) {
+            body.classList.toggle('custom-open', open);
+        } else {
+            const options = { duration: BOARD_MOTION_MS, easing: BOARD_MOTION_EASE, fill: 'forwards' };
+            const closing = [
+                $customRules.animate([{ translate: '0 0' }, { translate: '0 100%' }], options),
+                $sheetBackdrop.animate([{ opacity: 1 }, { opacity: 0 }], options)
+            ];
+            sheetClosing = closing;
+            closing[0].onfinish = function () {
+                if (sheetClosing === closing) {
+                    body.classList.remove('custom-open');
+                    closing.forEach(function (a) { a.cancel(); });
+                    sheetClosing = null;
+                }
+            };
+        }
     }
 
     // Difficulty table of the hints popup, built from DIFFICULTY so it never drifts from the rules
@@ -1631,7 +1724,7 @@
     $difficultyChips.forEach(function (chip) {
         chip.addEventListener('click', function () {
             $difficulty.value = chip.dataset.difficulty;
-            updateDifficultyNote();
+            changeDifficulty();
             setCustomSheet(chip.dataset.difficulty === CUSTOM);
         });
     });
@@ -1697,9 +1790,9 @@
     // Row heights change once the theme's web font arrives
     if (document.fonts) document.fonts.ready.then(onViewportChange);
 
-    $difficulty.addEventListener('change', updateDifficultyNote);
+    $difficulty.addEventListener('change', changeDifficulty);
     // Every control of the custom panel updates the note as it changes
-    $customRules.addEventListener('change', updateDifficultyNote);
+    $customRules.addEventListener('change', changeDifficulty);
     $attemptsStepper.addEventListener('click', stepCustomAttempts);
     fillCustomPanel(loadCustomRules());
     fillNoteSizer();
@@ -1737,4 +1830,5 @@
     } else {
         showStartScreen();
     }
+    screensReady = true;
 }());
