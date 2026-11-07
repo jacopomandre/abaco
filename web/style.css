@@ -1565,6 +1565,20 @@ select:focus {
         color: var(--alert);
     }
 
+    /* The whole "13 / 20 tentativi" does not fit beside the buttons below 375px (the widest case: the
+       thick frame of the lavagna theme) and would push the back arrow out of the card. The word stays
+       for screen readers. */
+    @media (max-width: 374px) {
+        body.playing .attempts-word {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+            white-space: nowrap;
+        }
+    }
+
     /* The board takes the free height and centers its rows; it scrolls only when it still cannot fit
        (a row group opened by hand, or the long definition of the revealed word) */
     body.playing .board-stack {

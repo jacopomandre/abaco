@@ -684,15 +684,19 @@
         const left  = attemptsLeft();
         const count = attemptCount();
         const big   = document.createElement('b');
-        let rest;
+        const parts = [big];
         if (game.status === 'IN_PROGRESS') {
             big.textContent = String(left);
-            rest = ` / ${rulesOf(game).attempts} ${left === 1 ? 'tentativo' : 'tentativi'}`;
+            // Its own span: the narrowest screens leave out the word, "13 / 20" still reads (.attempts-word)
+            const word = document.createElement('span');
+            word.className   = 'attempts-word';
+            word.textContent = ` ${left === 1 ? 'tentativo' : 'tentativi'}`;
+            parts.push(` / ${rulesOf(game).attempts}`, word);
         } else {
             big.textContent = String(count);
-            rest = count === 1 ? ' tentativo' : ' tentativi';
+            parts.push(count === 1 ? ' tentativo' : ' tentativi');
         }
-        $attemptsCount.replaceChildren(big, rest);
+        $attemptsCount.replaceChildren(...parts);
         $attemptsCount.classList.toggle('low', game.status === 'IN_PROGRESS' && left <= LOW_ATTEMPTS);
     }
 
